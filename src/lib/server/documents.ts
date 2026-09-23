@@ -2,10 +2,8 @@ import type { PoolClient } from "pg";
 import { resolveModules, seedAdminUsers, seedBankDetails } from "@/lib/admin";
 import {
   categories as seedCategories,
-  seedOrders,
   seedProducts,
 } from "@/lib/data";
-import { DEFAULT_HERO_BANNERS } from "@/lib/hero-storage";
 import { salePrice } from "@/lib/format";
 import { isDeliveredStatus, findOrdersByQuery } from "@/lib/orders";
 import type {
@@ -59,12 +57,12 @@ function seedUsers(): AdminUser[] {
 function seedDocs(): Docs {
   return {
     products: seedProducts,
-    orders: seedOrders,
+    orders: [],
     categories: [...seedCategories],
     bank: seedBankDetails,
     users: seedUsers(),
     refunds: [],
-    heroes: DEFAULT_HERO_BANNERS,
+    heroes: [],
   };
 }
 
@@ -91,7 +89,46 @@ async function migrate() {
         [key, JSON.stringify(seed[key])]
       );
     }
+    await removeSampleData(client);
   });
+}
+
+const SAMPLE_ORDER_IDS = new Set([
+  "ORD-1048",
+  "ORD-1047",
+  "ORD-1046",
+  "ORD-1045",
+]);
+const SAMPLE_HERO_IDS = new Set(["hero-seed-rose", "hero-seed-yellow"]);
+
+async function removeSampleData(client: PoolClient) {
+  const orders = await client.query<{ value: Order[] }>(
+    `SELECT value FROM app_documents WHERE key = 'orders'`
+  );
+  const currentOrders = orders.rows[0]?.value ?? [];
+  const nextOrders = currentOrders.filter(
+    (order) => !SAMPLE_ORDER_IDS.has(order.id)
+  );
+  if (nextOrders.length !== currentOrders.length) {
+    await client.query(
+      `UPDATE app_documents SET value = $1::jsonb, updated_at = NOW() WHERE key = 'orders'`,
+      [JSON.stringify(nextOrders)]
+    );
+  }
+
+  const heroes = await client.query<{ value: HeroBanner[] }>(
+    `SELECT value FROM app_documents WHERE key = 'heroes'`
+  );
+  const currentHeroes = heroes.rows[0]?.value ?? [];
+  const nextHeroes = currentHeroes.filter(
+    (banner) => !SAMPLE_HERO_IDS.has(banner.id)
+  );
+  if (nextHeroes.length !== currentHeroes.length) {
+    await client.query(
+      `UPDATE app_documents SET value = $1::jsonb, updated_at = NOW() WHERE key = 'heroes'`,
+      [JSON.stringify(nextHeroes)]
+    );
+  }
 }
 
 async function readDocs(client: PoolClient): Promise<Docs> {
