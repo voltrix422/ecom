@@ -18,26 +18,49 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { SaleBanner } from "@/components/storefront/sale-banner";
-import { BrandWordmark } from "@/components/brand-logo";
 import { brand, categories as seedCategories } from "@/lib/data";
 import { REVEAL_HEADER_EVENT } from "@/lib/fly-to-cart";
 import { useStore } from "@/lib/store";
 import { cn } from "cn";
 
-function CartButton() {
+const navIcon = "size-[15px] stroke-[1.5]";
+
+function HeaderLogo({ light }: { light: boolean }) {
+  return (
+    <Link href="/" aria-label="Ayesha's" className="inline-flex items-center">
+      <img
+        src={brand.wordmark}
+        alt="Ayesha's"
+        className={cn(
+          "h-8 w-auto sm:h-10 md:h-11",
+          light
+            ? "drop-shadow-[0_1px_2px_rgba(0,0,0,0.45)]"
+            : "brightness-0"
+        )}
+      />
+    </Link>
+  );
+}
+
+function CartButton({ light }: { light: boolean }) {
   const { cartCount, ready, setCartOpen } = useStore();
   const count = ready ? cartCount : 0;
 
   return (
     <button
       type="button"
-      className="relative inline-flex size-9 cursor-pointer items-center justify-center"
+      className="relative inline-flex size-8 cursor-pointer items-center justify-center"
       aria-label="Bag"
       onClick={() => setCartOpen(true)}
     >
       <span className="relative inline-flex" data-cart-target>
-        <ShoppingBag className="size-[18px] stroke-[1.5]" />
-        <span className="absolute -top-2 -right-2.5 flex size-4 items-center justify-center rounded-full bg-black text-[9px] text-white">
+        <ShoppingBag className={navIcon} />
+        <span
+          className={cn(
+            "absolute -top-1.5 -right-2 flex size-3.5 items-center justify-center rounded-full text-[8px]",
+            light ? "bg-white text-black" : "bg-black text-white"
+          )}
+        >
           {count}
         </span>
       </span>
@@ -126,7 +149,8 @@ export function Header({ hideSaleBanner = false }: { hideSaleBanner?: boolean })
     <header
       ref={headerRef}
       className={cn(
-        "z-50 text-black transition-transform duration-300",
+        "z-50 transition-transform duration-300",
+        overHero ? "text-white" : "text-black",
         overlay
           ? cn(
               "fixed inset-x-0 top-0",
@@ -140,24 +164,24 @@ export function Header({ hideSaleBanner = false }: { hideSaleBanner?: boolean })
       <div className="relative flex h-16 items-center px-3 sm:px-6">
         <button
           type="button"
-          className="inline-flex size-9 cursor-pointer items-center justify-center"
+          className="inline-flex size-8 cursor-pointer items-center justify-center"
           onClick={() => setOpen(true)}
           aria-label="Open menu"
         >
-          <Menu className="size-[18px] stroke-[1.5]" />
+          <Menu className={navIcon} />
         </button>
 
         <div className="pointer-events-none absolute inset-x-0 flex justify-center">
           <div className="pointer-events-auto">
-            <BrandWordmark className="text-base tracking-[0.16em] text-black uppercase sm:text-xl sm:tracking-[0.2em] md:text-2xl" />
+            <HeaderLogo light={overHero} />
           </div>
         </div>
 
-        <div className="ml-auto flex items-center gap-0.5 sm:gap-2">
-          <DropdownMenu>
+        <div className="ml-auto flex items-center gap-0.5 sm:gap-1">
+          <DropdownMenu modal={false}>
             <DropdownMenuTrigger className="hidden cursor-pointer items-center gap-1 px-2 text-sm font-semibold tracking-[0.08em] uppercase outline-none sm:inline-flex">
               Pakistan
-              <ChevronDown className="size-3.5" />
+              <ChevronDown className={navIcon} />
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-64 rounded-none">
               <DropdownMenuLabel className="text-foreground">
@@ -169,19 +193,19 @@ export function Header({ hideSaleBanner = false }: { hideSaleBanner?: boolean })
 
           <button
             type="button"
-            className="inline-flex size-9 cursor-pointer items-center justify-center"
+            className="inline-flex size-8 cursor-pointer items-center justify-center"
             aria-label="Search"
             onClick={() => setSearchOpen((value) => !value)}
           >
-            <Search className="size-[18px] stroke-[1.5]" />
+            <Search className={navIcon} />
           </button>
 
-          <DropdownMenu>
+          <DropdownMenu modal={false}>
             <DropdownMenuTrigger
-              className="inline-flex size-9 cursor-pointer items-center justify-center outline-none"
+              className="inline-flex size-8 cursor-pointer items-center justify-center outline-none"
               aria-label="Account"
             >
-              <User className="size-[18px] stroke-[1.5]" />
+              <User className={navIcon} />
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-44 rounded-none">
               <DropdownMenuItem asChild>
@@ -196,14 +220,14 @@ export function Header({ hideSaleBanner = false }: { hideSaleBanner?: boolean })
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <CartButton />
+          <CartButton light={overHero} />
         </div>
       </div>
 
       {searchOpen ? (
         <form
           onSubmit={submitSearch}
-          className="border-t border-black/10 bg-white px-4 py-3 sm:px-6"
+          className="border-t border-black/10 bg-white px-4 py-3 text-black sm:px-6"
         >
           <div className="mx-auto flex max-w-xl items-center gap-3">
             <Search className="size-4 shrink-0" />
@@ -229,8 +253,12 @@ export function Header({ hideSaleBanner = false }: { hideSaleBanner?: boolean })
       <Sheet open={open} onOpenChange={setOpen}>
         <SheetContent side="left" className="w-[min(100%,280px)] rounded-none bg-background p-0">
           <SheetHeader className="px-6 py-5">
-            <SheetTitle className="sr-only">{brand.name}</SheetTitle>
-            <BrandWordmark href={null} className="text-lg tracking-[0.18em] uppercase" />
+            <SheetTitle className="sr-only">Ayesha's</SheetTitle>
+            <img
+              src={brand.wordmark}
+              alt="Ayesha's"
+              className="h-8 w-auto brightness-0"
+            />
           </SheetHeader>
           <nav className="flex flex-col gap-4 px-6 py-4 text-sm">
             <Link href="/shop" onClick={() => setOpen(false)} className="text-foreground">

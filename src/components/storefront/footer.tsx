@@ -6,11 +6,12 @@ export function Footer() {
     <footer className="mt-auto">
       <div className="mx-auto h-px max-w-6xl bg-gradient-to-r from-transparent via-foreground/20 to-transparent" />
       <div className="mx-auto max-w-6xl px-6 py-14">
-        <Link
-          href="/"
-          className="font-heading text-3xl leading-none tracking-tight"
-        >
-          {brand.name}
+        <Link href="/" className="inline-flex" aria-label="Ayesha's">
+          <img
+            src={brand.wordmark}
+            alt="Ayesha's"
+            className="h-12 w-auto brightness-0"
+          />
         </Link>
         <nav className="mt-6 flex flex-row flex-wrap items-center gap-x-6 gap-y-2 text-sm text-muted-foreground">
           <Link href="/shop" className="hover:text-foreground">
