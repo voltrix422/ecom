@@ -149,15 +149,15 @@ export function Header({ hideSaleBanner = false }: { hideSaleBanner?: boolean })
 
         <div className="pointer-events-none absolute inset-x-0 flex justify-center">
           <div className="pointer-events-auto">
-            <BrandWordmark className="text-[0.72rem] tracking-[0.22em] text-black uppercase sm:text-sm sm:tracking-[0.28em] md:text-base" />
+            <BrandWordmark className="text-base tracking-[0.16em] text-black uppercase sm:text-xl sm:tracking-[0.2em] md:text-2xl" />
           </div>
         </div>
 
         <div className="ml-auto flex items-center gap-0.5 sm:gap-2">
           <DropdownMenu>
-            <DropdownMenuTrigger className="hidden cursor-pointer items-center gap-1 px-2 text-[11px] tracking-[0.16em] uppercase outline-none sm:inline-flex">
+            <DropdownMenuTrigger className="hidden cursor-pointer items-center gap-1 px-2 text-sm font-semibold tracking-[0.08em] uppercase outline-none sm:inline-flex">
               Pakistan
-              <ChevronDown className="size-3" />
+              <ChevronDown className="size-3.5" />
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-64 rounded-none">
               <DropdownMenuLabel className="text-foreground">

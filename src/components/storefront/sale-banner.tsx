@@ -19,7 +19,13 @@ function NoticeRow() {
 
 export function SaleBanner() {
   return (
-    <div className="overflow-hidden bg-black py-2.5 text-[10px] tracking-[0.18em] text-white uppercase sm:text-[11px]">
+    <div
+      className="overflow-hidden bg-black py-2.5 text-[13px] font-bold tracking-[0.02em] text-white uppercase sm:text-[15px]"
+      style={{
+        fontFamily:
+          '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif',
+      }}
+    >
       <div className="flex w-max animate-sale-marquee">
         <NoticeRow />
         <NoticeRow />
