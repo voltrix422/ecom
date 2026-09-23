@@ -32,7 +32,7 @@ export function HeroSection() {
   const safeIndex = count ? index % count : 0;
 
   return (
-    <section className="relative isolate h-dvh min-h-dvh overflow-hidden bg-[#e8e2da]">
+    <section className="relative isolate -mt-16 h-[calc(100dvh-var(--announce-h,40px))] max-h-[calc(100dvh-var(--announce-h,40px))] overflow-hidden bg-[#e8e2da]">
       {ready && count > 0
         ? slides.map((slide, slideIndex) => (
             <img
@@ -43,7 +43,7 @@ export function HeroSection() {
               decoding="sync"
               fetchPriority={slideIndex === 0 ? "high" : "low"}
               className={cn(
-                "absolute inset-0 h-full w-full object-cover object-[center_20%] transition-opacity duration-1000 ease-in-out",
+                "absolute inset-0 h-full w-full origin-center scale-[0.92] object-cover object-center transition-opacity duration-1000 ease-in-out",
                 slideIndex === safeIndex ? "opacity-100" : "opacity-0"
               )}
             />

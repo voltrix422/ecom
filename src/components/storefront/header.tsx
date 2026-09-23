@@ -28,30 +28,24 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { SaleBanner } from "@/components/storefront/sale-banner";
 import { brand, categories as seedCategories } from "@/lib/data";
-import { REVEAL_HEADER_EVENT } from "@/lib/fly-to-cart";
 import { useStore } from "@/lib/store";
 import { cn } from "cn";
 
 const navIcon = "size-[18px] stroke-[1.5]";
 
-function HeaderLogo({ light }: { light: boolean }) {
+function HeaderLogo() {
   return (
     <Link href="/" aria-label="Ayesha's" className="inline-flex items-center">
       <img
         src={brand.wordmark}
         alt="Ayesha's"
-        className={cn(
-          "h-8 w-auto sm:h-10 md:h-11",
-          light
-            ? "drop-shadow-[0_1px_2px_rgba(0,0,0,0.45)]"
-            : "brightness-0"
-        )}
+        className="h-8 w-auto brightness-0 sm:h-10 md:h-11"
       />
     </Link>
   );
 }
 
-function CartButton({ light }: { light: boolean }) {
+function CartButton() {
   const { cartCount, ready, setCartOpen } = useStore();
   const count = ready ? cartCount : 0;
 
@@ -64,12 +58,7 @@ function CartButton({ light }: { light: boolean }) {
     >
       <span className="relative inline-flex" data-cart-target>
         <ShoppingBag className={navIcon} />
-        <span
-          className={cn(
-            "absolute -top-1.5 -right-2 flex size-3.5 items-center justify-center rounded-full text-[8px]",
-            light ? "bg-white text-black" : "bg-black text-white"
-          )}
-        >
+        <span className="absolute -top-1.5 -right-2 flex size-3.5 items-center justify-center rounded-full bg-black text-[8px] text-white">
           {count}
         </span>
       </span>
@@ -85,7 +74,6 @@ export function Header({ hideSaleBanner = false }: { hideSaleBanner?: boolean })
     storeCategories.length > 0 ? storeCategories : [...seedCategories];
   const overlay = pathname === "/";
   const [open, setOpen] = useState(false);
-  const [hidden, setHidden] = useState(false);
   const [overHero, setOverHero] = useState(overlay);
   const [searchOpen, setSearchOpen] = useState(false);
   const [search, setSearch] = useState("");
@@ -105,43 +93,33 @@ export function Header({ hideSaleBanner = false }: { hideSaleBanner?: boolean })
     }
 
     syncHeight();
+    document.documentElement.style.setProperty(
+      "--announce-h",
+      hideSaleBanner ? "0px" : "40px"
+    );
     const observer = new ResizeObserver(syncHeight);
     observer.observe(node);
     return () => observer.disconnect();
   }, [hideSaleBanner, searchOpen]);
 
   useEffect(() => {
-    setOverHero(overlay && window.scrollY < 40);
-  }, [overlay]);
-
-  useEffect(() => {
-    let lastY = window.scrollY;
-
     function onScroll() {
-      const y = window.scrollY;
-      if (overlay) setOverHero(y < 40);
-      if (y < 80) {
-        setHidden(false);
-      } else if (y > lastY + 12) {
-        setHidden(true);
-      } else if (y < lastY - 8) {
-        setHidden(false);
+      if (!overlay) {
+        setOverHero(false);
+        return;
       }
-      lastY = y;
+      const announce = hideSaleBanner ? 0 : 40;
+      setOverHero(window.scrollY < window.innerHeight - announce - 64);
     }
 
+    onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, [overlay]);
-
-  useEffect(() => {
-    function onReveal() {
-      setHidden(false);
-    }
-
-    window.addEventListener(REVEAL_HEADER_EVENT, onReveal);
-    return () => window.removeEventListener(REVEAL_HEADER_EVENT, onReveal);
-  }, []);
+    window.addEventListener("resize", onScroll);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+    };
+  }, [overlay, hideSaleBanner]);
 
   useEffect(() => {
     if (searchOpen) searchRef.current?.focus();
@@ -155,22 +133,16 @@ export function Header({ hideSaleBanner = false }: { hideSaleBanner?: boolean })
   }
 
   return (
+    <>
+    {hideSaleBanner ? null : <SaleBanner />}
     <header
       ref={headerRef}
       className={cn(
-        "z-50 transition-transform duration-300",
-        overHero ? "text-white" : "text-black",
-        overlay
-          ? cn(
-              "fixed inset-x-0 top-0",
-              overHero ? "bg-transparent" : "bg-background/95 backdrop-blur-sm"
-            )
-          : "sticky top-0 bg-background",
-        hidden && !open && !searchOpen && "-translate-y-full"
+        "sticky top-0 z-50 text-black",
+        overHero ? "bg-transparent" : "bg-background"
       )}
     >
-      {hideSaleBanner ? null : <SaleBanner />}
-      <div className="relative flex h-16 items-center px-3 sm:px-6">
+      <div className="relative flex h-16 items-center px-4 sm:px-8">
         <button
           type="button"
           className="inline-flex size-9 cursor-pointer items-center justify-center"
@@ -182,7 +154,7 @@ export function Header({ hideSaleBanner = false }: { hideSaleBanner?: boolean })
 
         <div className="pointer-events-none absolute inset-x-0 flex justify-center">
           <div className="pointer-events-auto">
-            <HeaderLogo light={overHero} />
+            <HeaderLogo />
           </div>
         </div>
 
@@ -245,7 +217,7 @@ export function Header({ hideSaleBanner = false }: { hideSaleBanner?: boolean })
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <CartButton light={overHero} />
+          <CartButton />
         </div>
       </div>
 
@@ -342,5 +314,6 @@ export function Header({ hideSaleBanner = false }: { hideSaleBanner?: boolean })
         </SheetContent>
       </Sheet>
     </header>
+    </>
   );
 }
