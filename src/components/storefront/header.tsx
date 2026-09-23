@@ -31,7 +31,7 @@ import { brand, categories as seedCategories } from "@/lib/data";
 import { useStore } from "@/lib/store";
 import { cn } from "cn";
 
-const navIcon = "size-[18px] stroke-[1.5]";
+const navIcon = "size-[21px] stroke-[1.5]";
 
 function HeaderLogo() {
   return (
@@ -52,7 +52,7 @@ function CartButton() {
   return (
     <button
       type="button"
-      className="relative inline-flex size-9 cursor-pointer items-center justify-center"
+      className="relative inline-flex size-10 cursor-pointer items-center justify-center"
       aria-label="Bag"
       onClick={() => setCartOpen(true)}
     >
@@ -108,8 +108,7 @@ export function Header({ hideSaleBanner = false }: { hideSaleBanner?: boolean })
         setOverHero(false);
         return;
       }
-      const announce = hideSaleBanner ? 0 : 40;
-      setOverHero(window.scrollY < window.innerHeight - announce - 64);
+      setOverHero(window.scrollY < 8);
     }
 
     onScroll();
@@ -139,13 +138,13 @@ export function Header({ hideSaleBanner = false }: { hideSaleBanner?: boolean })
       ref={headerRef}
       className={cn(
         "sticky top-0 z-50 text-black",
-        overHero ? "bg-transparent" : "bg-background"
+        overHero ? "bg-transparent" : "bg-white text-black shadow-[0_1px_0_rgba(0,0,0,0.06)]"
       )}
     >
       <div className="relative flex h-16 items-center px-4 sm:px-8">
         <button
           type="button"
-          className="inline-flex size-9 cursor-pointer items-center justify-center"
+          className="inline-flex size-10 cursor-pointer items-center justify-center"
           onClick={() => setOpen(true)}
           aria-label="Open menu"
         >
@@ -174,7 +173,7 @@ export function Header({ hideSaleBanner = false }: { hideSaleBanner?: boolean })
 
           <button
             type="button"
-            className="inline-flex size-9 cursor-pointer items-center justify-center"
+            className="inline-flex size-10 cursor-pointer items-center justify-center"
             aria-label="Search"
             onClick={() => setSearchOpen((value) => !value)}
           >
@@ -183,7 +182,7 @@ export function Header({ hideSaleBanner = false }: { hideSaleBanner?: boolean })
 
           <DropdownMenu modal={false}>
             <DropdownMenuTrigger
-              className="inline-flex size-9 cursor-pointer items-center justify-center outline-none"
+              className="inline-flex size-10 cursor-pointer items-center justify-center outline-none"
               aria-label="Account"
             >
               <User className={navIcon} />
@@ -260,7 +259,7 @@ export function Header({ hideSaleBanner = false }: { hideSaleBanner?: boolean })
             </p>
             <button
               type="button"
-              className="inline-flex size-9 cursor-pointer items-center justify-center"
+              className="inline-flex size-10 cursor-pointer items-center justify-center"
               aria-label="Close menu"
               onClick={() => setOpen(false)}
             >

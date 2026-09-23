@@ -43,7 +43,7 @@ export function HeroSection() {
               decoding="sync"
               fetchPriority={slideIndex === 0 ? "high" : "low"}
               className={cn(
-                "absolute inset-0 h-full w-full origin-center scale-[0.92] object-cover object-center transition-opacity duration-1000 ease-in-out",
+                "absolute inset-0 h-full w-full object-cover object-center transition-opacity duration-1000 ease-in-out",
                 slideIndex === safeIndex ? "opacity-100" : "opacity-0"
               )}
             />
