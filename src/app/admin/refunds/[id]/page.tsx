@@ -73,21 +73,23 @@ export default function AdminRefundDetailPage({
     );
   }
 
+  const ticketId = ticket.id;
+
   async function copyId() {
-    await navigator.clipboard.writeText(ticket.id);
+    await navigator.clipboard.writeText(ticketId);
     setCopied(true);
     window.setTimeout(() => setCopied(false), 1500);
   }
 
   function saveRemark() {
     if (!editable) return;
-    updateRefundRemark(ticket.id, remark);
+    updateRefundRemark(ticketId, remark);
     toast.success("Remark updated");
   }
 
   function askForBank() {
     if (!editable) return;
-    requestRefundBankDetails(ticket.id, remark);
+    requestRefundBankDetails(ticketId, remark);
     toast.success("Asked for bank details");
   }
 
@@ -98,7 +100,7 @@ export default function AdminRefundDetailPage({
       return;
     }
     const src = await fileToDataUrl(file, 1400, 0.75);
-    attachRefundPayoutProof(ticket.id, src);
+    attachRefundPayoutProof(ticketId, src);
     toast.success("Refund screenshot attached");
     if (proofRef.current) proofRef.current.value = "";
   }

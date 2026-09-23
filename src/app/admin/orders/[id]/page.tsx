@@ -136,7 +136,10 @@ export default function AdminOrderDetailPage({
         {order.customer.phone ? (
           <button
             type="button"
-            onClick={() => copyValue(order.customer.phone, "phone")}
+            onClick={() => {
+              const phone = order.customer.phone;
+              if (phone) void copyValue(phone, "phone");
+            }}
             className="inline-flex items-center gap-1.5 bg-yellow-400 px-2 py-0.5 text-xs font-medium text-black"
             aria-label={`Copy ${order.customer.phone}`}
           >

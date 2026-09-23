@@ -41,7 +41,10 @@ export async function saveUpload(file: File) {
   await mkdir(dir, { recursive: true });
   const name = `${Date.now().toString(36)}-${randomBytes(6).toString("hex")}.${ext}`;
   const bytes = Buffer.from(await file.arrayBuffer());
-  await writeFile(path.join(dir, name), bytes);
+  await writeFile(
+    path.join(/*turbopackIgnore: true*/ dir, name),
+    bytes
+  );
   return { url: `/media/${name}`, name, type };
 }
 
@@ -49,7 +52,9 @@ export async function readUpload(name: string) {
   const safe = safeFileName(name);
   if (!safe) return null;
   try {
-    const data = await readFile(path.join(uploadDir(), safe));
+    const data = await readFile(
+      /*turbopackIgnore: true*/ path.join(/*turbopackIgnore: true*/ uploadDir(), safe)
+    );
     return { data, type: contentType(safe) };
   } catch {
     return null;

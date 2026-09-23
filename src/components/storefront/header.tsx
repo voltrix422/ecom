@@ -89,6 +89,7 @@ export function Header({ hideSaleBanner = false }: { hideSaleBanner?: boolean })
     if (!node) return;
 
     function syncHeight() {
+      if (!node) return;
       document.documentElement.style.setProperty(
         "--site-header-h",
         `${node.offsetHeight}px`

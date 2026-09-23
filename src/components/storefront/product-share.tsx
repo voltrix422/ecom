@@ -57,7 +57,7 @@ export function ProductShare({ product }: { product: Product }) {
           className="rounded-none text-foreground/50 hover:text-foreground"
           aria-label="Share"
           onClick={(event) => {
-            if (isMobile() && navigator.share) {
+            if (isMobile() && typeof navigator.share === "function") {
               event.preventDefault();
               void nativeShare();
             }
