@@ -222,6 +222,10 @@ function TrackForm() {
   const [query, setQuery] = useState(lookup);
   const [submitted, setSubmitted] = useState(lookup);
   const [filtersOpen, setFiltersOpen] = useState(false);
+  const [lookedUp, setLookedUp] = useState<{
+    orders: Order[];
+    refunds: RefundTicket[];
+  }>({ orders: [], refunds: [] });
 
   useEffect(() => {
     const next = searchParams.get("q") ?? searchParams.get("id") ?? "";
@@ -229,9 +233,43 @@ function TrackForm() {
     setSubmitted(next);
   }, [searchParams]);
 
+  useEffect(() => {
+    if (!ready || !submitted) return;
+    let cancelled = false;
+    (async () => {
+      const response = await fetch(
+        `/api/orders/lookup?q=${encodeURIComponent(submitted)}`
+      );
+      const data = (await response.json().catch(() => null)) as {
+        mode?: string;
+        orders?: Order[];
+        refunds?: RefundTicket[];
+      } | null;
+      if (cancelled || !data || data.mode === "local") return;
+      setLookedUp({
+        orders: data.orders ?? [],
+        refunds: data.refunds ?? [],
+      });
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [ready, submitted]);
+
+  const sourceOrders = useMemo(() => {
+    const map = new Map(orders.map((order) => [order.id, order]));
+    for (const order of lookedUp.orders) map.set(order.id, order);
+    return Array.from(map.values());
+  }, [orders, lookedUp.orders]);
+  const sourceTickets = useMemo(() => {
+    const map = new Map(refundTickets.map((ticket) => [ticket.id, ticket]));
+    for (const ticket of lookedUp.refunds) map.set(ticket.id, ticket);
+    return Array.from(map.values());
+  }, [refundTickets, lookedUp.refunds]);
+
   const matches = useMemo(
-    () => (submitted ? findOrdersByQuery(orders, submitted) : []),
-    [orders, submitted]
+    () => (submitted ? findOrdersByQuery(sourceOrders, submitted) : []),
+    [sourceOrders, submitted]
   );
   const visible = useMemo(
     () =>
@@ -245,7 +283,7 @@ function TrackForm() {
     [matches, statusFilter, paymentFilter]
   );
   const selected = selectedId
-    ? findOrdersByQuery(orders, selectedId)[0]
+    ? findOrdersByQuery(sourceOrders, selectedId)[0]
     : visible.length === 1
       ? visible[0]
       : undefined;
@@ -442,7 +480,7 @@ function TrackForm() {
                         <OrderTags
                           status={order.status}
                           refund={
-                            refundTicketForOrder(refundTickets, order.id)
+                            refundTicketForOrder(sourceTickets, order.id)
                               ?.status
                           }
                         />
@@ -462,7 +500,7 @@ function TrackForm() {
       {selected ? (
         <OrderResult
           order={selected}
-          refund={refundTicketForOrder(refundTickets, selected.id)}
+          refund={refundTicketForOrder(sourceTickets, selected.id)}
           backHref={listHref}
           onBack={listHref ? undefined : () => router.back()}
         />

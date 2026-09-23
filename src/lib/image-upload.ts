@@ -1,3 +1,19 @@
+async function publishFile(file: File): Promise<string> {
+  const form = new FormData();
+  form.append("file", file, file.name || "upload");
+  const response = await fetch("/api/upload", { method: "POST", body: form });
+  const data = (await response.json().catch(() => ({}))) as {
+    mode?: string;
+    url?: string;
+    error?: string;
+  };
+  if (data.mode === "local") return readFileAsDataUrl(file);
+  if (!response.ok || !data.url) {
+    throw new Error(data.error || "Could not upload");
+  }
+  return data.url;
+}
+
 export async function fileToDataUrl(
   file: File,
   maxWidth = 1200,
@@ -14,18 +30,26 @@ export async function fileToDataUrl(
     canvas.width = width;
     canvas.height = height;
     const context = canvas.getContext("2d");
-    if (!context) {
-      return await readFileAsDataUrl(file);
-    }
+    if (!context) return publishFile(file);
     context.drawImage(image, 0, 0, width, height);
-    return canvas.toDataURL("image/jpeg", quality);
+    const blob = await new Promise<Blob | null>((resolve) => {
+      canvas.toBlob(resolve, "image/jpeg", quality);
+    });
+    if (!blob) return publishFile(file);
+    return publishFile(
+      new File([blob], file.name.replace(/\.\w+$/, "") + ".jpg", {
+        type: "image/jpeg",
+      })
+    );
+  } catch {
+    return publishFile(file);
   } finally {
     URL.revokeObjectURL(objectUrl);
   }
 }
 
 export async function fileToHeroDataUrl(file: File): Promise<string> {
-  return readFileAsDataUrl(file);
+  return publishFile(file);
 }
 
 function loadImage(src: string) {
@@ -38,7 +62,7 @@ function loadImage(src: string) {
 }
 
 export function fileToDataUrlRaw(file: File) {
-  return readFileAsDataUrl(file);
+  return publishFile(file);
 }
 
 function readFileAsDataUrl(file: File) {

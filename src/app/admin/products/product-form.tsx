@@ -108,8 +108,8 @@ export function ProductForm({ product }: { product?: Product }) {
     });
   }
 
-  function onAddCategory() {
-    const result = addCategory(newCategory);
+  async function onAddCategory() {
+    const result = await addCategory(newCategory);
     if (!result.ok) {
       toast.error(result.error ?? "Could not add category");
       return;

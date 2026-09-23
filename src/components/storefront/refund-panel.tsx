@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useMemo, useRef, useState } from "react";
+import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { Check, ChevronLeft, Copy, Info, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -103,10 +103,53 @@ export function RefundPanel() {
   const [ticket, setTicket] = useState<RefundTicket | null>(null);
   const [copied, setCopied] = useState(false);
   const [photoIndex, setPhotoIndex] = useState<number | null>(null);
+  const [lookedUp, setLookedUp] = useState<{
+    orders: Order[];
+    refunds: RefundTicket[];
+  }>({ orders: [], refunds: [] });
+
+  useEffect(() => {
+    if (!ready || !submitted) return;
+    let cancelled = false;
+    (async () => {
+      const response = await fetch(
+        `/api/orders/lookup?q=${encodeURIComponent(submitted)}`
+      );
+      const data = (await response.json().catch(() => null)) as {
+        mode?: string;
+        orders?: Order[];
+        refunds?: RefundTicket[];
+      } | null;
+      if (cancelled || !data || data.mode === "local") return;
+      setLookedUp({
+        orders: data.orders ?? [],
+        refunds: data.refunds ?? [],
+      });
+      const needle = submitted.toUpperCase().replace(/\s+/g, "");
+      const found = (data.refunds ?? []).find(
+        (entry) => entry.id.toUpperCase().replace(/\s+/g, "") === needle
+      );
+      if (found) setTicket(found);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [ready, submitted]);
+
+  const sourceOrders = useMemo(() => {
+    const map = new Map(orders.map((order) => [order.id, order]));
+    for (const order of lookedUp.orders) map.set(order.id, order);
+    return Array.from(map.values());
+  }, [orders, lookedUp.orders]);
+  const sourceTickets = useMemo(() => {
+    const map = new Map(refundTickets.map((entry) => [entry.id, entry]));
+    for (const entry of lookedUp.refunds) map.set(entry.id, entry);
+    return Array.from(map.values());
+  }, [refundTickets, lookedUp.refunds]);
 
   const allMatches = useMemo(
-    () => (submitted ? findOrdersByQuery(orders, submitted) : []),
-    [orders, submitted]
+    () => (submitted ? findOrdersByQuery(sourceOrders, submitted) : []),
+    [sourceOrders, submitted]
   );
   const matches = useMemo(
     () => allMatches.filter(isDelivered),
@@ -116,10 +159,10 @@ export function RefundPanel() {
     matches.find((order) => order.id === selectedId) ??
     (!choosing && matches.length === 1 ? matches[0] : null);
   const existingTicket = selected
-    ? refundTicketForOrder(refundTickets, selected.id)
+    ? refundTicketForOrder(sourceTickets, selected.id)
     : undefined;
   const liveTicket = ticket
-    ? refundTickets.find((entry) => entry.id === ticket.id) ?? ticket
+    ? sourceTickets.find((entry) => entry.id === ticket.id) ?? ticket
     : null;
   const hasTicket = Boolean(existingTicket);
   const refunded = existingTicket?.status === "Completed";
@@ -135,7 +178,7 @@ export function RefundPanel() {
     if (!trimmed) return;
 
     const ticketId = trimmed.toUpperCase().replace(/\s+/g, "");
-    const foundTicket = refundTickets.find(
+    const foundTicket = sourceTickets.find(
       (entry) => entry.id.toUpperCase().replace(/\s+/g, "") === ticketId
     );
     if (foundTicket) {
@@ -179,9 +222,9 @@ export function RefundPanel() {
     window.setTimeout(() => setCopied(false), 1500);
   }
 
-  function onSubmit() {
+  async function onSubmit() {
     if (!selected) return;
-    const result = submitRefund({
+    const result = await submitRefund({
       order: selected,
       photos,
       voiceNote: voiceNote || undefined,
@@ -362,7 +405,7 @@ export function RefundPanel() {
                           <OrderTags
                             status={order.status}
                             refund={
-                              refundTicketForOrder(refundTickets, order.id)
+                              refundTicketForOrder(sourceTickets, order.id)
                                 ?.status
                             }
                           />

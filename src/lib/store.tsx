@@ -20,6 +20,7 @@ import {
 import { seedOrders, seedProducts, categories as seedCategories } from "@/lib/data";
 import { salePrice } from "@/lib/format";
 import { isDeliveredStatus } from "@/lib/orders";
+import { adminMutate, setRemoteMode, type RemoteAdminState } from "@/lib/remote-client";
 import {
   loadHeroBanners,
   persistHeroBanners,
@@ -175,13 +176,13 @@ type StoreContextValue = {
   isAdmin: boolean;
   adminUser: AdminUser | null;
   adminUsers: AdminUser[];
-  login: (email: string, password: string) => boolean;
+  login: (email: string, password: string) => Promise<boolean>;
   logout: () => void;
   canAccess: (module: AdminModule) => boolean;
   canEdit: () => boolean;
-  upsertAdminUser: (user: AdminUser) => { ok: boolean; error?: string };
-  deleteAdminUser: (id: string) => { ok: boolean; error?: string };
-  addCategory: (name: string) => { ok: boolean; error?: string };
+  upsertAdminUser: (user: AdminUser) => Promise<{ ok: boolean; error?: string }>;
+  deleteAdminUser: (id: string) => Promise<{ ok: boolean; error?: string }>;
+  addCategory: (name: string) => Promise<{ ok: boolean; error?: string }>;
   addToCart: (productId: string, quantity?: number) => void;
   updateCartQuantity: (productId: string, quantity: number) => void;
   removeFromCart: (productId: string) => void;
@@ -201,7 +202,7 @@ type StoreContextValue = {
       paymentProof?: string;
       shipping?: number;
     }
-  ) => Order;
+  ) => Promise<Order>;
   upsertProduct: (product: Product) => void;
   reorderProducts: (activeId: string, overId: string) => void;
   deleteProduct: (id: string) => void;
@@ -212,7 +213,7 @@ type StoreContextValue = {
     photos: string[];
     voiceNote?: string;
     note?: string;
-  }) => { ok: boolean; ticket?: RefundTicket; error?: string };
+  }) => Promise<{ ok: boolean; ticket?: RefundTicket; error?: string }>;
   updateRefundStatus: (id: string, status: RefundStatus) => void;
   updateRefundRemark: (id: string, remark: string) => void;
   requestRefundBankDetails: (id: string, remark?: string) => void;
@@ -220,7 +221,7 @@ type StoreContextValue = {
   submitRefundPayoutAccount: (
     id: string,
     account: BankDetails
-  ) => { ok: boolean; error?: string };
+  ) => Promise<{ ok: boolean; error?: string }>;
   attachRefundPayoutProof: (id: string, proof: string) => void;
   heroBanners: HeroBanner[];
   addHeroBanners: (srcs: string[]) => void;
@@ -244,13 +245,76 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   const [heroBanners, setHeroBanners] = useState<HeroBanner[]>([]);
   const [heroHydrated, setHeroHydrated] = useState(false);
   const heroTouched = useRef(false);
+  const remoteRef = useRef(false);
+
+  function applyRemote(data: Partial<RemoteAdminState> & { user?: AdminUser | null }) {
+    if (data.products) setProducts(data.products.map(normalizeProduct));
+    if (data.categories) setCategories(data.categories);
+    if (data.bank) setBankDetails(data.bank);
+    if (data.heroes && !heroTouched.current) setHeroBanners(data.heroes);
+    else if (data.heroes && heroTouched.current) setHeroBanners(data.heroes);
+    if (data.orders) setOrders(data.orders.map(normalizeOrder));
+    if (data.refunds) setRefundTickets(data.refunds);
+    if (data.users) setAdminUsers(data.users.map(normalizeAdminUser));
+    if (data.user) setAdminUser(normalizeAdminUser(data.user));
+  }
 
   useEffect(() => {
     let cancelled = false;
     (async () => {
       try {
-        setProducts(readJson(KEYS.products, seedProducts).map(normalizeProduct));
         setCart(readJson(KEYS.cart, []));
+        const response = await fetch("/api/bootstrap", { credentials: "include" });
+        const boot = (await response.json().catch(() => null)) as
+          | {
+              mode?: string;
+              error?: string;
+              products?: Product[];
+              categories?: string[];
+              bank?: BankDetails;
+              heroes?: HeroBanner[];
+              admin?: RemoteAdminState | null;
+            }
+          | null;
+
+        if (boot?.mode === "remote") {
+          if (!response.ok) {
+            console.error(boot.error || "Database is unavailable");
+            remoteRef.current = true;
+            setRemoteMode(true);
+            setProducts([]);
+            setOrders([]);
+            setRefundTickets([]);
+            return;
+          }
+          remoteRef.current = true;
+          setRemoteMode(true);
+          if (cancelled) return;
+          setProducts((boot.products ?? []).map(normalizeProduct));
+          setCategories(
+            boot.categories && boot.categories.length > 0
+              ? boot.categories
+              : [...seedCategories]
+          );
+          setBankDetails(boot.bank ?? seedBankDetails);
+          if (!heroTouched.current) setHeroBanners(boot.heroes ?? []);
+          if (boot.admin) {
+            setOrders((boot.admin.orders ?? []).map(normalizeOrder));
+            setRefundTickets(boot.admin.refunds ?? []);
+            setAdminUsers((boot.admin.users ?? []).map(normalizeAdminUser));
+            setAdminUser(
+              boot.admin.user ? normalizeAdminUser(boot.admin.user) : null
+            );
+          } else {
+            setOrders([]);
+            setRefundTickets([]);
+            setAdminUsers([]);
+            setAdminUser(null);
+          }
+          return;
+        }
+
+        setProducts(readJson(KEYS.products, seedProducts).map(normalizeProduct));
         setOrders(readJson(KEYS.orders, seedOrders).map(normalizeOrder));
         const storedCategories = readJson<string[]>(
           KEYS.categories,
@@ -297,8 +361,6 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         if (cancelled) return;
         setRefundTickets((current) => mergeTickets(tickets, current));
         if (!heroTouched.current) setHeroBanners(banners);
-        setRefundsHydrated(true);
-        setHeroHydrated(true);
       } catch (error) {
         console.error("Failed to hydrate store", error);
       } finally {
@@ -314,24 +376,22 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     };
   }, []);
 
-  useEffect(
-    () =>
-      subscribeRefunds((incoming) => {
-        setRefundTickets((current) => mergeTickets(current, incoming));
-      }),
-    []
-  );
-
-  useEffect(
-    () =>
-      subscribeHeroBanners((incoming) => {
-        setHeroBanners(incoming);
-      }),
-    []
-  );
+  useEffect(() => {
+    if (!ready || remoteRef.current) return;
+    return subscribeRefunds((incoming) => {
+      setRefundTickets((current) => mergeTickets(current, incoming));
+    });
+  }, [ready]);
 
   useEffect(() => {
-    if (!ready) return;
+    if (!ready || remoteRef.current) return;
+    return subscribeHeroBanners((incoming) => {
+      setHeroBanners(incoming);
+    });
+  }, [ready]);
+
+  useEffect(() => {
+    if (!ready || remoteRef.current) return;
     writeJson(KEYS.products, products);
   }, [products, ready]);
 
@@ -341,37 +401,52 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   }, [cart, ready]);
 
   useEffect(() => {
-    if (!ready) return;
+    if (!ready || remoteRef.current) return;
     writeJson(KEYS.orders, orders);
   }, [orders, ready]);
 
   useEffect(() => {
-    if (!ready) return;
+    if (!ready || remoteRef.current) return;
     writeJson(KEYS.categories, categories);
   }, [categories, ready]);
 
   useEffect(() => {
-    if (!ready) return;
+    if (!ready || remoteRef.current) return;
     writeJson(KEYS.adminUsers, adminUsers);
   }, [adminUsers, ready]);
 
   useEffect(() => {
-    if (!ready) return;
+    if (!ready || remoteRef.current) return;
     writeJson(KEYS.bankDetails, bankDetails);
   }, [bankDetails, ready]);
 
   useEffect(() => {
-    if (!refundsHydrated) return;
+    if (!refundsHydrated || remoteRef.current) return;
     persistRefunds(refundTickets);
   }, [refundTickets, refundsHydrated]);
 
   useEffect(() => {
-    if (!heroHydrated) return;
+    if (!heroHydrated || remoteRef.current) return;
     persistHeroBanners(heroBanners);
   }, [heroBanners, heroHydrated]);
 
   const login = useCallback(
-    (email: string, password: string) => {
+    async (email: string, password: string) => {
+      if (remoteRef.current) {
+        const response = await fetch("/api/admin/login", {
+          method: "POST",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password }),
+        });
+        const data = (await response.json().catch(() => ({}))) as RemoteAdminState & {
+          error?: string;
+        };
+        if (!response.ok) return false;
+        applyRemote(data);
+        return true;
+      }
+
       const normalizedEmail = email.trim().toLowerCase();
       let match = adminUsers.find(
         (user) =>
@@ -405,6 +480,14 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   );
 
   const logout = useCallback(() => {
+    if (remoteRef.current) {
+      void fetch("/api/admin/logout", { method: "POST", credentials: "include" });
+      setAdminUser(null);
+      setOrders([]);
+      setRefundTickets([]);
+      setAdminUsers([]);
+      return;
+    }
     window.localStorage.removeItem(KEYS.adminSession);
     window.localStorage.removeItem(KEYS.admin);
     setAdminUser(null);
@@ -418,7 +501,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   const canEdit = useCallback(() => canWrite(adminUser), [adminUser]);
 
   const upsertAdminUser = useCallback(
-    (user: AdminUser) => {
+    async (user: AdminUser) => {
       if (!adminUser || adminUser.role !== "superadmin") {
         return { ok: false, error: "Only a superadmin can manage users." };
       }
@@ -430,12 +513,32 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
             ? user.modules
             : defaultModulesForRole(user.role),
       });
+      const previous = adminUsers.find((entry) => entry.id === nextUser.id);
+      if (!nextUser.password && previous?.password) {
+        nextUser.password = previous.password;
+      }
+      if (!nextUser.password && !previous && !remoteRef.current) {
+        return { ok: false, error: "Set a password." };
+      }
 
       const duplicate = adminUsers.some(
         (entry) => entry.email === nextUser.email && entry.id !== nextUser.id
       );
       if (duplicate) {
         return { ok: false, error: "That email is already in use." };
+      }
+
+      if (remoteRef.current) {
+        try {
+          const data = await adminMutate({ op: "upsert-user", user: nextUser });
+          applyRemote(data);
+          return { ok: true };
+        } catch (error) {
+          return {
+            ok: false,
+            error: error instanceof Error ? error.message : "Could not save user",
+          };
+        }
       }
 
       setAdminUsers((current) => {
@@ -456,7 +559,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   );
 
   const deleteAdminUser = useCallback(
-    (id: string) => {
+    async (id: string) => {
       if (!adminUser || adminUser.role !== "superadmin") {
         return { ok: false, error: "Only a superadmin can manage users." };
       }
@@ -471,6 +574,18 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
           return { ok: false, error: "Keep at least one superadmin." };
         }
       }
+      if (remoteRef.current) {
+        try {
+          const data = await adminMutate({ op: "delete-user", id });
+          applyRemote(data);
+          return { ok: true };
+        } catch (error) {
+          return {
+            ok: false,
+            error: error instanceof Error ? error.message : "Could not delete",
+          };
+        }
+      }
       setAdminUsers((current) => current.filter((user) => user.id !== id));
       return { ok: true };
     },
@@ -478,11 +593,23 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   );
 
   const addCategory = useCallback(
-    (name: string) => {
+    async (name: string) => {
       const next = name.trim();
       if (!next) return { ok: false, error: "Enter a category name." };
       if (categories.some((item) => item.toLowerCase() === next.toLowerCase())) {
         return { ok: false, error: "That category already exists." };
+      }
+      if (remoteRef.current) {
+        try {
+          const data = await adminMutate({ op: "add-category", name: next });
+          applyRemote(data);
+          return { ok: true };
+        } catch (error) {
+          return {
+            ok: false,
+            error: error instanceof Error ? error.message : "Could not add category",
+          };
+        }
       }
       setCategories((current) => [...current, next]);
       return { ok: true };
@@ -530,7 +657,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   );
 
   const placeOrder = useCallback(
-    (
+    async (
       customer: CustomerInfo,
       options: {
         paymentMethod?: PaymentMethod;
@@ -539,6 +666,35 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         shipping?: number;
       } = {}
     ) => {
+      if (remoteRef.current) {
+        const response = await fetch("/api/orders", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            customer,
+            items: cart.map((item) => ({
+              productId: item.productId,
+              quantity: item.quantity,
+            })),
+            paymentMethod: options.paymentMethod ?? "cod",
+            notes: options.notes,
+            paymentProof: options.paymentProof,
+          }),
+        });
+        const data = (await response.json().catch(() => ({}))) as {
+          order?: Order;
+          products?: Product[];
+          error?: string;
+        };
+        if (!response.ok || !data.order) {
+          throw new Error(data.error || "Could not place order");
+        }
+        setOrders((current) => [normalizeOrder(data.order as Order), ...current]);
+        if (data.products) setProducts(data.products.map(normalizeProduct));
+        setCart([]);
+        return data.order;
+      }
+
       const paymentMethod = options.paymentMethod ?? "cod";
       const shipping = options.shipping ?? 0;
       const items = cart
@@ -596,11 +752,17 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   const updateBankDetails = useCallback(
     (details: BankDetails) => {
       if (!canWrite(adminUser) || !canAccessModule(adminUser, "settings")) return;
-      setBankDetails({
+      const next = {
         bankName: details.bankName.trim(),
         accountTitle: details.accountTitle.trim(),
         iban: details.iban.trim(),
-      });
+      };
+      setBankDetails(next);
+      if (remoteRef.current) {
+        void adminMutate({ op: "bank", bank: next })
+          .then((data) => applyRemote(data))
+          .catch((error) => console.error(error));
+      }
     },
     [adminUser]
   );
@@ -623,6 +785,11 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         copy[index] = next;
         return copy;
       });
+      if (remoteRef.current) {
+        void adminMutate({ op: "upsert-product", product: next })
+          .then((data) => applyRemote(data))
+          .catch((error) => console.error(error));
+      }
     },
     [adminUser]
   );
@@ -638,6 +805,14 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         const next = [...current];
         const [item] = next.splice(from, 1);
         next.splice(to, 0, item);
+        if (remoteRef.current) {
+          void adminMutate({
+            op: "reorder-products",
+            ids: next.map((product) => product.id),
+          })
+            .then((data) => applyRemote(data))
+            .catch((error) => console.error(error));
+        }
         return next;
       });
     },
@@ -649,6 +824,11 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       if (!canWrite(adminUser) || !canAccessModule(adminUser, "products")) return;
       setProducts((current) => current.filter((product) => product.id !== id));
       setCart((current) => current.filter((item) => item.productId !== id));
+      if (remoteRef.current) {
+        void adminMutate({ op: "delete-product", id })
+          .then((data) => applyRemote(data))
+          .catch((error) => console.error(error));
+      }
     },
     [adminUser]
   );
@@ -659,12 +839,17 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       setOrders((current) =>
         current.map((order) => (order.id === id ? { ...order, status } : order))
       );
+      if (remoteRef.current) {
+        void adminMutate({ op: "order-status", id, status })
+          .then((data) => applyRemote(data))
+          .catch((error) => console.error(error));
+      }
     },
     [adminUser]
   );
 
   const submitRefund = useCallback(
-    (input: {
+    async (input: {
       order: Order;
       photos: string[];
       voiceNote?: string;
@@ -688,6 +873,30 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
           error: `A ticket already exists: ${open.id}`,
           ticket: open,
         };
+      }
+
+      if (remoteRef.current) {
+        const response = await fetch("/api/refunds", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            orderId: input.order.id,
+            trackingId: input.order.trackingId,
+            photos: input.photos,
+            voiceNote: input.voiceNote,
+            note: input.note,
+          }),
+        });
+        const data = (await response.json().catch(() => ({}))) as {
+          ok?: boolean;
+          ticket?: RefundTicket;
+          error?: string;
+        };
+        if (!response.ok || !data.ok || !data.ticket) {
+          return { ok: false, error: data.error || "Could not submit", ticket: data.ticket };
+        }
+        setRefundTickets((current) => [data.ticket as RefundTicket, ...current]);
+        return { ok: true, ticket: data.ticket };
       }
 
       const nextNumber =
@@ -727,9 +936,14 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         const next = current.map((ticket) =>
           ticket.id === id ? { ...ticket, status } : ticket
         );
-        persistRefunds(next);
+        if (!remoteRef.current) persistRefunds(next);
         return next;
       });
+      if (remoteRef.current) {
+        void adminMutate({ op: "refund-patch", id, patch: { status } })
+          .then((data) => applyRemote(data))
+          .catch((error) => console.error(error));
+      }
     },
     [adminUser]
   );
@@ -744,9 +958,18 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
             ? { ...ticket, remark: text || undefined }
             : ticket
         );
-        persistRefunds(next);
+        if (!remoteRef.current) persistRefunds(next);
         return next;
       });
+      if (remoteRef.current) {
+        void adminMutate({
+          op: "refund-patch",
+          id,
+          patch: { remark: text },
+        })
+          .then((data) => applyRemote(data))
+          .catch((error) => console.error(error));
+      }
     },
     [adminUser]
   );
@@ -764,9 +987,18 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
             remark: text || ticket.remark,
           };
         });
-        persistRefunds(next);
+        if (!remoteRef.current) persistRefunds(next);
         return next;
       });
+      if (remoteRef.current) {
+        void adminMutate({
+          op: "refund-patch",
+          id,
+          patch: { askBankDetails: true, remark: text },
+        })
+          .then((data) => applyRemote(data))
+          .catch((error) => console.error(error));
+      }
     },
     [adminUser]
   );
@@ -784,22 +1016,52 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
               ticket.status === "Rejected" || ticket.status === "Completed"
                 ? ticket.status
                 : "Approved",
-          };
+          } as RefundTicket;
         });
-        persistRefunds(next);
+        if (!remoteRef.current) persistRefunds(next);
         return next;
       });
+      if (remoteRef.current) {
+        void adminMutate({
+          op: "refund-patch",
+          id,
+          patch: { skipBankWait: true, status: "Approved" },
+        })
+          .then((data) => applyRemote(data))
+          .catch((error) => console.error(error));
+      }
     },
     [adminUser]
   );
 
   const submitRefundPayoutAccount = useCallback(
-    (id: string, account: BankDetails) => {
+    async (id: string, account: BankDetails) => {
       const bankName = account.bankName.trim();
       const accountTitle = account.accountTitle.trim();
       const iban = account.iban.trim();
       if (!bankName || !accountTitle || !iban) {
         return { ok: false, error: "Fill in all bank fields" };
+      }
+      if (remoteRef.current) {
+        const response = await fetch("/api/refunds", {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            id,
+            account: { bankName, accountTitle, iban },
+          }),
+        });
+        const data = (await response.json().catch(() => ({}))) as {
+          ticket?: RefundTicket;
+          error?: string;
+        };
+        if (!response.ok || !data.ticket) {
+          return { ok: false, error: data.error || "Could not save" };
+        }
+        setRefundTickets((current) =>
+          current.map((entry) => (entry.id === id ? data.ticket! : entry))
+        );
+        return { ok: true };
       }
       let found = false;
       let blocked: string | undefined;
@@ -848,9 +1110,22 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
               }
             : ticket
         );
-        persistRefunds(next);
+        if (!remoteRef.current) persistRefunds(next);
         return next;
       });
+      if (remoteRef.current) {
+        void adminMutate({
+          op: "refund-patch",
+          id,
+          patch: {
+            payoutProof: proof,
+            payoutProofAt: new Date().toISOString(),
+            status: "Completed",
+          },
+        })
+          .then((data) => applyRemote(data))
+          .catch((error) => console.error(error));
+      }
     },
     [adminUser]
   );
@@ -868,9 +1143,14 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       heroTouched.current = true;
       setHeroBanners((current) => {
         const banners = [...current, ...next];
-        persistHeroBanners(banners);
+        if (!remoteRef.current) persistHeroBanners(banners);
         return banners;
       });
+      if (remoteRef.current) {
+        void adminMutate({ op: "hero-add", banners: next })
+          .then((data) => applyRemote(data))
+          .catch((error) => console.error(error));
+      }
     },
     [adminUser]
   );
@@ -881,9 +1161,14 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       heroTouched.current = true;
       setHeroBanners((current) => {
         const banners = current.filter((banner) => banner.id !== id);
-        persistHeroBanners(banners);
+        if (!remoteRef.current) persistHeroBanners(banners);
         return banners;
       });
+      if (remoteRef.current) {
+        void adminMutate({ op: "hero-remove", id })
+          .then((data) => applyRemote(data))
+          .catch((error) => console.error(error));
+      }
     },
     [adminUser]
   );

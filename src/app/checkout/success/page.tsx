@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { Suspense } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { Download, ShoppingCart } from "lucide-react";
 import { toast } from "sonner";
 import { StoreShell } from "@/components/storefront/store-shell";
@@ -11,6 +11,7 @@ import { brand } from "@/lib/data";
 import { formatDate, formatPrice } from "@/lib/format";
 import { downloadOrderReceiptPdf } from "@/lib/receipt-pdf";
 import { useStore } from "@/lib/store";
+import type { Order } from "@/lib/types";
 
 function ReceiptView({
   orderId,
@@ -20,7 +21,28 @@ function ReceiptView({
   onDownload: () => void;
 }) {
   const { orders, bankDetails } = useStore();
-  const order = orders.find((entry) => entry.id === orderId);
+  const [fetched, setFetched] = useState<Order | null>(null);
+  const order =
+    orders.find((entry) => entry.id === orderId) ?? fetched ?? undefined;
+
+  useEffect(() => {
+    if (!orderId || orders.some((entry) => entry.id === orderId)) return;
+    let cancelled = false;
+    (async () => {
+      const response = await fetch(
+        `/api/orders/lookup?q=${encodeURIComponent(orderId)}`
+      );
+      const data = (await response.json().catch(() => null)) as {
+        mode?: string;
+        orders?: Order[];
+      } | null;
+      if (cancelled || !data || data.mode === "local") return;
+      setFetched(data.orders?.find((entry) => entry.id === orderId) ?? null);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [orderId, orders]);
 
   if (!order) {
     return (
@@ -166,7 +188,28 @@ function SuccessContent() {
   const searchParams = useSearchParams();
   const orderId = searchParams.get("order");
   const { orders, bankDetails } = useStore();
-  const order = orders.find((entry) => entry.id === orderId);
+  const [fetched, setFetched] = useState<Order | null>(null);
+  const order =
+    orders.find((entry) => entry.id === orderId) ?? fetched ?? undefined;
+
+  useEffect(() => {
+    if (!orderId || orders.some((entry) => entry.id === orderId)) return;
+    let cancelled = false;
+    (async () => {
+      const response = await fetch(
+        `/api/orders/lookup?q=${encodeURIComponent(orderId)}`
+      );
+      const data = (await response.json().catch(() => null)) as {
+        mode?: string;
+        orders?: Order[];
+      } | null;
+      if (cancelled || !data || data.mode === "local") return;
+      setFetched(data.orders?.find((entry) => entry.id === orderId) ?? null);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [orderId, orders]);
 
   async function onDownload() {
     if (!order) {

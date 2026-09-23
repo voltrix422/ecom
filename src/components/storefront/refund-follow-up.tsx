@@ -46,9 +46,9 @@ export function RefundFollowUp({
     !ticket.payoutAccount &&
     !ticket.payoutProof;
 
-  function onSend(event: FormEvent) {
+  async function onSend(event: FormEvent) {
     event.preventDefault();
-    const result = submitRefundPayoutAccount(ticket.id, {
+    const result = await submitRefundPayoutAccount(ticket.id, {
       bankName,
       accountTitle,
       iban,

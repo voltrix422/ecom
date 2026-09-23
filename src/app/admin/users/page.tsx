@@ -84,7 +84,7 @@ export default function AdminUsersPage() {
     }));
   }
 
-  function onSubmit(event: FormEvent<HTMLFormElement>) {
+  async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (showModules && form.modules.length === 0) {
       toast.error("Pick at least one module");
@@ -103,7 +103,7 @@ export default function AdminUsersPage() {
           : defaultModulesForRole(form.role),
     };
 
-    const result = upsertAdminUser(user);
+    const result = await upsertAdminUser(user);
     if (!result.ok) {
       toast.error(result.error ?? "Could not save user");
       return;
@@ -199,7 +199,7 @@ export default function AdminUsersPage() {
               </span>
               <Input
                 type="text"
-                required
+                required={!editingId}
                 value={form.password}
                 onChange={(event) =>
                   setForm((current) => ({
@@ -323,8 +323,8 @@ export default function AdminUsersPage() {
                   <button
                     type="button"
                     disabled={user.id === adminUser?.id}
-                    onClick={() => {
-                      const result = deleteAdminUser(user.id);
+                    onClick={async () => {
+                      const result = await deleteAdminUser(user.id);
                       if (!result.ok) {
                         toast.error(result.error ?? "Could not delete");
                         return;

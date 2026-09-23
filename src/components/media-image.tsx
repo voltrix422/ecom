@@ -23,6 +23,7 @@ export function MediaImage({
   const unoptimized =
     src.startsWith("data:") ||
     src.startsWith("blob:") ||
+    src.startsWith("/media/") ||
     src.startsWith("http://") ||
     src.startsWith("https://");
 

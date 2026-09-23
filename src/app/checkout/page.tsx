@@ -321,7 +321,7 @@ export default function CheckoutPage() {
     setStep(3);
   }
 
-  function onComplete() {
+  async function onComplete() {
     if (lines.length === 0) return;
     if (payment === "bank" && !paymentProof) {
       toast.error("Attach your payment screenshot to continue");
@@ -336,16 +336,19 @@ export default function CheckoutPage() {
       city: details.city.trim(),
       country: details.country.trim(),
     };
-    const order = placeOrder(customer, {
-      paymentMethod: payment,
-      notes,
-      paymentProof: paymentProof || undefined,
-      shipping,
-    });
-    toast.success("Order placed");
-    router.push(
-      `/checkout/success?order=${order.id}&pay=${payment}`
-    );
+    try {
+      const order = await placeOrder(customer, {
+        paymentMethod: payment,
+        notes,
+        paymentProof: paymentProof || undefined,
+        shipping,
+      });
+      toast.success("Order placed");
+      router.push(`/checkout/success?order=${order.id}&pay=${payment}`);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Could not place order");
+      setSubmitting(false);
+    }
   }
 
   if (lines.length === 0) {

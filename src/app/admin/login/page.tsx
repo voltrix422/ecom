@@ -21,10 +21,10 @@ export default function AdminLoginPage() {
     }
   }, [isAdmin, ready, router]);
 
-  function onSubmit(event: FormEvent<HTMLFormElement>) {
+  async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const form = new FormData(event.currentTarget);
-    const ok = login(
+    const ok = await login(
       String(form.get("email") || ""),
       String(form.get("password") || "")
     );
