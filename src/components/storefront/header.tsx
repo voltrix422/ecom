@@ -3,11 +3,20 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { ChevronDown, Menu, Search, ShoppingBag, User, X } from "lucide-react";
+import {
+  ChevronDown,
+  Info,
+  Menu,
+  Package,
+  RotateCcw,
+  Search,
+  ShoppingBag,
+  User,
+  X,
+} from "lucide-react";
 import {
   Sheet,
   SheetContent,
-  SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
 import {
@@ -23,7 +32,7 @@ import { REVEAL_HEADER_EVENT } from "@/lib/fly-to-cart";
 import { useStore } from "@/lib/store";
 import { cn } from "cn";
 
-const navIcon = "size-[15px] stroke-[1.5]";
+const navIcon = "size-[18px] stroke-[1.5]";
 
 function HeaderLogo({ light }: { light: boolean }) {
   return (
@@ -49,7 +58,7 @@ function CartButton({ light }: { light: boolean }) {
   return (
     <button
       type="button"
-      className="relative inline-flex size-8 cursor-pointer items-center justify-center"
+      className="relative inline-flex size-9 cursor-pointer items-center justify-center"
       aria-label="Bag"
       onClick={() => setCartOpen(true)}
     >
@@ -164,7 +173,7 @@ export function Header({ hideSaleBanner = false }: { hideSaleBanner?: boolean })
       <div className="relative flex h-16 items-center px-3 sm:px-6">
         <button
           type="button"
-          className="inline-flex size-8 cursor-pointer items-center justify-center"
+          className="inline-flex size-9 cursor-pointer items-center justify-center"
           onClick={() => setOpen(true)}
           aria-label="Open menu"
         >
@@ -193,7 +202,7 @@ export function Header({ hideSaleBanner = false }: { hideSaleBanner?: boolean })
 
           <button
             type="button"
-            className="inline-flex size-8 cursor-pointer items-center justify-center"
+            className="inline-flex size-9 cursor-pointer items-center justify-center"
             aria-label="Search"
             onClick={() => setSearchOpen((value) => !value)}
           >
@@ -202,20 +211,36 @@ export function Header({ hideSaleBanner = false }: { hideSaleBanner?: boolean })
 
           <DropdownMenu modal={false}>
             <DropdownMenuTrigger
-              className="inline-flex size-8 cursor-pointer items-center justify-center outline-none"
+              className="inline-flex size-9 cursor-pointer items-center justify-center outline-none"
               aria-label="Account"
             >
               <User className={navIcon} />
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-44 rounded-none">
-              <DropdownMenuItem asChild>
-                <Link href="/track">Track order</Link>
+            <DropdownMenuContent
+              align="end"
+              sideOffset={12}
+              className="w-60 rounded-none bg-white p-2 text-black shadow-xl ring-1 ring-black/10"
+            >
+              <p className="px-3 pt-2 pb-1 text-[10px] tracking-[0.18em] text-neutral-500 uppercase">
+                Account
+              </p>
+              <DropdownMenuItem asChild className="cursor-pointer rounded-none px-3 py-3 text-sm text-black focus:bg-neutral-100">
+                <Link href="/track">
+                  <Package className={navIcon} />
+                  Track order
+                </Link>
               </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link href="/help">Refund</Link>
+              <DropdownMenuItem asChild className="cursor-pointer rounded-none px-3 py-3 text-sm text-black focus:bg-neutral-100">
+                <Link href="/help">
+                  <RotateCcw className={navIcon} />
+                  Refund
+                </Link>
               </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link href="/about">About</Link>
+              <DropdownMenuItem asChild className="cursor-pointer rounded-none px-3 py-3 text-sm text-black focus:bg-neutral-100">
+                <Link href="/about">
+                  <Info className={navIcon} />
+                  About
+                </Link>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -251,20 +276,34 @@ export function Header({ hideSaleBanner = false }: { hideSaleBanner?: boolean })
       ) : null}
 
       <Sheet open={open} onOpenChange={setOpen}>
-        <SheetContent side="left" className="w-[min(100%,280px)] rounded-none bg-background p-0">
-          <SheetHeader className="px-6 py-5">
-            <SheetTitle className="sr-only">Ayesha's</SheetTitle>
-            <img
-              src={brand.wordmark}
-              alt="Ayesha's"
-              className="h-8 w-auto brightness-0"
-            />
-          </SheetHeader>
-          <nav className="flex flex-col gap-4 px-6 py-4 text-sm">
-            <Link href="/shop" onClick={() => setOpen(false)} className="text-foreground">
+        <SheetContent
+          side="left"
+          showCloseButton={false}
+          className="w-[min(100%,320px)] gap-0 rounded-none border-0 bg-white p-0 text-black shadow-xl"
+        >
+          <SheetTitle className="sr-only">Menu</SheetTitle>
+          <div className="flex h-16 shrink-0 items-center justify-between border-b border-black/10 px-5">
+            <p className="text-[11px] tracking-[0.2em] text-neutral-500 uppercase">
+              Menu
+            </p>
+            <button
+              type="button"
+              className="inline-flex size-9 cursor-pointer items-center justify-center"
+              aria-label="Close menu"
+              onClick={() => setOpen(false)}
+            >
+              <X className={navIcon} />
+            </button>
+          </div>
+          <nav className="flex flex-1 flex-col overflow-y-auto px-3 py-4">
+            <Link
+              href="/shop"
+              onClick={() => setOpen(false)}
+              className="px-3 py-3 text-[15px] hover:bg-neutral-100"
+            >
               Shop all
             </Link>
-            <p className="text-xs tracking-[0.16em] text-muted-foreground uppercase">
+            <p className="mt-5 px-3 pb-1 text-[10px] tracking-[0.18em] text-neutral-500 uppercase">
               Category
             </p>
             {categories.map((category) => (
@@ -272,18 +311,31 @@ export function Header({ hideSaleBanner = false }: { hideSaleBanner?: boolean })
                 key={category}
                 href={`/shop?category=${category}`}
                 onClick={() => setOpen(false)}
-                className="pl-2 text-foreground"
+                className="px-3 py-2.5 text-[15px] hover:bg-neutral-100"
               >
                 {category}
               </Link>
             ))}
-            <Link href="/track" onClick={() => setOpen(false)} className="text-foreground">
+            <div className="my-4 h-px bg-neutral-200" />
+            <Link
+              href="/track"
+              onClick={() => setOpen(false)}
+              className="px-3 py-3 text-[15px] hover:bg-neutral-100"
+            >
               Track order
             </Link>
-            <Link href="/help" onClick={() => setOpen(false)} className="text-foreground">
+            <Link
+              href="/help"
+              onClick={() => setOpen(false)}
+              className="px-3 py-3 text-[15px] hover:bg-neutral-100"
+            >
               Refund
             </Link>
-            <Link href="/about" onClick={() => setOpen(false)} className="text-foreground">
+            <Link
+              href="/about"
+              onClick={() => setOpen(false)}
+              className="px-3 py-3 text-[15px] hover:bg-neutral-100"
+            >
               About
             </Link>
           </nav>
