@@ -20,7 +20,7 @@ function ShopContent() {
   const [category, setCategory] = useState<Category | "All">(
     allCategories.includes(initial) ? initial : "All"
   );
-  const [query, setQuery] = useState("");
+  const [query, setQuery] = useState(searchParams.get("q") ?? "");
 
   useEffect(() => {
     const next = searchParams.get("category") as Category | null;
@@ -29,6 +29,7 @@ function ShopContent() {
     } else if (!next) {
       setCategory("All");
     }
+    setQuery(searchParams.get("q") ?? "");
   }, [searchParams, allCategories]);
 
   const filtered = useMemo(() => {
