@@ -2,9 +2,9 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
-import { MediaImage } from "@/components/media-image";
+import { useEffect, useMemo } from "react";
 import FlexCarousel from "@/components/storefront/flex-carousel";
+import MorphSlider from "@/components/storefront/morph-slider";
 import { HeroSection } from "@/components/storefront/hero-section";
 import { StoreShell } from "@/components/storefront/store-shell";
 import { useStore } from "@/lib/store";
@@ -27,17 +27,30 @@ const collections = [
   },
 ];
 
+const morphItems = collections.map((collection) => ({
+  image: collection.image,
+  caption: collection.title,
+  href: collection.href,
+}));
+
 export default function HomePage() {
   const router = useRouter();
   const { products } = useStore();
-  const featured = products.filter((product) => product.featured);
-  const carouselItems = featured.map((product) => ({
-    src: product.image,
-    alt: product.name,
-    title: product.name,
-    subtitle: product.category,
-    slug: product.slug,
-  }));
+  const featured = useMemo(
+    () => products.filter((product) => product.featured),
+    [products]
+  );
+  const carouselItems = useMemo(
+    () =>
+      featured.map((product) => ({
+        src: product.image,
+        alt: product.name,
+        title: product.name,
+        subtitle: product.category,
+        slug: product.slug,
+      })),
+    [featured]
+  );
 
   const imageKey = carouselItems.map((item) => item.src).join("|");
 
@@ -67,8 +80,8 @@ export default function HomePage() {
     <StoreShell>
       <HeroSection />
 
-      <section className="relative z-10 bg-background">
-        <div className="mx-auto max-w-7xl px-6 py-16 md:py-20">
+      <section className="relative z-10 overflow-x-clip bg-background">
+        <div className="mx-auto max-w-7xl px-6 pt-16 md:pt-20">
           <div className="mb-8 flex items-end justify-between gap-6 md:mb-12">
             <div>
               <p className="font-nav-display text-[15px] tracking-wide text-muted-foreground md:text-[17px]">
@@ -85,15 +98,16 @@ export default function HomePage() {
               View all
             </Link>
           </div>
-          <div
-            className="relative w-full text-foreground"
-            style={{ height: "min(78svh, 720px)" }}
-          >
+        </div>
+        <div
+          className="relative w-screen max-w-[100vw] text-foreground"
+          style={{ height: "min(78svh, 720px)", marginLeft: "calc(50% - 50vw)" }}
+        >
             {carouselItems.length > 0 ? (
               <FlexCarousel
                 items={carouselItems}
                 preset="liquid"
-                intro="none"
+                intro="glide"
                 cardHeight={0.68}
                 gap={18}
                 squeeze={0.08}
@@ -111,7 +125,7 @@ export default function HomePage() {
                 dispersion={0.12}
                 liquid={0}
                 followCursor={false}
-                autoplay={false}
+                autoplay
                 interval={4}
                 captureWheel
                 className="font-nav-display"
@@ -121,23 +135,33 @@ export default function HomePage() {
                 }}
               />
             ) : null}
-          </div>
         </div>
+        <div className="pb-16 md:pb-20" />
       </section>
 
       <section className="border-t">
-        <div className="mx-auto grid max-w-7xl gap-8 px-6 py-20 md:grid-cols-3">
-          {collections.map((collection) => (
-            <Link key={collection.title} href={collection.href} className="group">
-              <MediaImage
-                src={collection.image}
-                alt={collection.title}
-                sizes="(min-width: 768px) 33vw, 100vw"
-                className="transition-opacity duration-300 group-hover:opacity-80"
-              />
-              <p className="font-nav-display mt-4 text-[18px]">{collection.title}</p>
-            </Link>
-          ))}
+        <div className="mx-auto max-w-7xl px-6 py-16 md:py-20">
+          <div className="relative w-full" style={{ height: "500px" }}>
+            <MorphSlider
+              items={morphItems}
+              transition="melt"
+              intensity={0.55}
+              aberration={0.35}
+              drift={0.4}
+              autoplay={false}
+              overlayColor="#05060a"
+              duration={1.1}
+              ease="power2.inOut"
+              scale={2.4}
+              autoplayDelay={4}
+              loop
+              radius={16}
+              showCaptions
+              showControls
+              showIndicators
+              className="font-nav-display"
+            />
+          </div>
         </div>
       </section>
     </StoreShell>

@@ -6,7 +6,7 @@ import { Renderer, Program, Mesh, Triangle, Plane, Texture, RenderTarget } from 
 
 type BendPreset = 'liquid' | 'ribbon' | 'vortex' | 'arch';
 type CurlMode = 'twist' | 'rise' | 'fall';
-type CarouselIntro = 'rise' | 'bloom' | 'spin' | 'deal' | 'none';
+type CarouselIntro = 'rise' | 'bloom' | 'spin' | 'deal' | 'glide' | 'none';
 type CardFit = 'natural' | 'portrait' | 'square' | 'landscape';
 
 export interface FlexCarouselItem {
@@ -220,7 +220,7 @@ const STYLE = `
 const FIT_ASPECT: Record<string, number> = { portrait: 0.75, square: 1, landscape: 4 / 3 };
 const TAPS = 12;
 const PIXEL_BUDGET = 4.5e6;
-const INTRO_DURATION: Record<string, number> = { rise: 2.1, bloom: 1.6, spin: 2.2, deal: 1.5, fade: 0.35 };
+const INTRO_DURATION: Record<string, number> = { rise: 2.1, bloom: 1.6, spin: 2.2, deal: 1.5, glide: 1.8, fade: 0.35 };
 
 const wrap = (value: number, size: number) => ((((value + size / 2) % size) + size) % size) - size / 2;
 const clamp01 = (value: number) => Math.min(Math.max(value, 0), 1);
@@ -793,6 +793,9 @@ const FlexCarousel = ({
       } else if (kind === 'spin') {
         e.sceneAlpha = easeOut(t / 0.25);
         e.strength = easeOut((t - 0.55) / 0.45);
+      } else if (kind === 'glide') {
+        e.sceneAlpha = easeOut(t / 0.2);
+        e.strength = easeOut((t - 0.35) / 0.55);
       } else if (kind === 'deal') {
         e.strength = easeOut((t - 0.45) / 0.5);
         e.card = rel => {
@@ -818,6 +821,12 @@ const FlexCarousel = ({
         const distance = m.loop * 1.6 + width;
         pos = goal + distance;
         vel = -distance * 3;
+        mode = 'spring';
+      } else if (introState.kind === 'glide') {
+        // Enter from the right edge and settle leftward into center.
+        const distance = m.loop * 1.35 + width * 1.15;
+        pos = goal - distance;
+        vel = distance * 2.4;
         mode = 'spring';
       }
     };
