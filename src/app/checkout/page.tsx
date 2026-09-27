@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { BrandArcLogo } from "@/components/brand-arc-logo";
+import { brand } from "@/lib/data";
 import { formatPrice, salePrice } from "@/lib/format";
 import { fileToDataUrl } from "@/lib/image-upload";
 import { useStore } from "@/lib/store";
@@ -29,31 +30,43 @@ type Line = { product: Product; quantity: number };
 function StepDots({ step }: { step: Step }) {
   const labels = ["Details", "Payment", "Receipt"];
   return (
-    <div className="flex items-center justify-center gap-1.5 sm:gap-2">
+    <div className="font-nav-display flex items-center justify-center gap-2 sm:gap-3">
       {labels.map((label, index) => {
         const n = (index + 1) as Step;
         const active = step === n;
         const done = step > n;
         return (
-          <div key={label} className="flex items-center gap-1.5 sm:gap-2">
+          <div key={label} className="flex items-center gap-2 sm:gap-3">
             {index > 0 ? (
-              <span className="h-px w-4 bg-border/50 sm:w-6" aria-hidden />
-            ) : null}
-            <div className="flex items-center gap-1">
               <span
                 className={cn(
-                  "text-[11px] tabular-nums",
-                  done || active
-                    ? "text-foreground"
-                    : "text-muted-foreground/50"
+                  "h-px w-5 sm:w-8",
+                  done || active ? "bg-foreground/40" : "bg-border/50"
+                )}
+                aria-hidden
+              />
+            ) : null}
+            <div className="flex items-center gap-1.5">
+              <span
+                className={cn(
+                  "inline-flex size-6 items-center justify-center rounded-full text-[12px] tabular-nums",
+                  done
+                    ? "bg-black text-white"
+                    : active
+                      ? "bg-black/85 text-white"
+                      : "bg-black/8 text-foreground/40"
                 )}
               >
                 {done ? "✓" : n}
               </span>
               <span
                 className={cn(
-                  "text-[10px] tracking-[0.1em] uppercase",
-                  active ? "text-foreground" : "text-muted-foreground/55"
+                  "text-[12px] tracking-wide sm:text-[13px]",
+                  active
+                    ? "text-foreground"
+                    : done
+                      ? "text-foreground/70"
+                      : "text-muted-foreground/55"
                 )}
               >
                 {label}
@@ -111,13 +124,16 @@ function ReceiptCard({
   );
 
   return (
-    <div className="mx-auto w-full max-w-[280px] px-1 py-2 font-mono text-[12px] leading-relaxed text-foreground">
+    <div className="font-nav-display mx-auto w-full max-w-[320px] px-1 py-2 text-[13px] leading-relaxed text-foreground">
       <div className="text-center">
-        <div className="mx-auto mb-2 flex justify-center">
-          <BrandArcLogo size={112} href={null} />
+        <div className="mx-auto mb-3 flex justify-center">
+          <BrandArcLogo size={128} href={null} />
         </div>
+        <p className="text-[15px] tracking-tight text-foreground/90">
+          {brand.name}
+        </p>
         {orderId ? (
-          <div className="mt-3 space-y-1 text-[10px] text-muted-foreground">
+          <div className="mt-3 space-y-1 text-[11px] text-muted-foreground">
             <p>
               <span className="text-muted-foreground/80">Order</span>{" "}
               <span className="text-foreground">{orderId}</span>
@@ -130,7 +146,7 @@ function ReceiptCard({
             ) : null}
           </div>
         ) : (
-          <p className="mt-1 text-[10px] tracking-[0.18em] text-muted-foreground uppercase">
+          <p className="mt-1.5 text-[12px] tracking-wide text-muted-foreground">
             Receipt
           </p>
         )}
@@ -140,9 +156,9 @@ function ReceiptCard({
 
       {hasCustomer ? (
         <>
-          <div className="space-y-0.5 text-[11px] text-muted-foreground">
+          <div className="space-y-1 text-[12px] text-muted-foreground">
             {customer?.name ? (
-              <p className="text-foreground">{customer.name}</p>
+              <p className="text-[14px] text-foreground">{customer.name}</p>
             ) : null}
             {customer?.phone ? <p>{customer.phone}</p> : null}
             {customer?.email ? (
@@ -159,7 +175,7 @@ function ReceiptCard({
         </>
       ) : null}
 
-      <div className="space-y-1.5">
+      <div className="space-y-2">
         {lines.map(({ product, quantity }) => (
           <div key={product.id} className="flex justify-between gap-2">
             <span className="min-w-0 flex-1 truncate text-muted-foreground">
@@ -174,7 +190,7 @@ function ReceiptCard({
 
       <ReceiptRule />
 
-      <div className="space-y-1">
+      <div className="space-y-1.5">
         <div className="flex justify-between gap-2">
           <span className="text-muted-foreground">Subtotal</span>
           <span className="tabular-nums">{formatPrice(subtotal)}</span>
@@ -193,7 +209,7 @@ function ReceiptCard({
 
       <ReceiptRule heavy />
 
-      <div className="flex justify-between gap-2 text-[13px]">
+      <div className="flex justify-between gap-2 text-[15px]">
         <span>Total</span>
         <span className="tabular-nums">{formatPrice(total)}</span>
       </div>
@@ -201,14 +217,14 @@ function ReceiptCard({
       {notes ? (
         <>
           <ReceiptRule />
-          <p className="text-[11px] text-muted-foreground">Note: {notes}</p>
+          <p className="text-[12px] text-muted-foreground">Note: {notes}</p>
         </>
       ) : null}
 
       {payment === "bank" && bankDetails ? (
         <>
           <ReceiptRule />
-          <div className="space-y-0.5 text-[11px]">
+          <div className="space-y-0.5 text-[12px]">
             <p className="text-muted-foreground">Bank transfer</p>
             <p>{bankDetails.bankName}</p>
             <p>{bankDetails.accountTitle}</p>
@@ -220,7 +236,7 @@ function ReceiptCard({
       {paymentProof ? (
         <>
           <ReceiptRule />
-          <p className="mb-2 text-[10px] tracking-[0.12em] text-muted-foreground uppercase">
+          <p className="mb-2 text-[11px] tracking-wide text-muted-foreground">
             Payment proof
           </p>
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -232,7 +248,7 @@ function ReceiptCard({
         </>
       ) : null}
 
-      <p className="mt-5 text-center text-[10px] text-muted-foreground">
+      <p className="mt-6 text-center text-[12px] text-muted-foreground">
         Thank you
       </p>
     </div>
@@ -240,7 +256,10 @@ function ReceiptCard({
 }
 
 const fieldClass =
-  "h-8 rounded-none border-0 border-b border-border/50 bg-transparent px-0 text-sm shadow-none focus-visible:border-foreground focus-visible:ring-0";
+  "font-nav-display h-10 rounded-md border-0 border-b border-border/50 bg-transparent px-0 text-[14px] shadow-none focus-visible:border-foreground focus-visible:ring-0";
+
+const btnClass = "h-11 border-0 shadow-none";
+const btnOutlineClass = "h-11 border-0 bg-black/8 shadow-none";
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -354,11 +373,13 @@ export default function CheckoutPage() {
   if (lines.length === 0) {
     return (
       <StoreShell hideSaleBanner>
-        <div className="mx-auto max-w-6xl px-6 py-24">
-          <h1 className="font-heading text-4xl">Checkout</h1>
-          <p className="mt-4 text-sm text-muted-foreground">Your bag is empty.</p>
-          <Button asChild className="mt-6 rounded-none">
-            <Link href="/shop">Continue shopping</Link>
+        <div className="font-nav-display mx-auto max-w-6xl px-6 py-24">
+          <h1 className="text-4xl tracking-tight md:text-5xl">Checkout</h1>
+          <p className="mt-4 text-[14px] text-muted-foreground">Your bag is empty.</p>
+          <Button asChild className={cn("mt-6", btnClass)}>
+            <Link href="/shop">
+              <span>Continue shopping</span>
+            </Link>
           </Button>
         </div>
       </StoreShell>
@@ -367,10 +388,10 @@ export default function CheckoutPage() {
 
   return (
     <StoreShell hideSaleBanner>
-      <div className="mx-auto max-w-6xl px-6 py-10 md:py-14">
+      <div className="font-nav-display mx-auto max-w-6xl px-6 py-10 md:py-14">
         <div className="text-center">
-          <h1 className="font-heading text-4xl tracking-tight">Checkout</h1>
-          <div className="mt-5">
+          <h1 className="text-4xl tracking-tight md:text-5xl">Checkout</h1>
+          <div className="mt-6">
             <StepDots step={step} />
           </div>
         </div>
@@ -387,7 +408,7 @@ export default function CheckoutPage() {
                   <div className="space-y-1">
                     <Label
                       htmlFor="name"
-                      className="text-[11px] text-muted-foreground"
+                      className="text-[12px] text-muted-foreground"
                     >
                       Name
                     </Label>
@@ -407,7 +428,7 @@ export default function CheckoutPage() {
                   <div className="space-y-1">
                     <Label
                       htmlFor="email"
-                      className="text-[11px] text-muted-foreground"
+                      className="text-[12px] text-muted-foreground"
                     >
                       Email
                     </Label>
@@ -429,7 +450,7 @@ export default function CheckoutPage() {
                   <div className="space-y-1">
                     <Label
                       htmlFor="phone"
-                      className="text-[11px] text-muted-foreground"
+                      className="text-[12px] text-muted-foreground"
                     >
                       Phone
                     </Label>
@@ -450,7 +471,7 @@ export default function CheckoutPage() {
                   <div className="space-y-1">
                     <Label
                       htmlFor="address"
-                      className="text-[11px] text-muted-foreground"
+                      className="text-[12px] text-muted-foreground"
                     >
                       Address
                     </Label>
@@ -470,7 +491,7 @@ export default function CheckoutPage() {
                   <div className="space-y-1">
                     <Label
                       htmlFor="city"
-                      className="text-[11px] text-muted-foreground"
+                      className="text-[12px] text-muted-foreground"
                     >
                       City
                     </Label>
@@ -490,7 +511,7 @@ export default function CheckoutPage() {
                   <div className="space-y-1">
                     <Label
                       htmlFor="country"
-                      className="text-[11px] text-muted-foreground"
+                      className="text-[12px] text-muted-foreground"
                     >
                       Country
                     </Label>
@@ -511,7 +532,7 @@ export default function CheckoutPage() {
                 <div className="space-y-1">
                   <Label
                     htmlFor="notes"
-                    className="text-[11px] text-muted-foreground"
+                    className="text-[12px] text-muted-foreground"
                   >
                     Remarks
                   </Label>
@@ -520,10 +541,10 @@ export default function CheckoutPage() {
                     value={notes}
                     onChange={(e) => setNotes(e.target.value)}
                     aria-label="Order notes"
-                    className="min-h-14 rounded-none border-0 border-b border-border/50 bg-transparent px-0 text-sm shadow-none focus-visible:border-foreground focus-visible:ring-0"
+                    className="font-nav-display min-h-16 rounded-md border-0 border-b border-border/50 bg-transparent px-0 text-[14px] shadow-none focus-visible:border-foreground focus-visible:ring-0"
                   />
                 </div>
-                <Button type="submit" className="h-8 rounded-none text-sm">
+                <Button type="submit" className={btnClass}>
                   Continue to payment
                 </Button>
               </form>
@@ -531,7 +552,7 @@ export default function CheckoutPage() {
 
             {step === 2 ? (
               <div className="space-y-5">
-                <p className="text-[10px] tracking-[0.18em] text-muted-foreground uppercase">
+                <p className="text-[13px] tracking-wide text-muted-foreground">
                   Payment method
                 </p>
                 <div className="grid gap-3 sm:grid-cols-2">
@@ -539,14 +560,21 @@ export default function CheckoutPage() {
                     type="button"
                     onClick={() => setPayment("cod")}
                     className={cn(
-                      "border px-4 py-4 text-left transition-colors",
+                      "rounded-md border-0 px-4 py-5 text-left transition-colors",
                       payment === "cod"
-                        ? "border-foreground bg-muted/35"
-                        : "border-border/60 hover:border-foreground/40"
+                        ? "bg-black text-white"
+                        : "bg-black/6 hover:bg-black/10"
                     )}
                   >
-                    <p className="text-sm">Cash on delivery</p>
-                    <p className="mt-1 text-xs text-muted-foreground">
+                    <p className="text-[15px]">Cash on delivery</p>
+                    <p
+                      className={cn(
+                        "mt-1.5 text-[13px]",
+                        payment === "cod"
+                          ? "text-white/70"
+                          : "text-muted-foreground"
+                      )}
+                    >
                       Pay in cash when your order arrives.
                     </p>
                   </button>
@@ -554,22 +582,29 @@ export default function CheckoutPage() {
                     type="button"
                     onClick={() => setPayment("bank")}
                     className={cn(
-                      "border px-4 py-4 text-left transition-colors",
+                      "rounded-md border-0 px-4 py-5 text-left transition-colors",
                       payment === "bank"
-                        ? "border-foreground bg-muted/35"
-                        : "border-border/60 hover:border-foreground/40"
+                        ? "bg-black text-white"
+                        : "bg-black/6 hover:bg-black/10"
                     )}
                   >
-                    <p className="text-sm">Bank transfer</p>
-                    <p className="mt-1 text-xs text-muted-foreground">
+                    <p className="text-[15px]">Bank transfer</p>
+                    <p
+                      className={cn(
+                        "mt-1.5 text-[13px]",
+                        payment === "bank"
+                          ? "text-white/70"
+                          : "text-muted-foreground"
+                      )}
+                    >
                       Transfer, then attach payment proof.
                     </p>
                   </button>
                 </div>
 
                 {payment === "bank" ? (
-                  <div className="space-y-4 border border-border/60 bg-muted/20 px-4 py-4">
-                    <div className="space-y-1.5 text-sm">
+                  <div className="space-y-4 rounded-md bg-black/5 px-4 py-4">
+                    <div className="space-y-2 text-[14px]">
                       <div className="flex justify-between gap-3">
                         <span className="text-muted-foreground">Bank</span>
                         <span>{bankDetails.bankName}</span>
@@ -582,7 +617,7 @@ export default function CheckoutPage() {
                       </div>
                       <div className="flex justify-between gap-3">
                         <span className="text-muted-foreground">IBAN</span>
-                        <span className="font-mono text-xs tracking-wide">
+                        <span className="text-[13px] tracking-wide">
                           {bankDetails.iban}
                         </span>
                       </div>
@@ -599,7 +634,7 @@ export default function CheckoutPage() {
                       <Button
                         type="button"
                         variant="outline"
-                        className="rounded-none"
+                        className={btnOutlineClass}
                         disabled={uploading}
                         onClick={() => proofRef.current?.click()}
                       >
@@ -616,34 +651,30 @@ export default function CheckoutPage() {
                           <img
                             src={paymentProof}
                             alt="Payment proof preview"
-                            className="max-h-40 border object-contain"
+                            className="max-h-40 object-contain"
                           />
-                          <p className="mt-3 text-xs text-muted-foreground">
+                          <p className="mt-3 text-[13px] text-muted-foreground">
                             Payment usually confirmed within 3 hours after you
                             place the order.
                           </p>
                         </div>
                       ) : (
-                        <p className="mt-2 text-xs text-muted-foreground">
+                        <p className="mt-2 text-[13px] text-muted-foreground">
                           Upload a clear screenshot of your transfer to continue.
                         </p>
                       )}
                     </div>
                   </div>
                 ) : (
-                  <div className="relative overflow-hidden bg-muted/30 px-5 py-5 sm:px-6 sm:py-6">
-                    <div
-                      className="absolute inset-y-0 left-0 w-0.5 bg-foreground/70"
-                      aria-hidden
-                    />
+                  <div className="relative overflow-hidden rounded-md bg-black/5 px-5 py-5 sm:px-6 sm:py-6">
                     <div className="flex items-start justify-between gap-3">
-                      <p className="text-[10px] tracking-[0.2em] text-muted-foreground uppercase">
+                      <p className="text-[13px] tracking-wide text-muted-foreground">
                         Delivery details
                       </p>
                       <button
                         type="button"
                         onClick={() => setStep(1)}
-                        className="text-[10px] tracking-[0.14em] text-muted-foreground uppercase underline-offset-4 transition-colors hover:text-foreground hover:underline"
+                        className="text-[13px] text-muted-foreground transition-colors hover:text-foreground"
                       >
                         Edit
                       </button>
@@ -651,39 +682,41 @@ export default function CheckoutPage() {
 
                     <div className="mt-5 grid gap-5 sm:grid-cols-2">
                       <div className="space-y-1">
-                        <p className="text-[9px] tracking-[0.16em] text-muted-foreground/80 uppercase">
+                        <p className="text-[11px] tracking-wide text-muted-foreground/80">
                           Name
                         </p>
-                        <p className="font-heading text-lg leading-snug tracking-tight">
+                        <p className="text-[18px] leading-snug tracking-tight">
                           {details.name || "—"}
                         </p>
                       </div>
                       <div className="space-y-1">
-                        <p className="text-[9px] tracking-[0.16em] text-muted-foreground/80 uppercase">
+                        <p className="text-[11px] tracking-wide text-muted-foreground/80">
                           Phone
                         </p>
-                        <p className="text-sm tabular-nums">
+                        <p className="text-[14px] tabular-nums">
                           {details.phone || "—"}
                         </p>
                       </div>
                       <div className="space-y-1 sm:col-span-2">
-                        <p className="text-[9px] tracking-[0.16em] text-muted-foreground/80 uppercase">
+                        <p className="text-[11px] tracking-wide text-muted-foreground/80">
                           Email
                         </p>
-                        <p className="break-all text-sm">{details.email || "—"}</p>
+                        <p className="break-all text-[14px]">
+                          {details.email || "—"}
+                        </p>
                       </div>
                     </div>
 
-                    <div className="my-5 h-px bg-border/50" aria-hidden />
+                    <div className="my-5 h-px bg-black/10" aria-hidden />
 
                     <div className="space-y-1">
-                      <p className="text-[9px] tracking-[0.16em] text-muted-foreground/80 uppercase">
+                      <p className="text-[11px] tracking-wide text-muted-foreground/80">
                         Address
                       </p>
-                      <p className="text-sm leading-relaxed">
+                      <p className="text-[14px] leading-relaxed">
                         {details.address || "—"}
                       </p>
-                      <p className="pt-0.5 text-sm text-muted-foreground">
+                      <p className="pt-0.5 text-[14px] text-muted-foreground">
                         {[details.city, details.country]
                           .filter(Boolean)
                           .join(", ") || "—"}
@@ -692,18 +725,18 @@ export default function CheckoutPage() {
                   </div>
                 )}
 
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-2.5">
                   <Button
                     type="button"
                     variant="outline"
-                    className="rounded-none"
+                    className={btnOutlineClass}
                     onClick={() => setStep(1)}
                   >
                     Back
                   </Button>
                   <Button
                     type="button"
-                    className="rounded-none"
+                    className={btnClass}
                     onClick={goReceipt}
                   >
                     Continue to receipt
@@ -714,64 +747,60 @@ export default function CheckoutPage() {
 
             {step === 3 ? (
               <div className="space-y-5">
-                <div className="relative overflow-hidden bg-muted/30 px-5 py-5 sm:px-6 sm:py-6">
-                  <div
-                    className="absolute inset-y-0 left-0 w-0.5 bg-foreground/70"
-                    aria-hidden
-                  />
-                  <p className="text-[11px] text-muted-foreground">
+                <div className="relative overflow-hidden rounded-md bg-black/5 px-5 py-5 sm:px-6 sm:py-6">
+                  <p className="text-[13px] tracking-wide text-muted-foreground">
                     Confirm order
                   </p>
                   {payment === "bank" ? (
                     <div className="mt-3 space-y-3">
-                      <p className="font-heading text-2xl leading-snug tracking-tight">
+                      <p className="text-[28px] leading-snug tracking-tight md:text-[32px]">
                         Ready to place your order
                       </p>
-                      <p className="max-w-md text-sm leading-relaxed text-muted-foreground">
+                      <p className="max-w-md text-[14px] leading-relaxed text-muted-foreground">
                         Your transfer proof is attached. Confirmation usually
                         takes up to 3 hours after you place the order.
                       </p>
-                      <div className="border-t border-border/50 pt-3">
-                        <p className="text-[11px] text-muted-foreground">
+                      <div className="border-t border-black/10 pt-3">
+                        <p className="text-[12px] text-muted-foreground">
                           Tracking ID
                         </p>
-                        <p className="mt-1 text-sm text-foreground">
+                        <p className="mt-1 text-[14px] text-foreground">
                           You’ll get yours on the next screen.
                         </p>
                       </div>
                     </div>
                   ) : (
                     <div className="mt-3 space-y-3">
-                      <p className="font-heading text-2xl leading-snug tracking-tight">
+                      <p className="text-[28px] leading-snug tracking-tight md:text-[32px]">
                         Review your receipt
                       </p>
-                      <p className="max-w-md text-sm leading-relaxed text-muted-foreground">
+                      <p className="max-w-md text-[14px] leading-relaxed text-muted-foreground">
                         Then place your cash-on-delivery order. Pay when the
                         parcel arrives.
                       </p>
-                      <div className="border-t border-border/50 pt-3">
-                        <p className="text-[11px] text-muted-foreground">
+                      <div className="border-t border-black/10 pt-3">
+                        <p className="text-[12px] text-muted-foreground">
                           Tracking ID
                         </p>
-                        <p className="mt-1 text-sm text-foreground">
+                        <p className="mt-1 text-[14px] text-foreground">
                           You’ll get yours on the next screen.
                         </p>
                       </div>
                     </div>
                   )}
                 </div>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-2.5">
                   <Button
                     type="button"
                     variant="outline"
-                    className="rounded-none"
+                    className={btnOutlineClass}
                     onClick={() => setStep(2)}
                   >
                     Back
                   </Button>
                   <Button
                     type="button"
-                    className="rounded-none"
+                    className={btnClass}
                     disabled={submitting}
                     onClick={onComplete}
                   >

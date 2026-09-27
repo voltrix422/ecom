@@ -118,7 +118,7 @@ export default function HomePage() {
               followCursor={false}
               autoplay
               interval={4}
-              captureWheel
+              captureWheel={false}
               className="font-nav-display"
               onSelect={(index) => {
                 const item = carouselItems[index];

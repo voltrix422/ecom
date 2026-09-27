@@ -55,22 +55,25 @@ function ReceiptView({
   const subtotal = order.total - (order.shipping || 0);
 
   return (
-    <div className="relative mx-auto w-full max-w-[280px] px-1 py-2 font-mono text-[12px] leading-relaxed">
+    <div className="font-nav-display relative mx-auto w-full max-w-[320px] px-1 py-2 text-[13px] leading-relaxed">
       <button
         type="button"
         onClick={onDownload}
         aria-label="Download receipt PDF"
         title="Download PDF"
-        className="absolute top-2 right-0 z-10 inline-flex size-7 items-center justify-center text-muted-foreground transition-colors hover:text-foreground"
+        className="absolute top-2 right-0 z-10 inline-flex size-8 items-center justify-center text-muted-foreground transition-colors hover:text-foreground"
       >
-        <Download className="size-3.5" />
+        <Download className="size-4" />
       </button>
 
       <div className="text-center">
-        <div className="mx-auto mb-2 flex justify-center">
-          <BrandArcLogo size={112} href={null} />
+        <div className="mx-auto mb-3 flex justify-center">
+          <BrandArcLogo size={128} href={null} />
         </div>
-        <div className="mt-3 space-y-1 text-[10px] text-muted-foreground">
+        <p className="text-[15px] tracking-tight text-foreground/90">
+          {brand.name}
+        </p>
+        <div className="mt-3 space-y-1 text-[11px] text-muted-foreground">
           <p>
             <span className="text-muted-foreground/80">Order</span>{" "}
             <span className="text-foreground">{order.id}</span>
@@ -80,15 +83,15 @@ function ReceiptView({
             <span className="text-foreground">{order.trackingId}</span>
           </p>
         </div>
-        <p className="mt-2 text-[10px] text-muted-foreground">
+        <p className="mt-2 text-[11px] text-muted-foreground">
           {formatDate(order.createdAt)}
         </p>
       </div>
 
       <div className="my-3 border-t border-dashed border-foreground/20" />
 
-      <div className="space-y-0.5 text-[11px] text-muted-foreground">
-        <p className="text-foreground">{order.customer.name}</p>
+      <div className="space-y-1 text-[12px] text-muted-foreground">
+        <p className="text-[14px] text-foreground">{order.customer.name}</p>
         {order.customer.phone ? <p>{order.customer.phone}</p> : null}
         <p className="break-all">{order.customer.email}</p>
         <p>
@@ -99,7 +102,7 @@ function ReceiptView({
 
       <div className="my-3 border-t border-dashed border-foreground/20" />
 
-      <div className="space-y-1.5">
+      <div className="space-y-2">
         {order.items.map((item) => (
           <div
             key={`${item.productId}-${item.name}`}
@@ -117,7 +120,7 @@ function ReceiptView({
 
       <div className="my-3 border-t border-dashed border-foreground/20" />
 
-      <div className="space-y-1">
+      <div className="space-y-1.5">
         <div className="flex justify-between gap-2">
           <span className="text-muted-foreground">Subtotal</span>
           <span className="tabular-nums">{formatPrice(subtotal)}</span>
@@ -138,7 +141,7 @@ function ReceiptView({
 
       <div className="my-3 border-t border-foreground/35" />
 
-      <div className="flex justify-between gap-2 text-[13px]">
+      <div className="flex justify-between gap-2 text-[15px]">
         <span>Total</span>
         <span className="tabular-nums">{formatPrice(order.total)}</span>
       </div>
@@ -146,14 +149,14 @@ function ReceiptView({
       {order.notes ? (
         <>
           <div className="my-3 border-t border-dashed border-foreground/20" />
-          <p className="text-[11px] text-muted-foreground">Note: {order.notes}</p>
+          <p className="text-[12px] text-muted-foreground">Note: {order.notes}</p>
         </>
       ) : null}
 
       {order.paymentMethod === "bank" ? (
         <>
           <div className="my-3 border-t border-dashed border-foreground/20" />
-          <div className="space-y-0.5 text-[11px]">
+          <div className="space-y-0.5 text-[12px]">
             <p className="text-muted-foreground">Bank transfer</p>
             <p>{bankDetails.bankName}</p>
             <p>{bankDetails.accountTitle}</p>
@@ -165,7 +168,7 @@ function ReceiptView({
       {order.paymentProof ? (
         <>
           <div className="my-3 border-t border-dashed border-foreground/20" />
-          <p className="mb-2 text-[10px] tracking-[0.12em] text-muted-foreground uppercase">
+          <p className="mb-2 text-[11px] tracking-wide text-muted-foreground">
             Payment proof
           </p>
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -177,7 +180,7 @@ function ReceiptView({
         </>
       ) : null}
 
-      <p className="mt-5 text-center text-[10px] text-muted-foreground">
+      <p className="mt-6 text-center text-[12px] text-muted-foreground">
         Thank you
       </p>
     </div>
@@ -228,7 +231,7 @@ function SuccessContent() {
 
   return (
     <StoreShell hideSaleBanner>
-      <div className="relative mx-auto grid max-w-6xl gap-10 px-6 py-14 lg:grid-cols-2 lg:items-start">
+      <div className="font-nav-display relative mx-auto grid max-w-6xl gap-10 px-6 py-14 lg:grid-cols-2 lg:items-start">
         <div className="relative flex min-h-[280px] items-center lg:min-h-[420px]">
           <div className="select-none animate-order-cart">
             <div className="flex items-end gap-3">
@@ -237,17 +240,17 @@ function SuccessContent() {
                 strokeWidth={1.5}
                 aria-hidden
               />
-              <h1 className="font-heading text-[clamp(2.6rem,9vw,5rem)] leading-[0.9] tracking-tight text-foreground">
+              <h1 className="text-[clamp(2.6rem,9vw,5rem)] leading-[0.9] tracking-tight text-foreground">
                 Order placed
               </h1>
             </div>
-            <p className="mt-4 max-w-xs text-sm text-muted-foreground">
+            <p className="mt-4 max-w-xs text-[14px] text-muted-foreground">
               Thank you for shopping with {brand.name}
             </p>
             {order?.trackingId ? (
               <Link
                 href={`/track?id=${encodeURIComponent(order.trackingId)}`}
-                className="mt-6 inline-block text-sm text-foreground underline-offset-4 hover:underline"
+                className="mt-6 inline-block text-[14px] text-foreground underline-offset-4 hover:underline"
               >
                 Track this order
               </Link>
