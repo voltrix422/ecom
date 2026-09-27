@@ -1,6 +1,7 @@
 import { CartDrawer } from "@/components/storefront/cart-drawer";
 import { Footer } from "@/components/storefront/footer";
 import { Header } from "@/components/storefront/header";
+import { WhatsAppFloat } from "@/components/storefront/whatsapp-float";
 import { PageFade } from "@/components/page-fade";
 import { PageVeil } from "@/components/page-veil";
 
@@ -19,6 +20,7 @@ export function StoreShell({
       </main>
       <Footer />
       <CartDrawer />
+      <WhatsAppFloat />
       <PageVeil />
     </div>
   );

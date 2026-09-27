@@ -15,6 +15,8 @@ export const brand = {
   wordmark: "/brand/logo-wordmark.png",
   /** Full lockup artwork: the name curved above the mark, transparent bg */
   lockup: "/brand/logo-lockup.png",
+  /** Digits only for wa.me links */
+  whatsapp: "923258550023",
 };
 
 export const seedProducts: Product[] = [
