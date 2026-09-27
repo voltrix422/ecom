@@ -47,10 +47,16 @@ function ShopContent() {
 
   function selectCategory(item: Category | "All") {
     setCategory(item);
+    const q = searchParams.get("q");
     if (item === "All") {
-      router.replace("/shop", { scroll: false });
+      router.replace(q ? `/shop?q=${encodeURIComponent(q)}` : "/shop", {
+        scroll: false,
+      });
     } else {
-      router.replace(`/shop?category=${item}`, { scroll: false });
+      const params = new URLSearchParams();
+      params.set("category", item);
+      if (q) params.set("q", q);
+      router.replace(`/shop?${params.toString()}`, { scroll: false });
     }
   }
 
@@ -60,11 +66,55 @@ function ShopContent() {
     router.replace("/shop", { scroll: false });
   }
 
+  function renderFilters(className?: string) {
+    return (["All", ...allCategories] as const).map((item) => (
+      <button
+        key={item}
+        type="button"
+        onClick={() => selectCategory(item)}
+        className={cn(
+          "font-nav-display shrink-0 cursor-pointer px-3 py-1.5 text-[14px] transition-colors sm:text-[15px] lg:w-full lg:px-2.5 lg:py-2 lg:text-left lg:text-[16px] xl:text-[17px]",
+          category === item
+            ? "bg-foreground text-background"
+            : "text-muted-foreground hover:text-foreground",
+          className
+        )}
+      >
+        {item}
+      </button>
+    ));
+  }
+
   return (
     <StoreShell>
       <div className="mx-auto max-w-7xl px-6 pt-4 pb-16 md:pt-6 md:pb-20">
+        {/* Mobile: horizontal filter strip only (search is in bottom nav) */}
+        <div className="mb-5 lg:hidden">
+          <div className="flex items-center justify-between gap-2">
+            <p className="text-[11px] tracking-[0.16em] text-muted-foreground uppercase">
+              Filter
+            </p>
+            {hasFilters ? (
+              <button
+                type="button"
+                onClick={clearFilters}
+                className="inline-flex items-center gap-1 text-[11px] tracking-wide text-muted-foreground transition-colors hover:text-foreground"
+              >
+                <X className="size-3" />
+                Clear
+              </button>
+            ) : null}
+          </div>
+          <nav
+            className="-mx-6 mt-3 flex gap-1.5 overflow-x-auto px-6 pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            aria-label="Categories"
+          >
+            {renderFilters()}
+          </nav>
+        </div>
+
         <div className="grid items-start gap-10 lg:grid-cols-[200px_minmax(0,1fr)] lg:gap-14">
-          <aside className="lg:sticky lg:top-28 lg:self-start">
+          <aside className="hidden lg:sticky lg:top-28 lg:block lg:self-start">
             <div className="relative">
               <Search className="pointer-events-none absolute top-1/2 left-0 size-3.5 -translate-y-1/2 text-muted-foreground/70" />
               <Input
@@ -91,25 +141,8 @@ function ShopContent() {
               ) : null}
             </div>
 
-            <nav
-              className="mt-4 flex flex-row flex-wrap gap-1 lg:flex-col lg:flex-nowrap lg:gap-0"
-              aria-label="Categories"
-            >
-              {(["All", ...allCategories] as const).map((item) => (
-                <button
-                  key={item}
-                  type="button"
-                  onClick={() => selectCategory(item)}
-                  className={cn(
-                    "font-nav-display cursor-pointer px-2.5 py-2 text-left text-[16px] transition-colors sm:text-[17px]",
-                    category === item
-                      ? "bg-foreground text-background"
-                      : "text-muted-foreground hover:text-foreground"
-                  )}
-                >
-                  {item}
-                </button>
-              ))}
+            <nav className="mt-4 flex flex-col gap-0" aria-label="Categories">
+              {renderFilters()}
             </nav>
           </aside>
 

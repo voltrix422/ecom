@@ -97,28 +97,28 @@ function Hamburger({
       type="button"
       className={cn(
         "relative z-[70] inline-flex cursor-pointer items-center justify-center",
-        compact ? "size-9" : "size-12"
+        compact ? "size-8" : "size-10"
       )}
       onClick={onClick}
       aria-label={open ? "Close menu" : "Open menu"}
       aria-expanded={open}
     >
-      <span className={cn("relative block", compact ? "h-3.5 w-5" : "h-5 w-7")}>
+      <span className={cn("relative block", compact ? "h-2.5 w-3.5" : "h-3.5 w-5")}>
         <span
           className={cn(
-            "absolute left-0 block h-[2px] w-full bg-current transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
+            "absolute left-0 block h-[1.5px] w-full bg-current transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
             open ? "top-1/2 -translate-y-1/2 rotate-45" : "top-0"
           )}
         />
         <span
           className={cn(
-            "absolute top-1/2 left-0 block h-[2px] w-full -translate-y-1/2 bg-current transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
+            "absolute top-1/2 left-0 block h-[1.5px] w-full -translate-y-1/2 bg-current transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
             open ? "scale-x-0 opacity-0" : "scale-x-100 opacity-100"
           )}
         />
         <span
           className={cn(
-            "absolute left-0 block h-[2px] w-full bg-current transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
+            "absolute left-0 block h-[1.5px] w-full bg-current transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
             open ? "top-1/2 -translate-y-1/2 -rotate-45" : "bottom-0"
           )}
         />
@@ -309,7 +309,7 @@ export function Header({ hideSaleBanner = false }: { hideSaleBanner?: boolean })
       <header
         ref={headerRef}
         className={cn(
-          "sticky top-0 z-50 bg-transparent text-black transition-colors duration-300",
+          "relative z-50 bg-transparent text-black transition-colors duration-300",
           light && "md:text-white"
         )}
       >
