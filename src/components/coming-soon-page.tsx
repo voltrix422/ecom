@@ -46,7 +46,7 @@ export default function ComingSoonPage() {
   }
 
   return (
-    <main className="coming-soon relative flex min-h-svh flex-col items-center justify-center overflow-hidden px-6 text-center">
+    <main className="coming-soon fixed inset-0 overflow-hidden text-center">
       <div className="absolute inset-0 z-0" aria-hidden>
         <LightRays
           raysOrigin="top-center"
@@ -65,65 +65,67 @@ export default function ComingSoonPage() {
         />
       </div>
 
-      <div className="relative z-10 flex w-full max-w-md flex-col items-center">
-        <Image
-          src={brand.wordmark}
-          alt={brand.name}
-          width={220}
-          height={48}
-          className="h-9 w-auto object-contain brightness-0 invert sm:h-10"
-          priority
-          unoptimized
-        />
-
-        <h1 className="coming-soon-title mt-10 whitespace-nowrap font-nav-display text-[clamp(2.4rem,11vw,4.25rem)] leading-none tracking-tight text-white">
-          Coming soon
-        </h1>
-
-        <form
-          onSubmit={onSubmit}
-          className="mt-8 flex w-full flex-col gap-2.5 sm:flex-row sm:items-stretch"
-        >
-          <label className="sr-only" htmlFor="notify-email">
-            Email
-          </label>
-          <input
-            id="notify-email"
-            type="email"
-            name="email"
-            required
-            autoComplete="email"
-            inputMode="email"
-            placeholder="Email to notify me"
-            value={email}
-            onChange={(e) => {
-              setEmail(e.target.value);
-              if (status !== "idle" && status !== "loading") setStatus("idle");
-            }}
-            className="h-12 flex-1 rounded-full border border-white/20 bg-white/10 px-5 text-[14px] text-white outline-none placeholder:text-white/45 backdrop-blur-sm focus:border-white/45"
+      <div className="relative z-10 flex h-full w-full flex-col items-center px-5 pt-[18svh] sm:justify-center sm:pt-0">
+        <div className="flex w-full max-w-md flex-col items-center">
+          <Image
+            src={brand.wordmark}
+            alt={brand.name}
+            width={220}
+            height={48}
+            className="h-8 w-auto object-contain brightness-0 invert sm:h-10"
+            priority
+            unoptimized
           />
-          <button
-            type="submit"
-            disabled={status === "loading" || status === "done"}
-            className="font-nav-display h-12 shrink-0 rounded-full bg-white px-6 text-[12px] tracking-wide text-black transition-opacity disabled:opacity-60"
-          >
-            {status === "loading"
-              ? "Saving…"
-              : status === "done"
-                ? "Saved"
-                : "Notify me"}
-          </button>
-        </form>
 
-        {message ? (
-          <p
-            className={`mt-3 text-[13px] normal-case ${
-              status === "error" ? "text-red-300" : "text-white/70"
-            }`}
+          <h1 className="coming-soon-title mt-5 whitespace-nowrap font-nav-display text-[clamp(2.1rem,10.5vw,4.25rem)] leading-none tracking-tight text-white sm:mt-8">
+            Coming soon
+          </h1>
+
+          <form
+            onSubmit={onSubmit}
+            className="mt-6 flex w-full flex-row items-stretch gap-2 sm:mt-8"
           >
-            {message}
-          </p>
-        ) : null}
+            <label className="sr-only" htmlFor="notify-email">
+              Email
+            </label>
+            <input
+              id="notify-email"
+              type="email"
+              name="email"
+              required
+              autoComplete="email"
+              inputMode="email"
+              placeholder="Email to notify me"
+              value={email}
+              onChange={(e) => {
+                setEmail(e.target.value);
+                if (status !== "idle" && status !== "loading") setStatus("idle");
+              }}
+              className="h-11 min-w-0 flex-1 rounded-full border border-white/20 bg-white/10 px-4 text-[13px] text-white outline-none placeholder:text-white/45 backdrop-blur-sm focus:border-white/45 sm:h-12 sm:px-5 sm:text-[14px]"
+            />
+            <button
+              type="submit"
+              disabled={status === "loading" || status === "done"}
+              className="font-nav-display h-11 shrink-0 rounded-full bg-white px-4 text-[11px] tracking-wide text-black transition-opacity disabled:opacity-60 sm:h-12 sm:px-6 sm:text-[12px]"
+            >
+              {status === "loading"
+                ? "Saving…"
+                : status === "done"
+                  ? "Saved"
+                  : "Notify me"}
+            </button>
+          </form>
+
+          {message ? (
+            <p
+              className={`mt-3 text-[13px] normal-case ${
+                status === "error" ? "text-red-300" : "text-white/70"
+              }`}
+            >
+              {message}
+            </p>
+          ) : null}
+        </div>
       </div>
     </main>
   );
