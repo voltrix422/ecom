@@ -10,14 +10,14 @@ function FeaturedPanel({ product }: { product: Product }) {
   return (
     <Link
       href={`/product/${product.slug}`}
-      className="group relative block min-h-[58svh] overflow-hidden bg-muted/15 lg:min-h-[72svh]"
+      className="group relative block min-h-[66svh] overflow-hidden bg-muted/10 lg:min-h-[80svh]"
     >
       <MediaImage
         src={product.image}
         alt={product.name}
         fill
         sizes="(min-width: 1024px) 50vw, 100vw"
-        className="object-contain p-6 transition-transform duration-700 group-hover:scale-[1.02] md:p-10"
+        className="object-contain p-3 transition-transform duration-700 group-hover:scale-[1.02] md:p-5"
       />
       <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-background via-background/70 to-transparent px-6 pb-8 pt-20 md:px-8 md:pb-10">
         <p className="font-nav-display text-[22px] tracking-tight text-foreground md:text-[28px]">
@@ -67,15 +67,10 @@ export function FeaturedSection({ products }: { products: Product[] }) {
       onMouseLeave={() => setPaused(false)}
     >
       <div className="mx-auto max-w-7xl px-6 pt-16 md:pt-20">
-        <div className="mb-10 flex items-end justify-between gap-6 md:mb-14">
-          <div>
-            <p className="font-nav-display text-[15px] tracking-wide text-muted-foreground md:text-[17px]">
-              Selected
-            </p>
-            <h2 className="font-nav-display mt-2 text-5xl leading-[0.95] tracking-tight md:text-6xl lg:text-7xl">
-              Featured suits
-            </h2>
-          </div>
+        <div className="mb-8 flex items-end justify-between gap-6 md:mb-10">
+          <h2 className="font-nav-display text-5xl leading-[0.95] tracking-tight md:text-6xl lg:text-7xl">
+            Featured suits
+          </h2>
           <Link
             href="/shop"
             className="font-nav-display shrink-0 pb-1 text-[18px] text-muted-foreground transition-colors hover:text-foreground md:text-[20px]"
@@ -87,15 +82,11 @@ export function FeaturedSection({ products }: { products: Product[] }) {
 
       <div
         key={`${pair[0].id}-${pair[1].id}-${index}`}
-        className="featured-pair-fade border-y border-black/8"
+        className="featured-pair-fade"
       >
         <div className="mx-auto grid max-w-7xl lg:grid-cols-2">
-          <div className="border-b border-black/8 lg:border-r lg:border-b-0">
-            <FeaturedPanel product={pair[0]} />
-          </div>
-          <div>
-            <FeaturedPanel product={pair[1]} />
-          </div>
+          <FeaturedPanel product={pair[0]} />
+          <FeaturedPanel product={pair[1]} />
         </div>
       </div>
 
