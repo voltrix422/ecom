@@ -7,20 +7,17 @@ import { Upload } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "cn";
 import { StoreShell } from "@/components/storefront/store-shell";
+import {
+  StoreReceipt,
+  checkoutReceiptLines,
+} from "@/components/storefront/store-receipt";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { BrandLogo } from "@/components/brand-logo";
-import { formatPrice, salePrice } from "@/lib/format";
 import { fileToDataUrl } from "@/lib/image-upload";
 import { useStore } from "@/lib/store";
-import type {
-  BankDetails,
-  CustomerInfo,
-  PaymentMethod,
-  Product,
-} from "@/lib/types";
+import type { PaymentMethod, Product } from "@/lib/types";
 
 type Step = 1 | 2 | 3;
 
@@ -74,184 +71,6 @@ function StepDots({ step }: { step: Step }) {
           </div>
         );
       })}
-    </div>
-  );
-}
-
-function ReceiptRule({ heavy = false }: { heavy?: boolean }) {
-  return (
-    <div
-      className={cn(
-        "my-3 border-t",
-        heavy ? "border-foreground/35" : "border-dashed border-foreground/20"
-      )}
-      aria-hidden
-    />
-  );
-}
-
-function ReceiptCard({
-  lines,
-  shipping,
-  total,
-  payment,
-  customer,
-  notes,
-  bankDetails,
-  paymentProof,
-  orderId,
-  trackingId,
-}: {
-  lines: Line[];
-  shipping: number;
-  total: number;
-  payment: PaymentMethod;
-  customer?: Partial<CustomerInfo>;
-  notes?: string;
-  bankDetails?: BankDetails;
-  paymentProof?: string | null;
-  orderId?: string;
-  trackingId?: string;
-}) {
-  const subtotal = total - shipping;
-  const hasCustomer = Boolean(
-    customer?.name ||
-      customer?.phone ||
-      customer?.email ||
-      customer?.address ||
-      customer?.city
-  );
-
-  return (
-    <div className="font-nav-display mx-auto w-full max-w-[320px] px-1 py-2 text-[13px] leading-relaxed text-foreground">
-      <div className="text-center">
-        <div className="mx-auto mb-3 flex justify-center">
-          <BrandLogo
-            size="lg"
-            href={null}
-            className="flex-col items-center gap-2"
-            wordmarkClassName="font-nav-display text-[16px] tracking-tight lowercase"
-          />
-        </div>
-        {orderId ? (
-          <div className="mt-3 space-y-1 text-[11px] text-muted-foreground">
-            <p>
-              <span className="text-muted-foreground/80">Order</span>{" "}
-              <span className="text-foreground">{orderId}</span>
-            </p>
-            {trackingId ? (
-              <p>
-                <span className="text-muted-foreground/80">Tracking ID</span>{" "}
-                <span className="text-foreground">{trackingId}</span>
-              </p>
-            ) : null}
-          </div>
-        ) : (
-          <p className="mt-1.5 text-[12px] tracking-wide text-muted-foreground">
-            Receipt
-          </p>
-        )}
-      </div>
-
-      <ReceiptRule />
-
-      {hasCustomer ? (
-        <>
-          <div className="space-y-1 text-[12px] text-muted-foreground">
-            {customer?.name ? (
-              <p className="text-[14px] text-foreground">{customer.name}</p>
-            ) : null}
-            {customer?.phone ? <p>{customer.phone}</p> : null}
-            {customer?.email ? (
-              <p className="break-all">{customer.email}</p>
-            ) : null}
-            {customer?.address || customer?.city ? (
-              <p>
-                {[customer?.address, customer?.city].filter(Boolean).join(", ")}
-              </p>
-            ) : null}
-            {customer?.country ? <p>{customer.country}</p> : null}
-          </div>
-          <ReceiptRule />
-        </>
-      ) : null}
-
-      <div className="space-y-2">
-        {lines.map(({ product, quantity }) => (
-          <div key={product.id} className="flex justify-between gap-2">
-            <span className="min-w-0 flex-1 truncate text-muted-foreground">
-              {product.name} × {quantity}
-            </span>
-            <span className="shrink-0 tabular-nums">
-              {formatPrice(salePrice(product.price) * quantity)}
-            </span>
-          </div>
-        ))}
-      </div>
-
-      <ReceiptRule />
-
-      <div className="space-y-1.5">
-        <div className="flex justify-between gap-2">
-          <span className="text-muted-foreground">Subtotal</span>
-          <span className="tabular-nums">{formatPrice(subtotal)}</span>
-        </div>
-        <div className="flex justify-between gap-2">
-          <span className="text-muted-foreground">Shipping</span>
-          <span className="tabular-nums">
-            {shipping === 0 ? "Free" : formatPrice(shipping)}
-          </span>
-        </div>
-        <div className="flex justify-between gap-2">
-          <span className="text-muted-foreground">Payment</span>
-          <span>{payment === "cod" ? "COD" : "Bank"}</span>
-        </div>
-      </div>
-
-      <ReceiptRule heavy />
-
-      <div className="flex justify-between gap-2 text-[15px]">
-        <span>Total</span>
-        <span className="tabular-nums">{formatPrice(total)}</span>
-      </div>
-
-      {notes ? (
-        <>
-          <ReceiptRule />
-          <p className="text-[12px] text-muted-foreground">Note: {notes}</p>
-        </>
-      ) : null}
-
-      {payment === "bank" && bankDetails ? (
-        <>
-          <ReceiptRule />
-          <div className="space-y-0.5 text-[12px]">
-            <p className="text-muted-foreground">Bank transfer</p>
-            <p>{bankDetails.bankName}</p>
-            <p>{bankDetails.accountTitle}</p>
-            <p className="break-all tracking-wide">{bankDetails.iban}</p>
-          </div>
-        </>
-      ) : null}
-
-      {paymentProof ? (
-        <>
-          <ReceiptRule />
-          <p className="mb-2 text-[11px] tracking-wide text-muted-foreground">
-            Payment proof
-          </p>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={paymentProof}
-            alt="Payment proof"
-            className="max-h-36 w-full object-contain"
-          />
-        </>
-      ) : null}
-
-      <p className="mt-6 text-center text-[12px] text-muted-foreground">
-        Thank you
-      </p>
     </div>
   );
 }
@@ -813,8 +632,8 @@ export default function CheckoutPage() {
           </div>
 
           <aside className="lg:sticky lg:top-24">
-            <ReceiptCard
-              lines={lines}
+            <StoreReceipt
+              lines={checkoutReceiptLines(lines)}
               shipping={shipping}
               total={total}
               payment={payment}

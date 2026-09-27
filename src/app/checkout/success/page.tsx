@@ -3,12 +3,10 @@
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
-import { Download, ShoppingCart } from "lucide-react";
 import { toast } from "sonner";
 import { StoreShell } from "@/components/storefront/store-shell";
-import { BrandLogo } from "@/components/brand-logo";
+import { StoreReceipt } from "@/components/storefront/store-receipt";
 import { brand } from "@/lib/data";
-import { formatDate, formatPrice } from "@/lib/format";
 import { downloadOrderReceiptPdf } from "@/lib/receipt-pdf";
 import { useStore } from "@/lib/store";
 import type { Order } from "@/lib/types";
@@ -52,140 +50,28 @@ function ReceiptView({
     );
   }
 
-  const subtotal = order.total - (order.shipping || 0);
-
   return (
-    <div className="font-nav-display relative mx-auto w-full max-w-[320px] px-1 py-2 text-[13px] leading-relaxed">
-      <button
-        type="button"
-        onClick={onDownload}
-        aria-label="Download receipt PDF"
-        title="Download PDF"
-        className="absolute top-2 right-0 z-10 inline-flex size-8 items-center justify-center text-muted-foreground transition-colors hover:text-foreground"
-      >
-        <Download className="size-4" />
-      </button>
-
-      <div className="text-center">
-        <div className="mx-auto mb-3 flex justify-center">
-          <BrandLogo
-            size="lg"
-            href={null}
-            className="flex-col items-center gap-2"
-            wordmarkClassName="font-nav-display text-[16px] tracking-tight lowercase"
-          />
-        </div>
-        <div className="mt-3 space-y-1 text-[11px] text-muted-foreground">
-          <p>
-            <span className="text-muted-foreground/80">Order</span>{" "}
-            <span className="text-foreground">{order.id}</span>
-          </p>
-          <p>
-            <span className="text-muted-foreground/80">Tracking ID</span>{" "}
-            <span className="text-foreground">{order.trackingId}</span>
-          </p>
-        </div>
-        <p className="mt-2 text-[11px] text-muted-foreground">
-          {formatDate(order.createdAt)}
-        </p>
-      </div>
-
-      <div className="my-3 border-t border-dashed border-foreground/20" />
-
-      <div className="space-y-1 text-[12px] text-muted-foreground">
-        <p className="text-[14px] text-foreground">{order.customer.name}</p>
-        {order.customer.phone ? <p>{order.customer.phone}</p> : null}
-        <p className="break-all">{order.customer.email}</p>
-        <p>
-          {order.customer.address}, {order.customer.city}
-        </p>
-        <p>{order.customer.country}</p>
-      </div>
-
-      <div className="my-3 border-t border-dashed border-foreground/20" />
-
-      <div className="space-y-2">
-        {order.items.map((item) => (
-          <div
-            key={`${item.productId}-${item.name}`}
-            className="flex justify-between gap-2"
-          >
-            <span className="min-w-0 flex-1 truncate text-muted-foreground">
-              {item.name} × {item.quantity}
-            </span>
-            <span className="shrink-0 tabular-nums">
-              {formatPrice(item.price * item.quantity)}
-            </span>
-          </div>
-        ))}
-      </div>
-
-      <div className="my-3 border-t border-dashed border-foreground/20" />
-
-      <div className="space-y-1.5">
-        <div className="flex justify-between gap-2">
-          <span className="text-muted-foreground">Subtotal</span>
-          <span className="tabular-nums">{formatPrice(subtotal)}</span>
-        </div>
-        <div className="flex justify-between gap-2">
-          <span className="text-muted-foreground">Shipping</span>
-          <span className="tabular-nums">
-            {order.shipping === 0 ? "Free" : formatPrice(order.shipping)}
-          </span>
-        </div>
-        <div className="flex justify-between gap-2">
-          <span className="text-muted-foreground">Payment</span>
-          <span>
-            {order.paymentMethod === "bank" ? "Bank" : "COD"}
-          </span>
-        </div>
-      </div>
-
-      <div className="my-3 border-t border-foreground/35" />
-
-      <div className="flex justify-between gap-2 text-[15px]">
-        <span>Total</span>
-        <span className="tabular-nums">{formatPrice(order.total)}</span>
-      </div>
-
-      {order.notes ? (
-        <>
-          <div className="my-3 border-t border-dashed border-foreground/20" />
-          <p className="text-[12px] text-muted-foreground">Note: {order.notes}</p>
-        </>
-      ) : null}
-
-      {order.paymentMethod === "bank" ? (
-        <>
-          <div className="my-3 border-t border-dashed border-foreground/20" />
-          <div className="space-y-0.5 text-[12px]">
-            <p className="text-muted-foreground">Bank transfer</p>
-            <p>{bankDetails.bankName}</p>
-            <p>{bankDetails.accountTitle}</p>
-            <p className="break-all tracking-wide">{bankDetails.iban}</p>
-          </div>
-        </>
-      ) : null}
-
-      {order.paymentProof ? (
-        <>
-          <div className="my-3 border-t border-dashed border-foreground/20" />
-          <p className="mb-2 text-[11px] tracking-wide text-muted-foreground">
-            Payment proof
-          </p>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={order.paymentProof}
-            alt="Payment proof"
-            className="max-h-48 w-full object-contain"
-          />
-        </>
-      ) : null}
-
-      <p className="mt-6 text-center text-[12px] text-muted-foreground">
-        Thank you
-      </p>
-    </div>
+    <StoreReceipt
+      lines={order.items.map((item) => ({
+        key: `${item.productId}-${item.name}`,
+        name: item.name,
+        quantity: item.quantity,
+        price: item.price,
+      }))}
+      shipping={order.shipping || 0}
+      total={order.total}
+      payment={order.paymentMethod ?? "cod"}
+      customer={order.customer}
+      notes={order.notes}
+      bankDetails={
+        order.paymentMethod === "bank" ? bankDetails : undefined
+      }
+      paymentProof={order.paymentProof}
+      orderId={order.id}
+      trackingId={order.trackingId}
+      createdAt={order.createdAt}
+      onDownload={onDownload}
+    />
   );
 }
 
@@ -233,34 +119,53 @@ function SuccessContent() {
 
   return (
     <StoreShell hideSaleBanner>
-      <div className="font-nav-display relative mx-auto grid max-w-6xl gap-10 px-6 py-14 lg:grid-cols-2 lg:items-start">
-        <div className="relative flex min-h-[280px] items-center lg:min-h-[420px]">
-          <div className="select-none animate-order-cart">
-            <div className="flex items-end gap-3">
-              <ShoppingCart
-                className="mb-2 size-8 shrink-0 text-foreground animate-cart-wiggle sm:size-10"
-                strokeWidth={1.5}
-                aria-hidden
-              />
-              <h1 className="text-[clamp(2.6rem,9vw,5rem)] leading-[0.9] tracking-tight text-foreground">
-                Order placed
-              </h1>
-            </div>
-            <p className="mt-4 max-w-xs text-[14px] text-muted-foreground">
-              Thank you for shopping with {brand.name}
-            </p>
-            {order?.trackingId ? (
+      <div className="font-nav-display relative mx-auto grid max-w-6xl gap-12 px-6 py-16 lg:grid-cols-[1fr_340px] lg:items-center lg:gap-16 lg:py-20">
+        <div className="relative flex min-h-[240px] flex-col justify-center lg:min-h-[380px]">
+          <p className="text-[12px] tracking-[0.18em] text-muted-foreground uppercase">
+            Confirmation
+          </p>
+          <h1 className="mt-4 max-w-[12ch] text-[clamp(2.75rem,8vw,4.75rem)] leading-[0.92] tracking-tight text-foreground">
+            Order placed
+          </h1>
+          <p className="mt-5 max-w-sm text-[15px] leading-relaxed text-muted-foreground">
+            Thank you for shopping with {brand.name}. A confirmation is on its
+            way — keep your tracking ID handy.
+          </p>
+
+          {order?.trackingId ? (
+            <div className="mt-8 max-w-sm border-t border-black/10 pt-6">
+              <p className="text-[11px] tracking-[0.14em] text-muted-foreground uppercase">
+                Tracking ID
+              </p>
+              <p className="mt-2 font-mono text-[15px] tracking-wide text-foreground">
+                {order.trackingId}
+              </p>
               <Link
                 href={`/track?id=${encodeURIComponent(order.trackingId)}`}
-                className="mt-6 inline-block text-[14px] text-foreground underline-offset-4 hover:underline"
+                className="mt-5 inline-flex items-center text-[13px] tracking-wide text-foreground underline-offset-4 transition-opacity hover:underline"
               >
                 Track this order
               </Link>
-            ) : null}
+            </div>
+          ) : null}
+
+          <div className="mt-10 flex flex-wrap gap-x-6 gap-y-3 text-[13px]">
+            <Link
+              href="/shop"
+              className="text-muted-foreground underline-offset-4 transition-colors hover:text-foreground hover:underline"
+            >
+              Continue shopping
+            </Link>
+            <Link
+              href="/"
+              className="text-muted-foreground underline-offset-4 transition-colors hover:text-foreground hover:underline"
+            >
+              Back home
+            </Link>
           </div>
         </div>
 
-        <div>
+        <div className="lg:border-l lg:border-black/8 lg:pl-12">
           <ReceiptView orderId={orderId} onDownload={onDownload} />
         </div>
       </div>

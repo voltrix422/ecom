@@ -5,11 +5,11 @@ import type { BankDetails, Order } from "@/lib/types";
 
 const RECEIPT_WIDTH = 80;
 
-/** Logo mark aspect after trim (w/h) */
-const LOGO_RATIO = 357 / 606;
+/** Wordmark aspect (w/h) — 720×160 */
+const WORDMARK_RATIO = 720 / 160;
 
 async function loadLogoDataUrl() {
-  const response = await fetch(brand.logo);
+  const response = await fetch(brand.wordmark);
   const blob = await response.blob();
   return new Promise<string>((resolve, reject) => {
     const reader = new FileReader();
@@ -109,8 +109,8 @@ export async function downloadOrderReceiptPdf(
   };
 
   if (logoDataUrl) {
-    const logoHeight = 22;
-    const logoWidth = logoHeight * LOGO_RATIO;
+    const logoWidth = 42;
+    const logoHeight = logoWidth / WORDMARK_RATIO;
     doc.addImage(
       logoDataUrl,
       "PNG",
@@ -119,12 +119,8 @@ export async function downloadOrderReceiptPdf(
       logoWidth,
       logoHeight
     );
-    y += logoHeight + 4;
+    y += logoHeight + 6;
   }
-
-  doc.setTextColor(20);
-  center(brand.name, 11, "bold");
-  y += 6;
 
   doc.setTextColor(120);
   center("RECEIPT", 8);
@@ -155,14 +151,21 @@ export async function downloadOrderReceiptPdf(
 
   rule();
 
+  doc.setFont("courier", "normal");
+  doc.setFontSize(7.5);
+  doc.setTextColor(120);
+  ensureSpace(4);
+  doc.text("Deliver to", margin, y);
+  y += 5;
+
   doc.setFont("courier", "bold");
   doc.setFontSize(9.5);
   doc.setTextColor(20);
   ensureSpace(5);
   doc.text(order.customer.name, margin, y);
   y += 5;
-  mutedLine(order.customer.phone || "");
   mutedLine(order.customer.email);
+  mutedLine(order.customer.phone || "");
   mutedLine(`${order.customer.address}, ${order.customer.city}`);
   mutedLine(order.customer.country);
   y += 3;
