@@ -20,7 +20,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { formatPrice } from "@/lib/format";
 import { fileToDataUrl } from "@/lib/image-upload";
 import { useStore } from "@/lib/store";
@@ -227,12 +226,15 @@ function SwipeToComplete({
 }
 
 const fieldClass =
-  "h-9 rounded-none border-0 border-b border-border/45 bg-transparent px-0 text-[14px] normal-case shadow-none focus-visible:border-foreground focus-visible:ring-0";
+  "h-8 rounded-none border-0 border-b border-border/45 bg-transparent px-0 text-[13px] normal-case shadow-none focus-visible:border-foreground focus-visible:ring-0";
 
 const labelClass =
-  "text-[11px] font-normal normal-case tracking-normal text-muted-foreground";
+  "text-[10px] font-normal normal-case tracking-normal text-muted-foreground";
 
-const btnClass = "font-nav-display h-11 w-full border-0 shadow-none sm:w-auto";
+const btnClass = "font-nav-display h-11 w-full border-0 shadow-none";
+
+const shellClass =
+  "mx-auto flex h-[calc(100svh-4rem)] max-w-6xl flex-col px-4 pt-1 pb-3 sm:px-6 md:h-auto md:pt-8 md:pb-14";
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -313,7 +315,6 @@ export default function CheckoutPage() {
       const dataUrl = await fileToDataUrl(file, 1400, 0.78);
       setPaymentProof(dataUrl);
       setProofName(file.name);
-      toast.success("Payment proof attached");
     } catch {
       toast.error("Could not upload proof");
     } finally {
@@ -379,8 +380,7 @@ export default function CheckoutPage() {
         paymentProof: paymentProof || undefined,
         shipping,
       });
-      toast.success("Order placed");
-      router.push(`/checkout/success?order=${order.id}&pay=${payment}`);
+      router.replace(`/checkout/success?order=${order.id}&pay=${payment}`);
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Could not place order");
       setSubmitting(false);
@@ -414,353 +414,341 @@ export default function CheckoutPage() {
 
   return (
     <StoreShell hideSaleBanner hideBottomNav>
-      <div
-        className={cn(
-          "mx-auto max-w-6xl px-4 sm:px-6",
-          step === 3
-            ? "flex h-[calc(100svh-4rem)] flex-col pt-1 pb-3 md:h-auto md:pt-8 md:pb-14"
-            : "pt-2 pb-8 sm:pt-4 md:pt-8 md:pb-14"
-        )}
-      >
+      <div className={shellClass}>
         <div className="relative shrink-0 text-center">
           <button
             type="button"
             onClick={goBack}
-            className="absolute top-0.5 left-0 inline-flex size-9 items-center justify-center text-foreground/70 transition-colors hover:text-foreground"
+            className="absolute top-0 left-0 inline-flex size-8 items-center justify-center text-foreground/70 transition-colors hover:text-foreground"
             aria-label="Go back"
           >
             <ArrowLeft className="size-4 stroke-[1.75]" />
           </button>
-          <h1
-            className={cn(
-              "font-nav-display leading-none tracking-tight",
-              step === 3
-                ? "text-[22px] sm:text-4xl md:text-5xl"
-                : "text-[28px] sm:text-4xl md:text-5xl"
-            )}
-          >
+          <h1 className="font-nav-display text-[22px] leading-none tracking-tight sm:text-4xl md:text-5xl">
             Checkout
           </h1>
-          <div className={cn(step === 3 ? "mt-2" : "mt-3 sm:mt-5")}>
+          <div className="mt-2 sm:mt-5">
             <StepDots step={step} />
           </div>
         </div>
 
-        <div
-          className={cn(
-            "mx-auto max-w-xl",
-            step === 3
-              ? "mt-3 flex min-h-0 flex-1 flex-col sm:mt-8"
-              : "mt-5 sm:mt-8"
-          )}
-        >
-          <div className={cn("normal-case", step === 3 && "flex min-h-0 flex-1 flex-col")}>
+        <div className="mx-auto mt-3 flex min-h-0 w-full max-w-xl flex-1 flex-col sm:mt-8">
+          <div className="flex min-h-0 flex-1 flex-col normal-case">
             {step === 1 ? (
               <form
                 onSubmit={goPayment}
-                className="space-y-2.5 sm:space-y-3"
+                className="flex min-h-0 flex-1 flex-col"
                 autoComplete="on"
               >
-                <div className="grid grid-cols-1 gap-x-3 gap-y-2 sm:grid-cols-2 sm:gap-y-2.5">
-                  <div className="space-y-0.5">
-                    <Label htmlFor="name" className={labelClass}>
-                      Name
-                    </Label>
-                    <Input
-                      id="name"
-                      name="name"
-                      autoComplete="name"
-                      value={details.name}
-                      onChange={(e) =>
-                        setDetails((d) => ({ ...d, name: e.target.value }))
-                      }
-                      required
-                      aria-label="Full name"
-                      className={fieldClass}
-                    />
-                  </div>
-                  <div className="space-y-0.5">
-                    <Label htmlFor="email" className={labelClass}>
-                      Email
-                    </Label>
-                    <Input
-                      id="email"
-                      name="email"
-                      type="email"
-                      autoComplete="email"
-                      inputMode="email"
-                      value={details.email}
-                      onChange={(e) =>
-                        setDetails((d) => ({ ...d, email: e.target.value }))
-                      }
-                      required
-                      aria-label="Email"
-                      className={fieldClass}
-                    />
-                  </div>
-                  <div className="space-y-0.5">
-                    <Label htmlFor="phone" className={labelClass}>
-                      Phone
-                    </Label>
-                    <Input
-                      id="phone"
-                      name="tel"
-                      type="tel"
-                      autoComplete="tel"
-                      value={details.phone}
-                      onChange={(e) =>
-                        setDetails((d) => ({ ...d, phone: e.target.value }))
-                      }
-                      required
-                      aria-label="Phone"
-                      className={fieldClass}
-                    />
-                  </div>
-                  <div className="space-y-0.5">
-                    <Label htmlFor="city" className={labelClass}>
-                      City
-                    </Label>
-                    <Input
-                      id="city"
-                      name="city"
-                      autoComplete="address-level2"
-                      value={details.city}
-                      onChange={(e) =>
-                        setDetails((d) => ({ ...d, city: e.target.value }))
-                      }
-                      required
-                      aria-label="City"
-                      className={fieldClass}
-                    />
-                  </div>
-                  <div className="space-y-0.5 sm:col-span-2">
-                    <Label htmlFor="address" className={labelClass}>
-                      Address
-                    </Label>
-                    <Input
-                      id="address"
-                      name="street-address"
-                      autoComplete="street-address"
-                      value={details.address}
-                      onChange={(e) =>
-                        setDetails((d) => ({ ...d, address: e.target.value }))
-                      }
-                      required
-                      aria-label="Address"
-                      className={fieldClass}
-                    />
-                  </div>
-                  <div className="space-y-0.5 sm:col-span-2">
-                    <Label htmlFor="country" className={labelClass}>
-                      Country
-                    </Label>
-                    <Input
-                      id="country"
-                      name="country"
-                      autoComplete="country-name"
-                      value={details.country}
-                      onChange={(e) =>
-                        setDetails((d) => ({ ...d, country: e.target.value }))
-                      }
-                      required
-                      aria-label="Country"
-                      className={fieldClass}
-                    />
+                <div className="min-h-0 flex-1 overflow-y-auto">
+                  <div className="grid grid-cols-2 gap-x-3 gap-y-1.5">
+                    <div className="space-y-0">
+                      <Label htmlFor="name" className={labelClass}>
+                        Name
+                      </Label>
+                      <Input
+                        id="name"
+                        name="name"
+                        autoComplete="name"
+                        value={details.name}
+                        onChange={(e) =>
+                          setDetails((d) => ({ ...d, name: e.target.value }))
+                        }
+                        required
+                        aria-label="Full name"
+                        className={fieldClass}
+                      />
+                    </div>
+                    <div className="space-y-0">
+                      <Label htmlFor="phone" className={labelClass}>
+                        Phone
+                      </Label>
+                      <Input
+                        id="phone"
+                        name="tel"
+                        type="tel"
+                        autoComplete="tel"
+                        value={details.phone}
+                        onChange={(e) =>
+                          setDetails((d) => ({ ...d, phone: e.target.value }))
+                        }
+                        required
+                        aria-label="Phone"
+                        className={fieldClass}
+                      />
+                    </div>
+                    <div className="col-span-2 space-y-0">
+                      <Label htmlFor="email" className={labelClass}>
+                        Email
+                      </Label>
+                      <Input
+                        id="email"
+                        name="email"
+                        type="email"
+                        autoComplete="email"
+                        inputMode="email"
+                        value={details.email}
+                        onChange={(e) =>
+                          setDetails((d) => ({ ...d, email: e.target.value }))
+                        }
+                        required
+                        aria-label="Email"
+                        className={fieldClass}
+                      />
+                    </div>
+                    <div className="col-span-2 space-y-0">
+                      <Label htmlFor="address" className={labelClass}>
+                        Address
+                      </Label>
+                      <Input
+                        id="address"
+                        name="street-address"
+                        autoComplete="street-address"
+                        value={details.address}
+                        onChange={(e) =>
+                          setDetails((d) => ({ ...d, address: e.target.value }))
+                        }
+                        required
+                        aria-label="Address"
+                        className={fieldClass}
+                      />
+                    </div>
+                    <div className="space-y-0">
+                      <Label htmlFor="city" className={labelClass}>
+                        City
+                      </Label>
+                      <Input
+                        id="city"
+                        name="city"
+                        autoComplete="address-level2"
+                        value={details.city}
+                        onChange={(e) =>
+                          setDetails((d) => ({ ...d, city: e.target.value }))
+                        }
+                        required
+                        aria-label="City"
+                        className={fieldClass}
+                      />
+                    </div>
+                    <div className="space-y-0">
+                      <Label htmlFor="country" className={labelClass}>
+                        Country
+                      </Label>
+                      <Input
+                        id="country"
+                        name="country"
+                        autoComplete="country-name"
+                        value={details.country}
+                        onChange={(e) =>
+                          setDetails((d) => ({ ...d, country: e.target.value }))
+                        }
+                        required
+                        aria-label="Country"
+                        className={fieldClass}
+                      />
+                    </div>
+                    <div className="col-span-2 space-y-0">
+                      <Label htmlFor="notes" className={labelClass}>
+                        Remarks
+                      </Label>
+                      <Input
+                        id="notes"
+                        value={notes}
+                        onChange={(e) => setNotes(e.target.value)}
+                        aria-label="Order notes"
+                        className={fieldClass}
+                      />
+                    </div>
                   </div>
                 </div>
-                <div className="space-y-0.5">
-                  <Label htmlFor="notes" className={labelClass}>
-                    Remarks
-                  </Label>
-                  <Textarea
-                    id="notes"
-                    value={notes}
-                    onChange={(e) => setNotes(e.target.value)}
-                    aria-label="Order notes"
-                    className="min-h-12 rounded-none border-0 border-b border-border/45 bg-transparent px-0 text-[14px] normal-case shadow-none focus-visible:border-foreground focus-visible:ring-0"
-                  />
+                <div className="mt-3 shrink-0 pb-[env(safe-area-inset-bottom)]">
+                  <Button type="submit" className={btnClass}>
+                    Continue to payment
+                  </Button>
                 </div>
-                <Button type="submit" className={cn("mt-2", btnClass)}>
-                  Continue to payment
-                </Button>
               </form>
             ) : null}
 
             {step === 2 ? (
-              <div className="flex flex-col gap-3">
-                <div className="rounded-md bg-black/[0.04] px-3 py-3 text-center">
-                  <p className="text-[11px] tracking-wide text-muted-foreground">
-                    Amount to pay
-                  </p>
-                  <p className="mt-1 font-nav-display text-[28px] leading-none tracking-tight tabular-nums sm:text-[32px]">
-                    {formatPrice(total)}
-                  </p>
-                  <p className="mt-1.5 text-[11px] text-muted-foreground">
-                    {shipping === 0
-                      ? "Includes free shipping"
-                      : `Includes ${formatPrice(shipping)} shipping`}
-                  </p>
-                </div>
-
-                <div
-                  role="tablist"
-                  aria-label="Payment method"
-                  className="relative grid grid-cols-2 rounded-full border border-black/15 bg-black/[0.04] p-1"
-                >
-                  <span
-                    aria-hidden
-                    className={cn(
-                      "absolute top-1 bottom-1 w-[calc(50%-4px)] rounded-full bg-black shadow-sm transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
-                      payment === "bank"
-                        ? "translate-x-[calc(100%+4px)]"
-                        : "translate-x-0"
-                    )}
-                    style={{ left: 4 }}
-                  />
-                  <button
-                    type="button"
-                    role="tab"
-                    aria-selected={payment === "cod"}
-                    onClick={() => setPayment("cod")}
-                    className={cn(
-                      "relative z-10 rounded-full py-2 text-center text-[12px] font-semibold tracking-wide transition-colors duration-300 sm:text-[13px]",
-                      payment === "cod" ? "text-white" : "text-foreground/55"
-                    )}
-                  >
-                    Cash on delivery
-                  </button>
-                  <button
-                    type="button"
-                    role="tab"
-                    aria-selected={payment === "bank"}
-                    onClick={() => setPayment("bank")}
-                    className={cn(
-                      "relative z-10 rounded-full py-2 text-center text-[12px] font-semibold tracking-wide transition-colors duration-300 sm:text-[13px]",
-                      payment === "bank" ? "text-white" : "text-foreground/55"
-                    )}
-                  >
-                    Bank transfer
-                  </button>
-                </div>
-
-                {payment === "bank" ? (
-                  <div
-                    key="bank-panel"
-                    className="animate-page-fade space-y-2.5 rounded-md bg-black/[0.04] px-3 py-2.5"
-                  >
-                    <div className="space-y-1 text-[12px] sm:text-[13px]">
-                      <div className="flex justify-between gap-2">
-                        <span className="text-muted-foreground">Bank</span>
-                        <span>{bankDetails.bankName}</span>
-                      </div>
-                      <div className="flex justify-between gap-2">
-                        <span className="text-muted-foreground">Title</span>
-                        <span className="truncate">{bankDetails.accountTitle}</span>
-                      </div>
-                      <div className="flex justify-between gap-2">
-                        <span className="text-muted-foreground">IBAN</span>
-                        <span className="text-[11px] tracking-wide sm:text-[12px]">
-                          {bankDetails.iban}
-                        </span>
-                      </div>
+              <div className="flex min-h-0 flex-1 flex-col">
+                <div className="min-h-0 flex-1 space-y-2 overflow-y-auto">
+                  <div className="flex items-baseline justify-between gap-3 rounded-md bg-black/[0.04] px-3 py-2">
+                    <div>
+                      <p className="text-[10px] tracking-wide text-muted-foreground">
+                        Amount to pay
+                      </p>
+                      <p className="mt-0.5 text-[10px] text-muted-foreground">
+                        {shipping === 0
+                          ? "Free shipping"
+                          : `Incl. ${formatPrice(shipping)} shipping`}
+                      </p>
                     </div>
-                    <input
-                      ref={proofRef}
-                      type="file"
-                      accept="image/*"
-                      className="hidden"
-                      onChange={(e) => onProofSelected(e.target.files)}
+                    <p className="font-nav-display text-[24px] leading-none tracking-tight tabular-nums">
+                      {formatPrice(total)}
+                    </p>
+                  </div>
+
+                  <div
+                    role="tablist"
+                    aria-label="Payment method"
+                    className="relative grid grid-cols-2 rounded-full border border-black/15 bg-black/[0.04] p-0.5"
+                  >
+                    <span
+                      aria-hidden
+                      className={cn(
+                        "absolute top-0.5 bottom-0.5 w-[calc(50%-2px)] rounded-full bg-black shadow-sm transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
+                        payment === "bank"
+                          ? "translate-x-[calc(100%+2px)]"
+                          : "translate-x-0"
+                      )}
+                      style={{ left: 2 }}
                     />
-                    {paymentProof && proofName ? (
-                      <div className="flex items-center gap-2 rounded-md border border-black/10 bg-white px-3 py-2">
-                        <span className="min-w-0 flex-1 truncate text-[13px] text-foreground">
-                          {proofName}
-                        </span>
+                    <button
+                      type="button"
+                      role="tab"
+                      aria-selected={payment === "cod"}
+                      onClick={() => setPayment("cod")}
+                      className={cn(
+                        "relative z-10 rounded-full py-1.5 text-center text-[11px] font-semibold tracking-wide transition-colors duration-300 sm:text-[12px]",
+                        payment === "cod" ? "text-white" : "text-foreground/55"
+                      )}
+                    >
+                      Cash on delivery
+                    </button>
+                    <button
+                      type="button"
+                      role="tab"
+                      aria-selected={payment === "bank"}
+                      onClick={() => setPayment("bank")}
+                      className={cn(
+                        "relative z-10 rounded-full py-1.5 text-center text-[11px] font-semibold tracking-wide transition-colors duration-300 sm:text-[12px]",
+                        payment === "bank" ? "text-white" : "text-foreground/55"
+                      )}
+                    >
+                      Bank transfer
+                    </button>
+                  </div>
+
+                  {payment === "bank" ? (
+                    <div
+                      key="bank-panel"
+                      className="animate-page-fade space-y-1.5 rounded-md bg-black/[0.04] px-2.5 py-2"
+                    >
+                      <div className="space-y-0.5 text-[11px]">
+                        <div className="flex justify-between gap-2">
+                          <span className="text-muted-foreground">Bank</span>
+                          <span>{bankDetails.bankName}</span>
+                        </div>
+                        <div className="flex justify-between gap-2">
+                          <span className="text-muted-foreground">Title</span>
+                          <span className="truncate">
+                            {bankDetails.accountTitle}
+                          </span>
+                        </div>
+                        <div className="flex justify-between gap-2">
+                          <span className="text-muted-foreground">IBAN</span>
+                          <span className="text-[10px] tracking-wide">
+                            {bankDetails.iban}
+                          </span>
+                        </div>
+                      </div>
+                      <input
+                        ref={proofRef}
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={(e) => onProofSelected(e.target.files)}
+                      />
+                      {paymentProof && proofName ? (
+                        <div className="flex items-center gap-2 rounded-md border border-black/10 bg-white px-2.5 py-1.5">
+                          <span className="min-w-0 flex-1 truncate text-[12px] text-foreground">
+                            {proofName}
+                          </span>
+                          <button
+                            type="button"
+                            disabled={uploading}
+                            onClick={() => proofRef.current?.click()}
+                            className="shrink-0 text-[11px] text-muted-foreground transition-colors hover:text-foreground disabled:opacity-50"
+                          >
+                            Replace
+                          </button>
+                          <button
+                            type="button"
+                            disabled={uploading}
+                            onClick={clearProof}
+                            aria-label="Remove screenshot"
+                            className="inline-flex size-6 shrink-0 items-center justify-center text-muted-foreground transition-colors hover:text-foreground disabled:opacity-50"
+                          >
+                            <Trash2 className="size-3.5" strokeWidth={2} />
+                          </button>
+                        </div>
+                      ) : (
                         <button
                           type="button"
                           disabled={uploading}
                           onClick={() => proofRef.current?.click()}
-                          className="shrink-0 text-[12px] text-muted-foreground transition-colors hover:text-foreground disabled:opacity-50"
+                          className="flex w-full items-center gap-2.5 rounded-md border border-dashed border-black/20 bg-white px-2.5 py-2 text-left transition-colors hover:border-black/35 hover:bg-black/[0.02] disabled:opacity-50"
                         >
-                          Replace
+                          <span className="inline-flex size-7 shrink-0 items-center justify-center rounded-full bg-black/[0.06]">
+                            <Upload
+                              className="size-3.5 text-foreground"
+                              strokeWidth={2}
+                            />
+                          </span>
+                          <span className="min-w-0 flex-1">
+                            <span className="block text-[12px] font-medium tracking-normal text-foreground normal-case">
+                              {uploading ? "Uploading…" : "Attach screenshot"}
+                            </span>
+                            <span className="block text-[10px] tracking-normal text-muted-foreground normal-case">
+                              Transfer receipt image
+                            </span>
+                          </span>
                         </button>
-                        <button
-                          type="button"
-                          disabled={uploading}
-                          onClick={clearProof}
-                          aria-label="Remove screenshot"
-                          className="inline-flex size-7 shrink-0 items-center justify-center text-muted-foreground transition-colors hover:text-foreground disabled:opacity-50"
-                        >
-                          <Trash2 className="size-3.5" strokeWidth={2} />
-                        </button>
-                      </div>
-                    ) : (
+                      )}
+                    </div>
+                  ) : null}
+
+                  <div className="rounded-md bg-black/[0.04] px-2.5 py-2">
+                    <div className="flex items-center justify-between gap-2">
+                      <p className="text-[10px] tracking-wide text-muted-foreground">
+                        Delivery
+                      </p>
                       <button
                         type="button"
-                        disabled={uploading}
-                        onClick={() => proofRef.current?.click()}
-                        className="flex w-full items-center gap-3 rounded-md border border-dashed border-black/20 bg-white px-3 py-2.5 text-left transition-colors hover:border-black/35 hover:bg-black/[0.02] disabled:opacity-50"
+                        onClick={() => setStep(1)}
+                        className="text-[10px] text-muted-foreground transition-colors hover:text-foreground"
                       >
-                        <span className="inline-flex size-8 shrink-0 items-center justify-center rounded-full bg-black/[0.06]">
-                          <Upload className="size-3.5 text-foreground" strokeWidth={2} />
-                        </span>
-                        <span className="min-w-0 flex-1">
-                          <span className="block text-[13px] font-medium tracking-normal text-foreground normal-case">
-                            {uploading ? "Uploading…" : "Attach screenshot"}
-                          </span>
-                          <span className="mt-0.5 block text-[11px] tracking-normal text-muted-foreground normal-case">
-                            Transfer receipt image
-                          </span>
-                        </span>
+                        Edit
                       </button>
-                    )}
-                  </div>
-                ) : null}
-
-                <div className="rounded-md bg-black/[0.04] px-3 py-2.5">
-                  <div className="flex items-center justify-between gap-2">
-                    <p className="text-[11px] tracking-wide text-muted-foreground">
-                      Delivery details
+                    </div>
+                    <p className="mt-1 text-[13px] leading-tight tracking-tight">
+                      {details.name || "—"}
                     </p>
-                    <button
-                      type="button"
-                      onClick={() => setStep(1)}
-                      className="text-[11px] text-muted-foreground transition-colors hover:text-foreground"
-                    >
-                      Edit
-                    </button>
+                    <p className="mt-0.5 line-clamp-1 text-[11px] text-foreground/70">
+                      {[details.phone, details.email, details.address, details.city]
+                        .filter(Boolean)
+                        .join(" · ") || "—"}
+                    </p>
                   </div>
-                  <p className="mt-1.5 text-[14px] leading-tight tracking-tight">
-                    {details.name || "—"}
-                  </p>
-                  <p className="mt-0.5 text-[12px] text-foreground/70 tabular-nums">
-                    {details.phone || "—"}
-                  </p>
-                  <p className="mt-0.5 truncate text-[12px] text-foreground/70">
-                    {details.email || "—"}
-                  </p>
-                  <p className="mt-1.5 line-clamp-2 text-[12px] leading-snug text-foreground/75">
-                    {[details.address, details.city, details.country]
-                      .filter(Boolean)
-                      .join(", ") || "—"}
-                  </p>
                 </div>
 
-                <button
-                  type="button"
-                  onClick={goReceipt}
-                  className="group font-nav-display inline-flex h-12 w-full items-center justify-between rounded-md bg-black px-4 text-[13px] tracking-wide text-white transition-colors hover:bg-black/90"
-                >
-                  <span>Receipt</span>
-                  <span className="inline-flex size-8 items-center justify-center rounded-full bg-white/15 transition-transform duration-300 group-hover:translate-x-0.5">
-                    <ArrowRight className="size-4 stroke-[2]" />
-                  </span>
-                </button>
+                <div className="mt-3 shrink-0 pb-[env(safe-area-inset-bottom)]">
+                  <button
+                    type="button"
+                    onClick={goReceipt}
+                    className="group font-nav-display inline-flex h-11 w-full items-center justify-between rounded-md bg-black px-4 text-[13px] tracking-wide text-white transition-colors hover:bg-black/90"
+                  >
+                    <span>Receipt</span>
+                    <span className="inline-flex size-7 items-center justify-center rounded-full bg-white/15 transition-transform duration-300 group-hover:translate-x-0.5">
+                      <ArrowRight className="size-4 stroke-[2]" />
+                    </span>
+                  </button>
+                </div>
               </div>
             ) : null}
 
             {step === 3 ? (
-              <div className="flex min-h-0 flex-1 flex-col gap-2.5 sm:min-h-0 sm:gap-4">
+              <div className="flex min-h-0 flex-1 flex-col gap-2.5">
                 <div className="min-h-0 flex-1 overflow-y-auto rounded-md bg-black/[0.03] px-2 py-1.5 sm:overflow-visible sm:bg-transparent sm:p-0">
                   <StoreReceipt
                     compact
