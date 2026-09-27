@@ -261,22 +261,22 @@ export function CartDrawer() {
                           Remove
                         </button>
                       </div>
-                      <div className="mt-4 flex w-fit items-center border border-black/15">
+                      <div className="mt-4 flex h-11 w-fit items-center rounded-md border border-black/15">
                         <button
                           type="button"
-                          className="px-3.5 py-2 text-base transition-colors hover:bg-neutral-100"
+                          className="inline-flex size-10 items-center justify-center text-lg transition-colors hover:bg-neutral-100"
                           onClick={() =>
                             updateCartQuantity(product.id, quantity - 1)
                           }
                         >
                           −
                         </button>
-                        <span className="w-8 text-center text-sm tabular-nums">
+                        <span className="font-nav-display w-8 text-center text-[14px] tabular-nums">
                           {quantity}
                         </span>
                         <button
                           type="button"
-                          className="px-3.5 py-2 text-base transition-colors hover:bg-neutral-100"
+                          className="inline-flex size-10 items-center justify-center text-lg transition-colors hover:bg-neutral-100"
                           onClick={() =>
                             updateCartQuantity(product.id, quantity + 1)
                           }

@@ -98,11 +98,11 @@
 @keyframes account-link {
   from {
     opacity: 0;
-    transform: translateX(12px);
+    transform: translateY(10px);
   }
   to {
     opacity: 1;
-    transform: translateX(0);
+    transform: translateY(0);
   }
 }
 
@@ -336,9 +336,4 @@
   [disabled] {
     cursor: not-allowed;
   }
-}
-
-html[data-cursor="custom"] :is(a, button, [role="button"], summary, label[for], [data-slot="button"]),
-html[data-cursor="custom"] .cursor-pointer {
-  cursor: url("/cursor-pointer.png?v=3") 6 2, pointer !important;
 }

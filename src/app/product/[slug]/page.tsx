@@ -105,27 +105,27 @@ export default function ProductPage({
             <div className="mt-5">
               <SalePrice price={product.price} size="md" />
             </div>
-            <p className="mt-8 text-[15px] leading-6 text-foreground/55">
+            <p className="mt-8 text-[16px] leading-7 text-foreground/60">
               {product.description}
             </p>
             <p className="mt-4 font-nav-display text-[12px] leading-5 text-foreground/40">
               {product.details.join(" · ")}
             </p>
-            <div className="mt-8 flex flex-wrap items-center gap-3">
-              <div className="flex items-center text-foreground/50">
+            <div className="mt-8 flex w-full max-w-md flex-col gap-3">
+              <div className="flex h-12 w-full items-center justify-between rounded-md border border-black/15 px-2">
                 <button
                   type="button"
-                  className="px-2 py-1 text-sm hover:text-foreground"
+                  className="inline-flex size-10 items-center justify-center text-lg hover:text-foreground"
                   onClick={() => setQuantity((value) => Math.max(1, value - 1))}
                 >
                   −
                 </button>
-                <span className="w-8 text-center text-sm tabular-nums text-foreground/70">
+                <span className="font-nav-display min-w-8 text-center text-[15px] tabular-nums text-foreground/80">
                   {quantity}
                 </span>
                 <button
                   type="button"
-                  className="px-2 py-1 text-sm hover:text-foreground"
+                  className="inline-flex size-10 items-center justify-center text-lg hover:text-foreground"
                   onClick={() =>
                     setQuantity((value) => Math.min(product.stock || 1, value + 1))
                   }
@@ -135,7 +135,7 @@ export default function ProductPage({
               </div>
               <Button
                 size="lg"
-                className="px-8"
+                className="h-12 w-full"
                 disabled={product.stock <= 0}
                 onClick={() => {
                   addToCart(product.id, quantity);
@@ -150,7 +150,7 @@ export default function ProductPage({
               <Button
                 size="lg"
                 variant="outline"
-                className="px-8"
+                className="h-12 w-full"
                 disabled={product.stock <= 0}
                 onClick={() => {
                   addToCart(product.id, quantity);

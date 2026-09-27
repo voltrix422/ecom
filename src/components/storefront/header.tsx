@@ -118,7 +118,7 @@ function AccountMenu() {
 
   function hide() {
     clearClose();
-    closeTimer.current = window.setTimeout(() => setOpen(false), 120);
+    closeTimer.current = window.setTimeout(() => setOpen(false), 160);
   }
 
   useEffect(() => {
@@ -139,7 +139,7 @@ function AccountMenu() {
     >
       <button
         type="button"
-        className="inline-flex size-10 cursor-pointer items-center justify-center outline-none"
+        className="inline-flex size-10 items-center justify-center outline-none"
         aria-label="Account"
         aria-expanded={open}
         onClick={() => setOpen((value) => !value)}
@@ -149,18 +149,13 @@ function AccountMenu() {
 
       <div
         className={cn(
-          "absolute top-full right-0 z-50 pt-3",
-          open ? "pointer-events-auto" : "pointer-events-none"
+          "absolute top-full right-0 z-50 pt-3 transition-[opacity,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
+          open
+            ? "pointer-events-auto translate-y-0 scale-100 opacity-100"
+            : "pointer-events-none -translate-y-2 scale-[0.96] opacity-0"
         )}
       >
-        <div
-          className={cn(
-            "origin-top-right overflow-hidden rounded-md border-0 bg-black/55 text-white shadow-[0_24px_80px_rgba(0,0,0,0.45)] backdrop-blur-2xl backdrop-saturate-100 transition-[width,opacity,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
-            open
-              ? "w-[min(94vw,360px)] scale-x-100 opacity-100"
-              : "w-10 scale-x-0 opacity-0"
-          )}
-        >
+        <div className="w-[min(94vw,360px)] overflow-hidden rounded-md border-0 bg-black/60 text-white shadow-[0_24px_80px_rgba(0,0,0,0.45)] backdrop-blur-2xl backdrop-saturate-100">
           <div className="flex min-w-[300px] items-stretch gap-0">
             {accountLinks.map((item, index) => {
               const Icon = item.icon;
@@ -172,7 +167,7 @@ function AccountMenu() {
                     "group flex min-w-0 flex-1 flex-col items-center justify-center gap-2.5 px-3 py-5 text-center transition-colors hover:bg-white/10",
                     open ? "animate-account-link" : ""
                   )}
-                  style={{ animationDelay: `${80 + index * 60}ms` }}
+                  style={{ animationDelay: `${60 + index * 70}ms` }}
                   onClick={() => {
                     flashPageVeil();
                     setOpen(false);

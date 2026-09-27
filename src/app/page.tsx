@@ -35,22 +35,27 @@ export default function HomePage() {
 
       <section className="relative z-10 bg-background">
         <div className="mx-auto max-w-7xl px-6 py-20">
-        <div className="mb-10 flex items-end justify-between">
-          <div>
-            <p className="text-xs tracking-[0.22em] text-muted-foreground uppercase">
-              Selected
-            </p>
-            <h2 className="mt-2 text-3xl md:text-4xl">Featured suits</h2>
+          <div className="mb-10 flex items-end justify-between gap-4">
+            <div>
+              <p className="font-nav-display text-[12px] text-muted-foreground">
+                Selected
+              </p>
+              <h2 className="font-nav-display mt-2 text-3xl md:text-4xl">
+                Featured suits
+              </h2>
+            </div>
+            <Link
+              href="/shop"
+              className="font-nav-display text-[14px] text-muted-foreground transition-colors hover:text-foreground"
+            >
+              View all
+            </Link>
           </div>
-          <Link href="/shop" className="text-sm text-muted-foreground hover:text-foreground">
-            View all
-          </Link>
-        </div>
-        <div className="grid gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
-          {featured.map((product) => (
-            <ProductCard key={product.id} product={product} badgeTone="soft" />
-          ))}
-        </div>
+          <div className="grid gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
+            {featured.map((product) => (
+              <ProductCard key={product.id} product={product} badgeTone="soft" />
+            ))}
+          </div>
         </div>
       </section>
 
@@ -64,7 +69,7 @@ export default function HomePage() {
                 sizes="(min-width: 768px) 33vw, 100vw"
                 className="transition-opacity duration-300 group-hover:opacity-80"
               />
-              <p className="mt-4 text-sm">{collection.title}</p>
+              <p className="font-nav-display mt-4 text-[18px]">{collection.title}</p>
             </Link>
           ))}
         </div>

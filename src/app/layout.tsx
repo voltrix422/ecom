@@ -34,12 +34,6 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col bg-background font-sans text-foreground">
-        <script
-          dangerouslySetInnerHTML={{
-            __html:
-              "if(!/Mac|iPhone|iPad|iPod/.test(navigator.userAgent))document.documentElement.setAttribute('data-cursor','custom')",
-          }}
-        />
         <Providers>{children}</Providers>
       </body>
     </html>

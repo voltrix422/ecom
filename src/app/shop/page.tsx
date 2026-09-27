@@ -67,25 +67,25 @@ function ShopContent() {
 
         <div className="mt-8 grid items-start gap-8 lg:grid-cols-[160px_minmax(0,1fr)] lg:gap-12">
           <aside className="lg:sticky lg:top-28 lg:self-start">
-            <div className="relative w-full max-w-[180px]">
-              <Search className="pointer-events-none absolute top-1/2 left-2 size-3 -translate-y-1/2 text-muted-foreground" />
+            <div className="relative w-full max-w-[200px]">
+              <Search className="pointer-events-none absolute top-1/2 left-2.5 size-3.5 -translate-y-1/2 text-muted-foreground" />
               <Input
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
                 placeholder="Search"
-                className="h-7 rounded-none border-border/70 pr-2 pl-7 text-xs"
+                className="font-nav-display h-9 rounded-md border-border/70 pr-2 pl-8 text-[13px]"
               />
             </div>
 
             <div className="mt-6 flex items-center justify-between gap-2">
-              <p className="text-[10px] tracking-[0.2em] text-muted-foreground uppercase">
+              <p className="font-nav-display text-[12px] text-muted-foreground">
                 Filter
               </p>
               {hasFilters ? (
                 <button
                   type="button"
                   onClick={clearFilters}
-                  className="inline-flex cursor-pointer items-center gap-1 text-[10px] tracking-[0.14em] text-muted-foreground uppercase hover:text-foreground"
+                  className="font-nav-display inline-flex items-center gap-1 text-[11px] text-muted-foreground hover:text-foreground"
                 >
                   <X className="size-3" />
                   Clear
