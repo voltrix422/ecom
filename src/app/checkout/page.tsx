@@ -26,7 +26,7 @@ type Line = { product: Product; quantity: number };
 function StepDots({ step }: { step: Step }) {
   const labels = ["Details", "Payment", "Receipt"];
   return (
-    <div className="font-nav-display flex items-center justify-center gap-2 sm:gap-3">
+    <div className="flex items-center justify-center gap-2 sm:gap-3">
       {labels.map((label, index) => {
         const n = (index + 1) as Step;
         const active = step === n;
@@ -57,7 +57,7 @@ function StepDots({ step }: { step: Step }) {
               </span>
               <span
                 className={cn(
-                  "text-[12px] tracking-wide sm:text-[13px]",
+                  "text-[12px] sm:text-[13px]",
                   active
                     ? "text-foreground"
                     : done
@@ -76,10 +76,12 @@ function StepDots({ step }: { step: Step }) {
 }
 
 const fieldClass =
-  "font-nav-display h-10 rounded-md border-0 border-b border-border/50 bg-transparent px-0 text-[14px] shadow-none focus-visible:border-foreground focus-visible:ring-0";
+  "h-10 rounded-md border-0 border-b border-border/50 bg-transparent px-0 text-[14px] normal-case shadow-none focus-visible:border-foreground focus-visible:ring-0";
 
-const btnClass = "h-11 border-0 shadow-none";
-const btnOutlineClass = "h-11 border-0 bg-black/8 shadow-none";
+const labelClass = "text-[12px] font-normal normal-case tracking-normal text-muted-foreground";
+
+const btnClass = "font-nav-display h-11 border-0 shadow-none";
+const btnOutlineClass = "font-nav-display h-11 border-0 bg-black/8 shadow-none";
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -208,16 +210,18 @@ export default function CheckoutPage() {
 
   return (
     <StoreShell hideSaleBanner>
-      <div className="font-nav-display mx-auto max-w-6xl px-6 py-10 md:py-14">
+      <div className="mx-auto max-w-6xl px-6 py-10 md:py-14">
         <div className="text-center">
-          <h1 className="text-4xl tracking-tight md:text-5xl">Checkout</h1>
+          <h1 className="font-nav-display text-4xl tracking-tight md:text-5xl">
+            Checkout
+          </h1>
           <div className="mt-6">
             <StepDots step={step} />
           </div>
         </div>
 
         <div className="mt-10 grid gap-10 lg:grid-cols-[minmax(0,1.05fr)_minmax(280px,0.85fr)] lg:items-start">
-          <div>
+          <div className="normal-case">
             {step === 1 ? (
               <form
                 onSubmit={goPayment}
@@ -226,10 +230,7 @@ export default function CheckoutPage() {
               >
                 <div className="grid grid-cols-1 gap-x-4 gap-y-3 sm:grid-cols-3">
                   <div className="space-y-1">
-                    <Label
-                      htmlFor="name"
-                      className="text-[12px] text-muted-foreground"
-                    >
+                    <Label htmlFor="name" className={labelClass}>
                       Name
                     </Label>
                     <Input
@@ -248,7 +249,7 @@ export default function CheckoutPage() {
                   <div className="space-y-1">
                     <Label
                       htmlFor="email"
-                      className="text-[12px] text-muted-foreground"
+                      className={labelClass}
                     >
                       Email
                     </Label>
@@ -270,7 +271,7 @@ export default function CheckoutPage() {
                   <div className="space-y-1">
                     <Label
                       htmlFor="phone"
-                      className="text-[12px] text-muted-foreground"
+                      className={labelClass}
                     >
                       Phone
                     </Label>
@@ -291,7 +292,7 @@ export default function CheckoutPage() {
                   <div className="space-y-1">
                     <Label
                       htmlFor="address"
-                      className="text-[12px] text-muted-foreground"
+                      className={labelClass}
                     >
                       Address
                     </Label>
@@ -311,7 +312,7 @@ export default function CheckoutPage() {
                   <div className="space-y-1">
                     <Label
                       htmlFor="city"
-                      className="text-[12px] text-muted-foreground"
+                      className={labelClass}
                     >
                       City
                     </Label>
@@ -331,7 +332,7 @@ export default function CheckoutPage() {
                   <div className="space-y-1">
                     <Label
                       htmlFor="country"
-                      className="text-[12px] text-muted-foreground"
+                      className={labelClass}
                     >
                       Country
                     </Label>
@@ -352,7 +353,7 @@ export default function CheckoutPage() {
                 <div className="space-y-1">
                   <Label
                     htmlFor="notes"
-                    className="text-[12px] text-muted-foreground"
+                    className={labelClass}
                   >
                     Remarks
                   </Label>
@@ -361,7 +362,7 @@ export default function CheckoutPage() {
                     value={notes}
                     onChange={(e) => setNotes(e.target.value)}
                     aria-label="Order notes"
-                    className="font-nav-display min-h-16 rounded-md border-0 border-b border-border/50 bg-transparent px-0 text-[14px] shadow-none focus-visible:border-foreground focus-visible:ring-0"
+                    className="min-h-16 rounded-md border-0 border-b border-border/50 bg-transparent px-0 text-[14px] normal-case shadow-none focus-visible:border-foreground focus-visible:ring-0"
                   />
                 </div>
                 <Button type="submit" className={btnClass}>
@@ -581,7 +582,7 @@ export default function CheckoutPage() {
                         takes up to 3 hours after you place the order.
                       </p>
                       <div className="border-t border-black/10 pt-3">
-                        <p className="text-[12px] text-muted-foreground">
+                        <p className={labelClass}>
                           Tracking ID
                         </p>
                         <p className="mt-1 text-[14px] text-foreground">
@@ -599,7 +600,7 @@ export default function CheckoutPage() {
                         parcel arrives.
                       </p>
                       <div className="border-t border-black/10 pt-3">
-                        <p className="text-[12px] text-muted-foreground">
+                        <p className={labelClass}>
                           Tracking ID
                         </p>
                         <p className="mt-1 text-[14px] text-foreground">

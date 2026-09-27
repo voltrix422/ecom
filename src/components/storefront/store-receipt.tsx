@@ -32,9 +32,9 @@ export function ReceiptBrand({ className }: { className?: string }) {
       <Image
         src={brand.wordmark}
         alt={brand.name}
-        width={200}
-        height={44}
-        className="h-10 w-auto object-contain md:h-11"
+        width={220}
+        height={48}
+        className="h-9 w-auto object-contain brightness-0 md:h-10"
         priority
         unoptimized
       />
@@ -60,9 +60,7 @@ function CustomerBlock({
 
   return (
     <div className="rounded-md bg-black/[0.035] px-4 py-4">
-      <p className="text-[11px] tracking-[0.14em] text-muted-foreground uppercase">
-        Deliver to
-      </p>
+      <p className="text-[11px] text-muted-foreground">Deliver to</p>
       {name ? (
         <p className="mt-3 text-[15px] leading-snug text-foreground">{name}</p>
       ) : null}
@@ -114,7 +112,7 @@ export function StoreReceipt({
   );
 
   return (
-    <div className="font-nav-display relative mx-auto w-full max-w-[340px] px-1 py-2 text-[13px] leading-relaxed text-foreground">
+    <div className="relative mx-auto w-full max-w-[340px] px-1 py-2 text-[13px] leading-relaxed text-foreground normal-case">
       {onDownload ? (
         <button
           type="button"
@@ -138,9 +136,7 @@ export function StoreReceipt({
             {createdAt ? <p>{formatDate(createdAt)}</p> : null}
           </div>
         ) : (
-          <p className="mt-3 text-[12px] tracking-wide text-muted-foreground">
-            Receipt
-          </p>
+          <p className="mt-3 text-[12px] text-muted-foreground">Receipt</p>
         )}
       </div>
 
@@ -210,9 +206,7 @@ export function StoreReceipt({
       {paymentProof ? (
         <>
           <Rule />
-          <p className="mb-2 text-[11px] tracking-wide text-muted-foreground">
-            Payment proof
-          </p>
+          <p className="mb-2 text-[11px] text-muted-foreground">Payment proof</p>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={paymentProof}
