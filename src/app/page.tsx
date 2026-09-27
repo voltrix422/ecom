@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 import { MediaImage } from "@/components/media-image";
 import FlexCarousel from "@/components/storefront/flex-carousel";
 import { HeroSection } from "@/components/storefront/hero-section";
@@ -38,52 +39,76 @@ export default function HomePage() {
     slug: product.slug,
   }));
 
+  const imageKey = carouselItems.map((item) => item.src).join("|");
+
+  useEffect(() => {
+    if (!imageKey) return;
+    const links: HTMLLinkElement[] = [];
+    for (const src of imageKey.split("|")) {
+      const link = document.createElement("link");
+      link.rel = "preload";
+      link.as = "image";
+      link.href = src;
+      link.fetchPriority = "high";
+      document.head.appendChild(link);
+      links.push(link);
+
+      const img = new window.Image();
+      img.decoding = "async";
+      img.fetchPriority = "high";
+      img.src = src;
+    }
+    return () => {
+      for (const link of links) link.remove();
+    };
+  }, [imageKey]);
+
   return (
     <StoreShell>
       <HeroSection />
 
       <section className="relative z-10 bg-background">
-        <div className="mx-auto max-w-7xl px-6 py-20">
-          <div className="mb-10 flex items-end justify-between gap-4">
+        <div className="mx-auto max-w-7xl px-6 py-16 md:py-20">
+          <div className="mb-8 flex items-end justify-between gap-6 md:mb-12">
             <div>
-              <p className="font-nav-display text-[12px] text-muted-foreground">
+              <p className="font-nav-display text-[15px] tracking-wide text-muted-foreground md:text-[17px]">
                 Selected
               </p>
-              <h2 className="font-nav-display mt-2 text-3xl md:text-4xl">
+              <h2 className="font-nav-display mt-2 text-5xl leading-[0.95] tracking-tight md:text-6xl lg:text-7xl">
                 Featured suits
               </h2>
             </div>
             <Link
               href="/shop"
-              className="font-nav-display text-[14px] text-muted-foreground transition-colors hover:text-foreground"
+              className="font-nav-display shrink-0 pb-1 text-[18px] text-muted-foreground transition-colors hover:text-foreground md:text-[20px]"
             >
               View all
             </Link>
           </div>
           <div
             className="relative w-full text-foreground"
-            style={{ height: "560px" }}
+            style={{ height: "min(78svh, 720px)" }}
           >
             {carouselItems.length > 0 ? (
               <FlexCarousel
                 items={carouselItems}
                 preset="liquid"
-                intro="rise"
-                cardHeight={0.5}
-                gap={12}
-                squeeze={0.2}
+                intro="none"
+                cardHeight={0.68}
+                gap={18}
+                squeeze={0.08}
                 focusOnClick
                 captions
                 fit="natural"
                 radius={0}
-                lensWidth={0.74}
-                lensHeight={1.18}
-                tilt={62}
-                roundness={1}
-                bend={0.34}
-                reach={0.38}
+                lensWidth={0.82}
+                lensHeight={1.12}
+                tilt={28}
+                roundness={0.6}
+                bend={0.12}
+                reach={0.22}
                 curl="twist"
-                dispersion={0.45}
+                dispersion={0.12}
                 liquid={0}
                 followCursor={false}
                 autoplay={false}

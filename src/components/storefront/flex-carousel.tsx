@@ -612,6 +612,7 @@ const FlexCarousel = ({
       const image = new Image();
       image.crossOrigin = 'anonymous';
       image.decoding = 'async';
+      if (index < 4) image.fetchPriority = 'high';
       image.onload = () => {
         if (!alive || !slots.includes(slot)) return;
         texture.image = image;
@@ -1386,13 +1387,15 @@ const FlexCarousel = ({
         >
           <span
             key={active}
-            className="flex max-w-full flex-col items-center text-[15px] font-medium leading-[1.35] animate-[flex-carousel-title_520ms_cubic-bezier(0.22,1,0.36,1)] motion-reduce:animate-none"
+            className="flex max-w-full flex-col items-center gap-1 text-[20px] font-medium leading-[1.25] animate-[flex-carousel-title_520ms_cubic-bezier(0.22,1,0.36,1)] motion-reduce:animate-none md:text-[24px]"
           >
             {current.title || current.alt}
-            {current.subtitle && <span className="font-normal opacity-60">{current.subtitle}</span>}
+            {current.subtitle && (
+              <span className="text-[14px] font-normal opacity-55 md:text-[15px]">{current.subtitle}</span>
+            )}
           </span>
           <span
-            className="inline-flex items-center gap-[3px] text-[12px] leading-none tabular-nums opacity-50 transition-opacity duration-[400ms] data-[hidden]:opacity-0"
+            className="inline-flex items-center gap-[3px] text-[13px] leading-none tabular-nums opacity-50 transition-opacity duration-[400ms] data-[hidden]:opacity-0"
             data-hidden={focusOpen ? '' : undefined}
           >
             <Digits value={active + 1} />
