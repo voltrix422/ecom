@@ -195,12 +195,13 @@ export function Header({ hideSaleBanner = false }: { hideSaleBanner?: boolean })
     storeCategories.length > 0 ? storeCategories : [...seedCategories];
   const overlay = pathname === "/";
   const [menuOpen, setMenuOpen] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
   const [overHero, setOverHero] = useState(overlay);
   const [searchOpen, setSearchOpen] = useState(false);
   const [search, setSearch] = useState("");
   const headerRef = useRef<HTMLElement>(null);
   const searchRef = useRef<HTMLInputElement>(null);
-  const light = overHero && !searchOpen && !menuOpen;
+  const light = overHero && !searchOpen && !menuOpen && !profileOpen;
 
   const menuItems = useMemo(
     () => [
@@ -215,6 +216,15 @@ export function Header({ hideSaleBanner = false }: { hideSaleBanner?: boolean })
       { label: "About", ariaLabel: "About Ayesha's", link: "/about" },
     ],
     [categories]
+  );
+
+  const profileItems = useMemo(
+    () => [
+      { label: "Track order", ariaLabel: "Track your order", link: "/track" },
+      { label: "Refund", ariaLabel: "Refund help", link: "/help" },
+      { label: "About", ariaLabel: "About Ayesha's", link: "/about" },
+    ],
+    []
   );
 
   useEffect(() => {
@@ -258,6 +268,12 @@ export function Header({ hideSaleBanner = false }: { hideSaleBanner?: boolean })
     if (searchOpen) searchRef.current?.focus();
   }, [searchOpen]);
 
+  useEffect(() => {
+    setMenuOpen(false);
+    setProfileOpen(false);
+    setSearchOpen(false);
+  }, [pathname]);
+
   function submitSearch(event: React.FormEvent) {
     event.preventDefault();
     const value = search.trim();
@@ -274,12 +290,29 @@ export function Header({ hideSaleBanner = false }: { hideSaleBanner?: boolean })
           light && "md:bg-transparent md:text-white"
         )}
       >
-        {/* Mobile: logo left, hamburger right */}
-        <div className="relative flex h-14 items-center justify-between px-3 md:hidden">
-          <HeaderLogo light={false} />
+        {/* Mobile: profile + logo left, hamburger right */}
+        <div className="relative flex h-14 items-center justify-between px-2 md:hidden">
+          <div className="flex items-center gap-0.5">
+            <button
+              type="button"
+              className="inline-flex size-10 items-center justify-center"
+              aria-label={profileOpen ? "Close profile" : "Open profile"}
+              aria-expanded={profileOpen}
+              onClick={() => {
+                setMenuOpen(false);
+                setProfileOpen((value) => !value);
+              }}
+            >
+              <User className="size-6 stroke-[1.5]" />
+            </button>
+            <HeaderLogo light={false} />
+          </div>
           <Hamburger
             open={menuOpen}
-            onClick={() => setMenuOpen((value) => !value)}
+            onClick={() => {
+              setProfileOpen(false);
+              setMenuOpen((value) => !value);
+            }}
           />
         </div>
 
@@ -347,6 +380,20 @@ export function Header({ hideSaleBanner = false }: { hideSaleBanner?: boolean })
           </div>
         </div>
       </header>
+
+      <StaggeredMenu
+        position="left"
+        hideChrome
+        isFixed
+        open={profileOpen}
+        onOpenChange={setProfileOpen}
+        items={profileItems}
+        displayItemNumbering={false}
+        displaySocials={false}
+        colors={["#111111", "#e8e8e8"]}
+        accentColor="#111111"
+        closeOnClickAway={false}
+      />
 
       <StaggeredMenu
         position="right"
