@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { ProductShare } from "@/components/storefront/product-share";
 import { SalePrice } from "@/components/storefront/sale-price";
 import { flyToCart } from "@/lib/fly-to-cart";
+import { formatPrice } from "@/lib/format";
 import { useStore } from "@/lib/store";
 import { cn } from "cn";
 
@@ -100,7 +101,7 @@ export default function ProductPage({
       <div className="md:hidden">
         <div
           ref={mobileGalleryRef}
-          className="relative flex max-h-[46svh] w-full items-center justify-center bg-[#efeae4] px-3 pt-1"
+          className="relative flex max-h-[46svh] w-full items-center justify-center bg-white px-3 pt-1"
         >
           <MediaImage
             src={currentSrc}
@@ -138,7 +139,7 @@ export default function ProductPage({
         ) : null}
 
         <div className="px-4 pt-2 pb-6">
-          <div className="flex items-center gap-0.5">
+          <div className="flex items-center gap-0.5 text-foreground">
             <button
               type="button"
               onClick={toggleLike}
@@ -148,7 +149,7 @@ export default function ProductPage({
             >
               <Heart
                 className={cn(
-                  "size-5 transition-transform",
+                  "size-5 text-foreground transition-transform",
                   liked && "fill-foreground scale-110"
                 )}
                 strokeWidth={1.7}
@@ -165,48 +166,35 @@ export default function ProductPage({
               )}
               aria-label="Add to bag"
             >
-              <ShoppingBag className="size-5" strokeWidth={1.7} />
+              <ShoppingBag
+                className="size-5 text-foreground"
+                strokeWidth={1.7}
+              />
             </button>
 
-            <div className="inline-flex size-10 items-center justify-center [&_button]:size-10 [&_svg]:size-3.5">
-              <ProductShare product={piece} />
+            <div className="inline-flex size-10 items-center justify-center">
+              <ProductShare
+                product={piece}
+                className="size-10 rounded-none text-foreground hover:bg-transparent hover:text-foreground [&_svg]:size-5"
+              />
             </div>
           </div>
 
-          <h1 className="mt-1.5 font-nav-display text-[22px] leading-none tracking-tight text-foreground">
+          <h1 className="mt-2 font-nav-display text-[22px] leading-none tracking-tight text-foreground">
             {piece.name}
           </h1>
-          <div className="mt-2">
-            <SalePrice price={piece.price} size="md" className="gap-2.5" />
-          </div>
 
-          <div className="mt-2.5 flex h-10 items-center justify-center gap-1">
-            <button
-              type="button"
-              className="inline-flex size-9 items-center justify-center text-[20px] leading-none text-foreground/70"
-              onClick={() => setQuantity((value) => Math.max(1, value - 1))}
-              aria-label="Decrease quantity"
-            >
-              −
-            </button>
-            <span className="font-nav-display min-w-7 text-center text-[17px] tabular-nums">
-              {quantity}
-            </span>
-            <button
-              type="button"
-              className="inline-flex size-9 items-center justify-center text-[20px] leading-none text-foreground/70"
-              onClick={() =>
-                setQuantity((value) => Math.min(piece.stock || 1, value + 1))
-              }
-              aria-label="Increase quantity"
-            >
-              +
-            </button>
-          </div>
+          <p className="mt-2.5 font-nav-display text-[20px] font-semibold tracking-tight text-foreground">
+            {formatPrice(piece.price)}
+          </p>
+
+          <p className="mt-2 truncate text-[13px] leading-snug text-foreground/55">
+            {piece.details.join(" · ")}
+          </p>
 
           <Button
             size="lg"
-            className="mt-2.5 h-11 w-full rounded-md border-0 bg-black text-[14px] font-semibold tracking-wide text-white shadow-none hover:bg-black/90"
+            className="mt-4 h-14 w-full rounded-md border-0 bg-black text-[18px] font-bold tracking-wide text-white shadow-none hover:bg-black/90"
             disabled={piece.stock <= 0}
             onClick={handleBuy}
           >

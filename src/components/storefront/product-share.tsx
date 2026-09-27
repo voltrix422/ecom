@@ -21,7 +21,13 @@ function shareMessage(name: string, href: string) {
   return `${name} — ${brand.name}\n${href}`;
 }
 
-export function ProductShare({ product }: { product: Product }) {
+export function ProductShare({
+  product,
+  className,
+}: {
+  product: Product;
+  className?: string;
+}) {
   const [href, setHref] = useState("");
 
   useEffect(() => {
@@ -54,7 +60,10 @@ export function ProductShare({ product }: { product: Product }) {
           type="button"
           variant="ghost"
           size="icon"
-          className="rounded-none text-foreground/50 hover:text-foreground"
+          className={
+            className ??
+            "rounded-none text-foreground/50 hover:text-foreground"
+          }
           aria-label="Share"
           onClick={(event) => {
             if (isMobile() && typeof navigator.share === "function") {
