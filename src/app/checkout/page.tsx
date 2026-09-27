@@ -19,7 +19,6 @@ import {
 } from "@/components/storefront/store-receipt";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { formatPrice } from "@/lib/format";
 import { fileToDataUrl } from "@/lib/image-upload";
 import { useStore } from "@/lib/store";
@@ -53,26 +52,26 @@ const emptyDetails = {
 function StepDots({ step }: { step: Step }) {
   const labels = ["Details", "Payment", "Receipt"];
   return (
-    <div className="flex items-center justify-center gap-1.5 sm:gap-2.5">
+    <div className="flex items-center justify-center gap-1">
       {labels.map((label, index) => {
         const n = (index + 1) as Step;
         const active = step === n;
         const done = step > n;
         return (
-          <div key={label} className="flex items-center gap-1.5 sm:gap-2.5">
+          <div key={label} className="flex items-center gap-1">
             {index > 0 ? (
               <span
                 className={cn(
-                  "h-px w-4 sm:w-6",
+                  "h-px w-3",
                   done || active ? "bg-foreground/40" : "bg-border/50"
                 )}
                 aria-hidden
               />
             ) : null}
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-0.5">
               <span
                 className={cn(
-                  "inline-flex size-5 items-center justify-center rounded-full text-[11px] tabular-nums sm:size-6 sm:text-[12px]",
+                  "inline-flex size-4 items-center justify-center rounded-full text-[10px] tabular-nums",
                   done
                     ? "bg-black text-white"
                     : active
@@ -84,7 +83,7 @@ function StepDots({ step }: { step: Step }) {
               </span>
               <span
                 className={cn(
-                  "text-[11px] sm:text-[12px]",
+                  "text-[10px]",
                   active
                     ? "text-foreground"
                     : done
@@ -226,15 +225,12 @@ function SwipeToComplete({
 }
 
 const fieldClass =
-  "h-8 rounded-none border-0 border-b border-border/45 bg-transparent px-0 text-[13px] normal-case shadow-none focus-visible:border-foreground focus-visible:ring-0";
-
-const labelClass =
-  "text-[10px] font-normal normal-case tracking-normal text-muted-foreground";
+  "h-9 rounded-none border-0 border-b border-border/40 bg-transparent px-0 text-[13px] normal-case shadow-none placeholder:text-muted-foreground/55 focus-visible:border-foreground focus-visible:ring-0";
 
 const btnClass = "font-nav-display h-11 w-full border-0 shadow-none";
 
 const shellClass =
-  "mx-auto flex h-[calc(100svh-4rem)] max-w-6xl flex-col px-4 pt-1 pb-3 sm:px-6 md:h-auto md:pt-8 md:pb-14";
+  "mx-auto flex h-svh max-w-6xl flex-col overflow-hidden px-4 pt-3 pb-3 sm:px-6 md:h-auto md:overflow-visible md:pt-8 md:pb-14";
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -389,7 +385,7 @@ export default function CheckoutPage() {
 
   if (lines.length === 0) {
     return (
-      <StoreShell hideSaleBanner hideBottomNav>
+      <StoreShell hideSaleBanner hideBottomNav hideHeader>
         <div className="font-nav-display mx-auto max-w-6xl px-6 py-24">
           <button
             type="button"
@@ -413,7 +409,7 @@ export default function CheckoutPage() {
   }
 
   return (
-    <StoreShell hideSaleBanner hideBottomNav>
+    <StoreShell hideSaleBanner hideBottomNav hideHeader>
       <div className={shellClass}>
         <div className="relative shrink-0 text-center">
           <button
@@ -424,15 +420,15 @@ export default function CheckoutPage() {
           >
             <ArrowLeft className="size-4 stroke-[1.75]" />
           </button>
-          <h1 className="font-nav-display text-[22px] leading-none tracking-tight sm:text-4xl md:text-5xl">
+          <h1 className="font-nav-display text-[20px] leading-none tracking-tight sm:text-4xl md:text-5xl">
             Checkout
           </h1>
-          <div className="mt-2 sm:mt-5">
+          <div className="mt-1.5 sm:mt-5">
             <StepDots step={step} />
           </div>
         </div>
 
-        <div className="mx-auto mt-3 flex min-h-0 w-full max-w-xl flex-1 flex-col sm:mt-8">
+        <div className="mx-auto mt-2.5 flex min-h-0 w-full max-w-xl flex-1 flex-col sm:mt-8">
           <div className="flex min-h-0 flex-1 flex-col normal-case">
             {step === 1 ? (
               <form
@@ -440,126 +436,96 @@ export default function CheckoutPage() {
                 className="flex min-h-0 flex-1 flex-col"
                 autoComplete="on"
               >
-                <div className="min-h-0 flex-1 overflow-y-auto">
-                  <div className="grid grid-cols-2 gap-x-3 gap-y-1.5">
-                    <div className="space-y-0">
-                      <Label htmlFor="name" className={labelClass}>
-                        Name
-                      </Label>
-                      <Input
-                        id="name"
-                        name="name"
-                        autoComplete="name"
-                        value={details.name}
-                        onChange={(e) =>
-                          setDetails((d) => ({ ...d, name: e.target.value }))
-                        }
-                        required
-                        aria-label="Full name"
-                        className={fieldClass}
-                      />
-                    </div>
-                    <div className="space-y-0">
-                      <Label htmlFor="phone" className={labelClass}>
-                        Phone
-                      </Label>
-                      <Input
-                        id="phone"
-                        name="tel"
-                        type="tel"
-                        autoComplete="tel"
-                        value={details.phone}
-                        onChange={(e) =>
-                          setDetails((d) => ({ ...d, phone: e.target.value }))
-                        }
-                        required
-                        aria-label="Phone"
-                        className={fieldClass}
-                      />
-                    </div>
-                    <div className="col-span-2 space-y-0">
-                      <Label htmlFor="email" className={labelClass}>
-                        Email
-                      </Label>
-                      <Input
-                        id="email"
-                        name="email"
-                        type="email"
-                        autoComplete="email"
-                        inputMode="email"
-                        value={details.email}
-                        onChange={(e) =>
-                          setDetails((d) => ({ ...d, email: e.target.value }))
-                        }
-                        required
-                        aria-label="Email"
-                        className={fieldClass}
-                      />
-                    </div>
-                    <div className="col-span-2 space-y-0">
-                      <Label htmlFor="address" className={labelClass}>
-                        Address
-                      </Label>
-                      <Input
-                        id="address"
-                        name="street-address"
-                        autoComplete="street-address"
-                        value={details.address}
-                        onChange={(e) =>
-                          setDetails((d) => ({ ...d, address: e.target.value }))
-                        }
-                        required
-                        aria-label="Address"
-                        className={fieldClass}
-                      />
-                    </div>
-                    <div className="space-y-0">
-                      <Label htmlFor="city" className={labelClass}>
-                        City
-                      </Label>
-                      <Input
-                        id="city"
-                        name="city"
-                        autoComplete="address-level2"
-                        value={details.city}
-                        onChange={(e) =>
-                          setDetails((d) => ({ ...d, city: e.target.value }))
-                        }
-                        required
-                        aria-label="City"
-                        className={fieldClass}
-                      />
-                    </div>
-                    <div className="space-y-0">
-                      <Label htmlFor="country" className={labelClass}>
-                        Country
-                      </Label>
-                      <Input
-                        id="country"
-                        name="country"
-                        autoComplete="country-name"
-                        value={details.country}
-                        onChange={(e) =>
-                          setDetails((d) => ({ ...d, country: e.target.value }))
-                        }
-                        required
-                        aria-label="Country"
-                        className={fieldClass}
-                      />
-                    </div>
-                    <div className="col-span-2 space-y-0">
-                      <Label htmlFor="notes" className={labelClass}>
-                        Remarks
-                      </Label>
-                      <Input
-                        id="notes"
-                        value={notes}
-                        onChange={(e) => setNotes(e.target.value)}
-                        aria-label="Order notes"
-                        className={fieldClass}
-                      />
-                    </div>
-                  </div>
+                <div className="grid min-h-0 flex-1 grid-cols-2 content-start gap-x-3 gap-y-1 overflow-y-auto">
+                  <Input
+                    id="name"
+                    name="name"
+                    autoComplete="name"
+                    placeholder="Name"
+                    value={details.name}
+                    onChange={(e) =>
+                      setDetails((d) => ({ ...d, name: e.target.value }))
+                    }
+                    required
+                    aria-label="Full name"
+                    className={fieldClass}
+                  />
+                  <Input
+                    id="phone"
+                    name="tel"
+                    type="tel"
+                    autoComplete="tel"
+                    placeholder="Phone"
+                    value={details.phone}
+                    onChange={(e) =>
+                      setDetails((d) => ({ ...d, phone: e.target.value }))
+                    }
+                    required
+                    aria-label="Phone"
+                    className={fieldClass}
+                  />
+                  <Input
+                    id="email"
+                    name="email"
+                    type="email"
+                    autoComplete="email"
+                    inputMode="email"
+                    placeholder="Email"
+                    value={details.email}
+                    onChange={(e) =>
+                      setDetails((d) => ({ ...d, email: e.target.value }))
+                    }
+                    required
+                    aria-label="Email"
+                    className={cn(fieldClass, "col-span-2")}
+                  />
+                  <Input
+                    id="address"
+                    name="street-address"
+                    autoComplete="street-address"
+                    placeholder="Address"
+                    value={details.address}
+                    onChange={(e) =>
+                      setDetails((d) => ({ ...d, address: e.target.value }))
+                    }
+                    required
+                    aria-label="Address"
+                    className={cn(fieldClass, "col-span-2")}
+                  />
+                  <Input
+                    id="city"
+                    name="city"
+                    autoComplete="address-level2"
+                    placeholder="City"
+                    value={details.city}
+                    onChange={(e) =>
+                      setDetails((d) => ({ ...d, city: e.target.value }))
+                    }
+                    required
+                    aria-label="City"
+                    className={fieldClass}
+                  />
+                  <Input
+                    id="country"
+                    name="country"
+                    autoComplete="country-name"
+                    placeholder="Country"
+                    value={details.country}
+                    onChange={(e) =>
+                      setDetails((d) => ({ ...d, country: e.target.value }))
+                    }
+                    required
+                    aria-label="Country"
+                    className={fieldClass}
+                  />
+                  <Input
+                    id="notes"
+                    placeholder="Remarks (optional)"
+                    value={notes}
+                    onChange={(e) => setNotes(e.target.value)}
+                    aria-label="Order notes"
+                    className={cn(fieldClass, "col-span-2")}
+                  />
                 </div>
                 <div className="mt-3 shrink-0 pb-[env(safe-area-inset-bottom)]">
                   <Button type="submit" className={btnClass}>

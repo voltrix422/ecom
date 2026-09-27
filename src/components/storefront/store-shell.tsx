@@ -8,14 +8,16 @@ export function StoreShell({
   children,
   hideSaleBanner = false,
   hideBottomNav = false,
+  hideHeader = false,
 }: {
   children: React.ReactNode;
   hideSaleBanner?: boolean;
   hideBottomNav?: boolean;
+  hideHeader?: boolean;
 }) {
   return (
     <div className="flex min-h-svh flex-col">
-      <Header hideSaleBanner={hideSaleBanner} />
+      {hideHeader ? null : <Header hideSaleBanner={hideSaleBanner} />}
       <main className={hideBottomNav ? "flex-1" : "flex-1 pb-20 md:pb-0"}>
         <PageFade>{children}</PageFade>
       </main>

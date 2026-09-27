@@ -119,8 +119,8 @@ function SuccessContent() {
   }
 
   return (
-    <StoreShell hideSaleBanner hideBottomNav>
-      <div className="mx-auto flex min-h-[calc(100svh-4rem)] max-w-lg flex-col px-5 pt-6 pb-10 sm:max-w-xl sm:pt-10">
+    <StoreShell hideSaleBanner hideBottomNav hideHeader>
+      <div className="mx-auto flex min-h-svh max-w-lg flex-col px-5 pt-6 pb-10 sm:max-w-xl sm:pt-10">
         {!showReceipt ? (
           <div className="flex flex-1 flex-col items-center justify-center text-center">
             <div className="animate-order-placed select-none">
