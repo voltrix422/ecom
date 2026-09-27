@@ -13,6 +13,7 @@ import {
   X,
 } from "lucide-react";
 import { StaggeredMenu } from "@/components/storefront/staggered-menu";
+import { flashPageVeil } from "@/components/page-veil";
 import { brand, categories as seedCategories } from "@/lib/data";
 import { useStore } from "@/lib/store";
 import { cn } from "cn";
