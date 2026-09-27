@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, useRef, useState } from "react";
-import { ArrowLeft, Upload } from "lucide-react";
+import { ArrowLeft, ArrowRight, Upload } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "cn";
 import { StoreShell } from "@/components/storefront/store-shell";
@@ -373,30 +373,19 @@ export default function CheckoutPage() {
             ) : null}
 
             {step === 2 ? (
-              <div className="flex min-h-[calc(100svh-8.5rem)] flex-col gap-3 sm:min-h-0 sm:gap-4">
-                <div className="flex items-center justify-between gap-2">
-                  <p className="text-[12px] tracking-wide text-muted-foreground">
-                    Payment
-                  </p>
-                  <Button
-                    type="button"
-                    className="font-nav-display h-9 shrink-0 border-0 px-4 text-[12px] shadow-none"
-                    onClick={goReceipt}
-                  >
-                    Continue to receipt
-                  </Button>
-                </div>
-
+              <div className="flex flex-col gap-3">
                 <div
                   role="tablist"
                   aria-label="Payment method"
-                  className="relative grid grid-cols-2 rounded-full bg-black/[0.06] p-1"
+                  className="relative grid grid-cols-2 rounded-full border border-black/15 bg-black/[0.04] p-1"
                 >
                   <span
                     aria-hidden
                     className={cn(
                       "absolute top-1 bottom-1 w-[calc(50%-4px)] rounded-full bg-black shadow-sm transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
-                      payment === "bank" ? "translate-x-[calc(100%+4px)]" : "translate-x-0"
+                      payment === "bank"
+                        ? "translate-x-[calc(100%+4px)]"
+                        : "translate-x-0"
                     )}
                     style={{ left: 4 }}
                   />
@@ -425,15 +414,6 @@ export default function CheckoutPage() {
                     Bank transfer
                   </button>
                 </div>
-
-                <p
-                  key={payment}
-                  className="animate-page-fade text-[11px] leading-snug text-muted-foreground sm:text-[12px]"
-                >
-                  {payment === "cod"
-                    ? "Pay in cash when your order arrives."
-                    : "Transfer, then attach payment proof below."}
-                </p>
 
                 {payment === "bank" ? (
                   <div
@@ -488,7 +468,7 @@ export default function CheckoutPage() {
                   </div>
                 ) : null}
 
-                <div className="mt-auto rounded-md bg-black/[0.04] px-3 py-2.5">
+                <div className="rounded-md bg-black/[0.04] px-3 py-2.5">
                   <div className="flex items-center justify-between gap-2">
                     <p className="text-[11px] tracking-wide text-muted-foreground">
                       Delivery details
@@ -516,6 +496,17 @@ export default function CheckoutPage() {
                       .join(", ") || "—"}
                   </p>
                 </div>
+
+                <button
+                  type="button"
+                  onClick={goReceipt}
+                  className="group font-nav-display inline-flex h-12 w-full items-center justify-between rounded-md bg-black px-4 text-[13px] tracking-wide text-white transition-colors hover:bg-black/90"
+                >
+                  <span>Receipt</span>
+                  <span className="inline-flex size-8 items-center justify-center rounded-full bg-white/15 transition-transform duration-300 group-hover:translate-x-0.5">
+                    <ArrowRight className="size-4 stroke-[2]" />
+                  </span>
+                </button>
               </div>
             ) : null}
 
