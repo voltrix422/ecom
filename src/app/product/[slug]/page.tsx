@@ -56,12 +56,13 @@ export default function ProductPage({
     );
   }
 
+  const piece = product;
   const gallery =
-    product.images && product.images.length > 0
-      ? product.images
-      : [product.image];
+    piece.images && piece.images.length > 0
+      ? piece.images
+      : [piece.image];
   const related = products
-    .filter((item) => item.category === product.category && item.id !== product.id)
+    .filter((item) => item.category === piece.category && item.id !== piece.id)
     .slice(0, 3);
   const currentSrc = gallery[Math.min(activeImage, gallery.length - 1)];
 
@@ -77,12 +78,12 @@ export default function ProductPage({
   function toggleLike() {
     const next = !liked;
     setLiked(next);
-    window.localStorage.setItem(likedKey(product.id), next ? "1" : "0");
+    window.localStorage.setItem(likedKey(piece.id), next ? "1" : "0");
     toast.success(next ? "Saved to wishlist" : "Removed from wishlist");
   }
 
   function handleAddToBag() {
-    addToCart(product.id, quantity);
+    addToCart(piece.id, quantity);
     setBagPulse(true);
     window.setTimeout(() => setBagPulse(false), 500);
     flyToCart(currentSrc, galleryRect());
@@ -90,7 +91,7 @@ export default function ProductPage({
   }
 
   function handleBuy() {
-    addToCart(product.id, quantity);
+    addToCart(piece.id, quantity);
     router.push("/checkout");
   }
 
@@ -105,7 +106,7 @@ export default function ProductPage({
           <SaleBadge />
           <MediaImage
             src={currentSrc}
-            alt={product.name}
+            alt={piece.name}
             fill
             priority
             fit="cover"
@@ -129,7 +130,7 @@ export default function ProductPage({
               >
                 <MediaImage
                   src={src}
-                  alt={`${product.name} ${index + 1}`}
+                  alt={`${piece.name} ${index + 1}`}
                   fill
                   fit="cover"
                   sizes="44px"
@@ -161,7 +162,7 @@ export default function ProductPage({
               <button
                 type="button"
                 onClick={handleAddToBag}
-                disabled={product.stock <= 0}
+                disabled={piece.stock <= 0}
                 className={cn(
                   "inline-flex size-11 items-center justify-center text-foreground transition-transform disabled:opacity-40",
                   bagPulse && "scale-110"
@@ -172,7 +173,7 @@ export default function ProductPage({
               </button>
 
               <div className="inline-flex size-11 items-center justify-center [&_button]:size-11 [&_svg]:size-3.5">
-                <ProductShare product={product} />
+                <ProductShare product={piece} />
               </div>
             </div>
           </div>
@@ -180,20 +181,20 @@ export default function ProductPage({
           <Button
             size="lg"
             className="mt-3 h-12 w-full rounded-md border-0 bg-black text-[14px] font-semibold tracking-wide text-white shadow-none hover:bg-black/90"
-            disabled={product.stock <= 0}
+            disabled={piece.stock <= 0}
             onClick={handleBuy}
           >
             Buy
           </Button>
 
           <h1 className="mt-5 font-nav-display text-[26px] leading-none tracking-tight text-foreground">
-            {product.name}
+            {piece.name}
           </h1>
           <div className="mt-3">
-            <SalePrice price={product.price} size="md" className="gap-3" />
+            <SalePrice price={piece.price} size="md" className="gap-3" />
           </div>
           <p className="mt-3 text-[13px] leading-relaxed text-foreground/55">
-            {product.details.join(" · ")}
+            {piece.details.join(" · ")}
           </p>
 
           <div className="mt-5 flex h-11 items-center justify-center gap-1">
@@ -212,7 +213,7 @@ export default function ProductPage({
               type="button"
               className="inline-flex size-10 items-center justify-center text-[22px] leading-none text-foreground/70"
               onClick={() =>
-                setQuantity((value) => Math.min(product.stock || 1, value + 1))
+                setQuantity((value) => Math.min(piece.stock || 1, value + 1))
               }
               aria-label="Increase quantity"
             >
@@ -232,7 +233,7 @@ export default function ProductPage({
             <SaleBadge />
             <MediaImage
               src={currentSrc}
-              alt={product.name}
+              alt={piece.name}
               fill
               priority
               sizes="50vw"
@@ -254,7 +255,7 @@ export default function ProductPage({
                 >
                   <MediaImage
                     src={src}
-                    alt={`${product.name} ${index + 1}`}
+                    alt={`${piece.name} ${index + 1}`}
                     fill
                     sizes="64px"
                     className="object-contain"
@@ -267,17 +268,17 @@ export default function ProductPage({
 
         <div className="relative">
           <div className="relative mb-3 flex justify-end">
-            <ProductShare product={product} />
+            <ProductShare product={piece} />
           </div>
           <div className="relative mt-10 max-w-md">
             <h1 className="font-nav-display truncate whitespace-nowrap text-[34px] leading-none tracking-tight text-foreground/90">
-              {product.name}
+              {piece.name}
             </h1>
             <div className="mt-3">
-              <SalePrice price={product.price} size="md" className="gap-3" />
+              <SalePrice price={piece.price} size="md" className="gap-3" />
             </div>
             <p className="mt-4 font-nav-display text-[13px] leading-snug tracking-wide text-foreground/45">
-              {product.details.join(" · ")}
+              {piece.details.join(" · ")}
             </p>
             <div className="mt-6 flex w-full max-w-md flex-col gap-2.5">
               <div className="mx-auto flex h-12 items-center justify-center gap-1">
@@ -297,7 +298,7 @@ export default function ProductPage({
                   className="inline-flex size-11 items-center justify-center text-[26px] leading-none text-foreground/75 hover:text-foreground"
                   onClick={() =>
                     setQuantity((value) =>
-                      Math.min(product.stock || 1, value + 1)
+                      Math.min(piece.stock || 1, value + 1)
                     )
                   }
                   aria-label="Increase quantity"
@@ -308,7 +309,7 @@ export default function ProductPage({
               <Button
                 size="lg"
                 className="h-12 w-full border-0 shadow-none"
-                disabled={product.stock <= 0}
+                disabled={piece.stock <= 0}
                 onClick={handleAddToBag}
               >
                 Add to bag
@@ -317,7 +318,7 @@ export default function ProductPage({
                 size="lg"
                 variant="outline"
                 className="h-12 w-full border-0 bg-black/8 shadow-none"
-                disabled={product.stock <= 0}
+                disabled={piece.stock <= 0}
                 onClick={handleBuy}
               >
                 Buy now
@@ -330,7 +331,7 @@ export default function ProductPage({
       {related.length > 0 ? (
         <section className="mx-auto max-w-7xl px-6 pt-6 pb-20 md:pt-10">
           <h2 className="font-nav-display text-2xl md:text-3xl">
-            More {product.category}
+            More {piece.category}
           </h2>
           <div className="mt-6 grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:mt-8 lg:grid-cols-3 lg:gap-x-8 lg:gap-y-12">
             {related.map((item) => (
