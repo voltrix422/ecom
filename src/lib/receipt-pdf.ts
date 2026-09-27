@@ -11,11 +11,44 @@ const WORDMARK_RATIO = 720 / 160;
 async function loadLogoDataUrl() {
   const response = await fetch(brand.wordmark);
   const blob = await response.blob();
-  return new Promise<string>((resolve, reject) => {
+  const original = await new Promise<string>((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = () => resolve(String(reader.result));
     reader.onerror = () => reject(new Error("Could not load logo"));
     reader.readAsDataURL(blob);
+  });
+
+  // Recolor wordmark to solid black for print/PDF clarity
+  return new Promise<string>((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => {
+      try {
+        const canvas = document.createElement("canvas");
+        canvas.width = img.naturalWidth || img.width;
+        canvas.height = img.naturalHeight || img.height;
+        const ctx = canvas.getContext("2d");
+        if (!ctx) {
+          resolve(original);
+          return;
+        }
+        ctx.drawImage(img, 0, 0);
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const { data } = imageData;
+        for (let i = 0; i < data.length; i += 4) {
+          if (data[i + 3] > 12) {
+            data[i] = 0;
+            data[i + 1] = 0;
+            data[i + 2] = 0;
+          }
+        }
+        ctx.putImageData(imageData, 0, 0);
+        resolve(canvas.toDataURL("image/png"));
+      } catch {
+        resolve(original);
+      }
+    };
+    img.onerror = () => reject(new Error("Could not decode logo"));
+    img.src = original;
   });
 }
 
@@ -134,14 +167,6 @@ export async function downloadOrderReceiptPdf(
   doc.setTextColor(20);
   doc.setFontSize(8.5);
   doc.text(order.id, pageWidth / 2, y, { align: "center" });
-  y += 5;
-  doc.setTextColor(120);
-  doc.setFontSize(7.5);
-  doc.text("Tracking ID", pageWidth / 2, y, { align: "center" });
-  y += 4;
-  doc.setTextColor(20);
-  doc.setFontSize(8.5);
-  doc.text(order.trackingId, pageWidth / 2, y, { align: "center" });
   y += 5;
   doc.setTextColor(120);
   doc.setFontSize(7.5);

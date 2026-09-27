@@ -88,7 +88,6 @@ export function StoreReceipt({
   bankDetails,
   paymentProof,
   orderId,
-  trackingId,
   createdAt,
   onDownload,
 }: {
@@ -101,7 +100,6 @@ export function StoreReceipt({
   bankDetails?: BankDetails;
   paymentProof?: string | null;
   orderId?: string;
-  trackingId?: string;
   createdAt?: string;
   onDownload?: () => void;
 }) {
@@ -137,12 +135,6 @@ export function StoreReceipt({
               <span className="text-muted-foreground/75">Order</span>{" "}
               <span className="text-foreground">{orderId}</span>
             </p>
-            {trackingId ? (
-              <p>
-                <span className="text-muted-foreground/75">Tracking</span>{" "}
-                <span className="text-foreground">{trackingId}</span>
-              </p>
-            ) : null}
             {createdAt ? <p>{formatDate(createdAt)}</p> : null}
           </div>
         ) : (

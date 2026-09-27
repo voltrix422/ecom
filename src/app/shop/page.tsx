@@ -62,30 +62,28 @@ function ShopContent() {
 
   return (
     <StoreShell>
-      <div className="mx-auto max-w-7xl px-6 pt-2 pb-14 md:pt-3">
-        <h1 className="font-nav-display text-4xl md:text-5xl">Suits</h1>
-
-        <div className="mt-8 grid items-start gap-8 lg:grid-cols-[160px_minmax(0,1fr)] lg:gap-12">
+      <div className="mx-auto max-w-7xl px-6 pt-4 pb-16 md:pt-6 md:pb-20">
+        <div className="grid items-start gap-10 lg:grid-cols-[200px_minmax(0,1fr)] lg:gap-14">
           <aside className="lg:sticky lg:top-28 lg:self-start">
-            <div className="relative w-full max-w-[200px]">
-              <Search className="pointer-events-none absolute top-1/2 left-2.5 size-3.5 -translate-y-1/2 text-muted-foreground" />
+            <div className="relative">
+              <Search className="pointer-events-none absolute top-1/2 left-0 size-3.5 -translate-y-1/2 text-muted-foreground/70" />
               <Input
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
                 placeholder="Search"
-                className="font-nav-display h-9 rounded-md border-border/70 pr-2 pl-8 text-[13px]"
+                className="font-nav-display h-10 rounded-none border-0 border-b border-border/60 bg-transparent px-0 pl-6 text-[13px] shadow-none focus-visible:border-foreground focus-visible:ring-0"
               />
             </div>
 
-            <div className="mt-6 flex items-center justify-between gap-2">
-              <p className="font-nav-display text-[12px] text-muted-foreground">
+            <div className="mt-8 flex items-center justify-between gap-2">
+              <p className="text-[11px] tracking-[0.16em] text-muted-foreground uppercase">
                 Filter
               </p>
               {hasFilters ? (
                 <button
                   type="button"
                   onClick={clearFilters}
-                  className="font-nav-display inline-flex items-center gap-1 text-[11px] text-muted-foreground hover:text-foreground"
+                  className="inline-flex items-center gap-1 text-[11px] tracking-wide text-muted-foreground transition-colors hover:text-foreground"
                 >
                   <X className="size-3" />
                   Clear
@@ -93,14 +91,17 @@ function ShopContent() {
               ) : null}
             </div>
 
-            <div className="mt-3 flex flex-row flex-wrap gap-0.5 lg:flex-col lg:flex-nowrap lg:gap-0">
+            <nav
+              className="mt-4 flex flex-row flex-wrap gap-1 lg:flex-col lg:flex-nowrap lg:gap-0"
+              aria-label="Categories"
+            >
               {(["All", ...allCategories] as const).map((item) => (
                 <button
                   key={item}
                   type="button"
                   onClick={() => selectCategory(item)}
                   className={cn(
-                    "font-nav-display cursor-pointer px-2 py-1.5 text-left text-[17px] transition-colors sm:text-[18px]",
+                    "font-nav-display cursor-pointer px-2.5 py-2 text-left text-[16px] transition-colors sm:text-[17px]",
                     category === item
                       ? "bg-foreground text-background"
                       : "text-muted-foreground hover:text-foreground"
@@ -109,16 +110,26 @@ function ShopContent() {
                   {item}
                 </button>
               ))}
-            </div>
+            </nav>
           </aside>
 
           <div>
+            <div className="mb-8 flex items-baseline justify-between gap-4 border-b border-black/8 pb-4">
+              <p className="text-[12px] tracking-[0.12em] text-muted-foreground uppercase">
+                {category === "All" ? "All pieces" : category}
+              </p>
+              <p className="text-[12px] tabular-nums text-muted-foreground">
+                {filtered.length}{" "}
+                {filtered.length === 1 ? "piece" : "pieces"}
+              </p>
+            </div>
+
             {filtered.length === 0 ? (
-              <p className="mt-4 text-sm text-muted-foreground">
-                No suits match this view.
+              <p className="mt-8 text-sm text-muted-foreground">
+                Nothing matches this view.
               </p>
             ) : (
-              <div className="grid gap-x-6 gap-y-12 sm:grid-cols-2 xl:grid-cols-3">
+              <div className="grid gap-x-7 gap-y-14 sm:grid-cols-2 xl:grid-cols-3">
                 {filtered.map((product) => (
                   <ProductCard
                     key={product.id}
