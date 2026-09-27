@@ -9,7 +9,7 @@ import {
   useRef,
   useState,
 } from "react";
-import { ArrowLeft, ArrowRight, ChevronRight, Upload } from "lucide-react";
+import { ArrowLeft, ArrowRight, ChevronRight, Trash2, Upload } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "cn";
 import { StoreShell } from "@/components/storefront/store-shell";
@@ -243,6 +243,7 @@ export default function CheckoutPage() {
   const [payment, setPayment] = useState<PaymentMethod>("cod");
   const [notes, setNotes] = useState("");
   const [paymentProof, setPaymentProof] = useState<string | null>(null);
+  const [proofName, setProofName] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const [details, setDetails] = useState(emptyDetails);
   const [detailsReady, setDetailsReady] = useState(false);
@@ -311,6 +312,7 @@ export default function CheckoutPage() {
     try {
       const dataUrl = await fileToDataUrl(file, 1400, 0.78);
       setPaymentProof(dataUrl);
+      setProofName(file.name);
       toast.success("Payment proof attached");
     } catch {
       toast.error("Could not upload proof");
@@ -318,6 +320,12 @@ export default function CheckoutPage() {
       setUploading(false);
       if (proofRef.current) proofRef.current.value = "";
     }
+  }
+
+  function clearProof() {
+    setPaymentProof(null);
+    setProofName(null);
+    if (proofRef.current) proofRef.current.value = "";
   }
 
   function validateDetails() {
@@ -381,7 +389,7 @@ export default function CheckoutPage() {
 
   if (lines.length === 0) {
     return (
-      <StoreShell hideSaleBanner>
+      <StoreShell hideSaleBanner hideBottomNav>
         <div className="font-nav-display mx-auto max-w-6xl px-6 py-24">
           <button
             type="button"
@@ -405,9 +413,16 @@ export default function CheckoutPage() {
   }
 
   return (
-    <StoreShell hideSaleBanner>
-      <div className="mx-auto max-w-6xl px-4 pt-2 pb-8 sm:px-6 sm:pt-4 md:pt-8 md:pb-14">
-        <div className="relative text-center">
+    <StoreShell hideSaleBanner hideBottomNav>
+      <div
+        className={cn(
+          "mx-auto max-w-6xl px-4 sm:px-6",
+          step === 3
+            ? "flex h-[calc(100svh-4rem)] flex-col pt-1 pb-3 md:h-auto md:pt-8 md:pb-14"
+            : "pt-2 pb-8 sm:pt-4 md:pt-8 md:pb-14"
+        )}
+      >
+        <div className="relative shrink-0 text-center">
           <button
             type="button"
             onClick={goBack}
@@ -416,16 +431,30 @@ export default function CheckoutPage() {
           >
             <ArrowLeft className="size-4 stroke-[1.75]" />
           </button>
-          <h1 className="font-nav-display text-[28px] leading-none tracking-tight sm:text-4xl md:text-5xl">
+          <h1
+            className={cn(
+              "font-nav-display leading-none tracking-tight",
+              step === 3
+                ? "text-[22px] sm:text-4xl md:text-5xl"
+                : "text-[28px] sm:text-4xl md:text-5xl"
+            )}
+          >
             Checkout
           </h1>
-          <div className="mt-3 sm:mt-5">
+          <div className={cn(step === 3 ? "mt-2" : "mt-3 sm:mt-5")}>
             <StepDots step={step} />
           </div>
         </div>
 
-        <div className="mx-auto mt-5 max-w-xl sm:mt-8">
-          <div className="normal-case">
+        <div
+          className={cn(
+            "mx-auto max-w-xl",
+            step === 3
+              ? "mt-3 flex min-h-0 flex-1 flex-col sm:mt-8"
+              : "mt-5 sm:mt-8"
+          )}
+        >
+          <div className={cn("normal-case", step === 3 && "flex min-h-0 flex-1 flex-col")}>
             {step === 1 ? (
               <form
                 onSubmit={goPayment}
@@ -642,40 +671,49 @@ export default function CheckoutPage() {
                       className="hidden"
                       onChange={(e) => onProofSelected(e.target.files)}
                     />
-                    <button
-                      type="button"
-                      disabled={uploading}
-                      onClick={() => proofRef.current?.click()}
-                      className={cn(
-                        "flex w-full items-center gap-3 rounded-md border border-dashed border-black/20 bg-white px-3 py-2.5 text-left transition-colors hover:border-black/35 hover:bg-black/[0.02] disabled:opacity-50"
-                      )}
-                    >
-                      <span className="inline-flex size-8 shrink-0 items-center justify-center rounded-full bg-black/[0.06]">
-                        <Upload className="size-3.5 text-foreground" strokeWidth={2} />
-                      </span>
-                      <span className="min-w-0 flex-1">
-                        <span className="block text-[13px] font-medium tracking-normal text-foreground normal-case">
-                          {uploading
-                            ? "Uploading…"
-                            : paymentProof
-                              ? "Replace screenshot"
-                              : "Attach screenshot"}
+                    {paymentProof && proofName ? (
+                      <div className="flex items-center gap-2 rounded-md border border-black/10 bg-white px-3 py-2">
+                        <span className="min-w-0 flex-1 truncate text-[13px] text-foreground">
+                          {proofName}
                         </span>
-                        <span className="mt-0.5 block text-[11px] tracking-normal text-muted-foreground normal-case">
-                          {paymentProof
-                            ? "Tap to choose a different image"
-                            : "Transfer receipt image"}
+                        <button
+                          type="button"
+                          disabled={uploading}
+                          onClick={() => proofRef.current?.click()}
+                          className="shrink-0 text-[12px] text-muted-foreground transition-colors hover:text-foreground disabled:opacity-50"
+                        >
+                          Replace
+                        </button>
+                        <button
+                          type="button"
+                          disabled={uploading}
+                          onClick={clearProof}
+                          aria-label="Remove screenshot"
+                          className="inline-flex size-7 shrink-0 items-center justify-center text-muted-foreground transition-colors hover:text-foreground disabled:opacity-50"
+                        >
+                          <Trash2 className="size-3.5" strokeWidth={2} />
+                        </button>
+                      </div>
+                    ) : (
+                      <button
+                        type="button"
+                        disabled={uploading}
+                        onClick={() => proofRef.current?.click()}
+                        className="flex w-full items-center gap-3 rounded-md border border-dashed border-black/20 bg-white px-3 py-2.5 text-left transition-colors hover:border-black/35 hover:bg-black/[0.02] disabled:opacity-50"
+                      >
+                        <span className="inline-flex size-8 shrink-0 items-center justify-center rounded-full bg-black/[0.06]">
+                          <Upload className="size-3.5 text-foreground" strokeWidth={2} />
                         </span>
-                      </span>
-                    </button>
-                    {paymentProof ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        src={paymentProof}
-                        alt="Payment proof preview"
-                        className="mt-1 max-h-16 w-full rounded-md object-contain"
-                      />
-                    ) : null}
+                        <span className="min-w-0 flex-1">
+                          <span className="block text-[13px] font-medium tracking-normal text-foreground normal-case">
+                            {uploading ? "Uploading…" : "Attach screenshot"}
+                          </span>
+                          <span className="mt-0.5 block text-[11px] tracking-normal text-muted-foreground normal-case">
+                            Transfer receipt image
+                          </span>
+                        </span>
+                      </button>
+                    )}
                   </div>
                 ) : null}
 
@@ -722,8 +760,8 @@ export default function CheckoutPage() {
             ) : null}
 
             {step === 3 ? (
-              <div className="flex min-h-[calc(100svh-8.5rem)] flex-col gap-3 sm:min-h-0">
-                <div className="min-h-0 flex-1 overflow-hidden rounded-md bg-black/[0.03] px-2.5 py-2 sm:overflow-visible sm:bg-transparent sm:p-0">
+              <div className="flex min-h-0 flex-1 flex-col gap-2.5 sm:min-h-0 sm:gap-4">
+                <div className="min-h-0 flex-1 overflow-y-auto rounded-md bg-black/[0.03] px-2 py-1.5 sm:overflow-visible sm:bg-transparent sm:p-0">
                   <StoreReceipt
                     compact
                     lines={checkoutReceiptLines(lines)}
@@ -732,10 +770,9 @@ export default function CheckoutPage() {
                     payment={payment}
                     customer={details}
                     notes={notes}
-                    paymentProof={payment === "bank" ? paymentProof : null}
                   />
                 </div>
-                <div className="mt-auto shrink-0 pb-[env(safe-area-inset-bottom)]">
+                <div className="shrink-0 pb-[env(safe-area-inset-bottom)]">
                   <SwipeToComplete
                     disabled={submitting}
                     loading={submitting}

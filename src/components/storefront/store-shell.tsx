@@ -7,18 +7,20 @@ import { PageVeil } from "@/components/page-veil";
 export function StoreShell({
   children,
   hideSaleBanner = false,
+  hideBottomNav = false,
 }: {
   children: React.ReactNode;
   hideSaleBanner?: boolean;
+  hideBottomNav?: boolean;
 }) {
   return (
     <div className="flex min-h-svh flex-col">
       <Header hideSaleBanner={hideSaleBanner} />
-      <main className="flex-1 pb-20 md:pb-0">
+      <main className={hideBottomNav ? "flex-1" : "flex-1 pb-20 md:pb-0"}>
         <PageFade>{children}</PageFade>
       </main>
       <CartDrawer />
-      <MobileBottomNav />
+      {hideBottomNav ? null : <MobileBottomNav />}
       <PageVeil />
     </div>
   );

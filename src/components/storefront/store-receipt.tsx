@@ -25,7 +25,7 @@ function Rule({
     <div
       className={cn(
         "border-t",
-        compact ? "my-1.5" : "my-4",
+        compact ? "my-1" : "my-4",
         heavy ? "border-foreground/35" : "border-dashed border-foreground/15"
       )}
       aria-hidden
@@ -69,11 +69,11 @@ function CustomerBlock({
 
   if (compact) {
     return (
-      <div className="rounded-md bg-black/[0.035] px-2.5 py-2">
+      <div className="rounded-md bg-black/[0.035] px-2 py-1.5">
         {name ? (
-          <p className="text-[13px] leading-tight text-foreground">{name}</p>
+          <p className="text-[12px] leading-tight text-foreground">{name}</p>
         ) : null}
-        <p className="mt-0.5 line-clamp-2 text-[11px] leading-snug text-muted-foreground">
+        <p className="mt-0.5 line-clamp-1 text-[10px] leading-snug text-muted-foreground">
           {[phone, email, address, [city, country].filter(Boolean).join(", ")]
             .filter(Boolean)
             .join(" · ")}
@@ -108,7 +108,6 @@ export function StoreReceipt({
   customer,
   notes,
   bankDetails,
-  paymentProof,
   orderId,
   createdAt,
   onDownload,
@@ -142,7 +141,7 @@ export function StoreReceipt({
       className={cn(
         "relative mx-auto w-full max-w-[340px] text-foreground normal-case",
         compact
-          ? "px-0.5 py-0 text-[12px] leading-snug"
+          ? "px-0.5 py-0 text-[11px] leading-tight"
           : "px-1 py-2 text-[13px] leading-relaxed"
       )}
     >
@@ -163,9 +162,9 @@ export function StoreReceipt({
           <Image
             src={brand.wordmark}
             alt={brand.name}
-            width={160}
-            height={36}
-            className="mx-auto h-6 w-auto object-contain brightness-0"
+            width={120}
+            height={28}
+            className="mx-auto h-5 w-auto object-contain brightness-0"
             unoptimized
           />
         ) : (
@@ -263,28 +262,6 @@ export function StoreReceipt({
             <p className="break-all tracking-wide">{bankDetails.iban}</p>
           </div>
         </>
-      ) : null}
-
-      {paymentProof && !compact ? (
-        <>
-          <Rule />
-          <p className="mb-2 text-[11px] text-muted-foreground">Payment proof</p>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={paymentProof}
-            alt="Payment proof"
-            className="max-h-40 w-full object-contain"
-          />
-        </>
-      ) : null}
-
-      {paymentProof && compact ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={paymentProof}
-          alt="Payment proof"
-          className="mt-1.5 max-h-10 w-full rounded object-contain"
-        />
       ) : null}
 
       {!compact ? (

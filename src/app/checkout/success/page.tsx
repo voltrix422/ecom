@@ -68,7 +68,6 @@ function ReceiptView({
       bankDetails={
         order.paymentMethod === "bank" ? bankDetails : undefined
       }
-      paymentProof={order.paymentProof}
       orderId={order.id}
       createdAt={order.createdAt}
       onDownload={onDownload}
