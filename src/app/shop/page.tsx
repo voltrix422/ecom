@@ -149,7 +149,7 @@ function ShopContent() {
                 Nothing matches this view.
               </p>
             ) : (
-              <div className="grid grid-cols-3 gap-1.5 sm:gap-x-4 sm:gap-y-6 md:grid-cols-3 xl:grid-cols-3 xl:gap-x-5 xl:gap-y-8">
+              <div className="grid grid-cols-2 gap-2 sm:gap-x-4 sm:gap-y-6 xl:gap-x-5 xl:gap-y-8">
                 {filtered.map((product) => (
                   <ProductCard
                     key={product.id}

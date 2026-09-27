@@ -5,7 +5,6 @@ import { useEffect, useLayoutEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { X } from "lucide-react";
 import { MediaImage } from "@/components/media-image";
-import { SaleBadge } from "@/components/storefront/sale-badge";
 import { SalePrice } from "@/components/storefront/sale-price";
 import { Button } from "@/components/ui/button";
 import { formatPrice } from "@/lib/format";
@@ -232,7 +231,6 @@ export function CartDrawer() {
                     className="grid grid-cols-[72px_1fr] gap-3"
                   >
                     <div className="relative w-[72px] shrink-0">
-                      <SaleBadge compact />
                       <MediaImage
                         src={product.image}
                         alt={product.name}
