@@ -4,7 +4,6 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { use, useEffect, useRef, useState } from "react";
 import { Heart, ShoppingBag } from "lucide-react";
-import { toast } from "sonner";
 import { MediaImage } from "@/components/media-image";
 import { ProductCard } from "@/components/storefront/product-card";
 import { StoreShell } from "@/components/storefront/store-shell";
@@ -79,7 +78,6 @@ export default function ProductPage({
     const next = !liked;
     setLiked(next);
     window.localStorage.setItem(likedKey(piece.id), next ? "1" : "0");
-    toast.success(next ? "Saved to wishlist" : "Removed from wishlist");
   }
 
   function handleAddToBag() {
@@ -87,7 +85,6 @@ export default function ProductPage({
     setBagPulse(true);
     window.setTimeout(() => setBagPulse(false), 500);
     flyToCart(currentSrc, galleryRect());
-    toast.success("Added to bag");
   }
 
   function handleBuy() {
@@ -99,7 +96,7 @@ export default function ProductPage({
     <StoreShell>
       {/* Mobile detail layout */}
       <div className="md:hidden">
-        <div className="flex h-[calc(100dvh-4rem)] flex-col">
+        <div className="flex h-[calc(100lvh-4rem)] max-h-[calc(100lvh-4rem)] flex-col">
           <div
             ref={mobileGalleryRef}
             className="relative min-h-0 w-full flex-1 bg-white"

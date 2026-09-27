@@ -289,8 +289,8 @@ export function Header({ hideSaleBanner = false }: { hideSaleBanner?: boolean })
     setNavHidden(false);
 
     function onScroll() {
-      // Home: navbar always visible
-      if (isHome || menuOpen || searchOpen) {
+      // Home + product detail: navbar always visible (stable layout)
+      if (isHome || pathname.startsWith("/product") || menuOpen || searchOpen) {
         setNavHidden(false);
         lastScrollY.current = window.scrollY;
         return;

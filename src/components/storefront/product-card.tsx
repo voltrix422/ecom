@@ -15,27 +15,27 @@ export function ProductCard({
     return (
       <Link
         href={`/product/${product.slug}`}
-        className="group flex min-w-0 flex-col overflow-hidden border border-black/12 bg-white"
+        className="group flex min-w-0 flex-col overflow-hidden rounded-[4px] border border-black/12 bg-white"
       >
-        <div className="relative aspect-[3/4] overflow-hidden bg-[#f6f4f1]">
+        <div className="relative aspect-[3/4] overflow-hidden bg-white">
           <MediaImage
             src={product.image}
             alt={product.name}
             fill
-            fit="cover"
+            fit="contain"
             sizes="50vw"
             className="transition-opacity duration-300 group-hover:opacity-85"
           />
         </div>
-        <div className="min-w-0 px-2 pt-2 pb-2.5">
-          <p className="font-nav-display truncate text-[12px] leading-tight tracking-wide text-foreground uppercase sm:text-[14px]">
+        <div className="min-w-0 px-1.5 pt-1 pb-1.5">
+          <p className="font-nav-display truncate text-[11px] leading-none tracking-wide text-foreground uppercase sm:text-[13px]">
             {product.name}
           </p>
           <SalePrice
             price={product.price}
-            className="mt-1 flex-col items-start gap-0 [&_span:first-child]:text-[10px] [&_span:last-child]:text-[13px] sm:[&_span:first-child]:text-[12px] sm:[&_span:last-child]:text-[15px]"
+            className="mt-0.5 flex-row flex-wrap items-baseline gap-x-1.5 gap-y-0 [&_span:first-child]:text-[9px] [&_span:last-child]:text-[12px] sm:[&_span:first-child]:text-[11px] sm:[&_span:last-child]:text-[14px]"
           />
-          <p className="mt-0.5 truncate text-[10px] tracking-wide text-muted-foreground uppercase sm:text-[11px]">
+          <p className="mt-0.5 truncate text-[9px] leading-none tracking-wide text-muted-foreground uppercase sm:text-[10px]">
             {product.category} · 3-piece
           </p>
         </div>
