@@ -2,12 +2,13 @@
 
 import { usePathname, useSearchParams } from "next/navigation";
 import { Suspense } from "react";
+import { isStorePath } from "@/lib/site-mode";
 
 function PageFadeInner({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const key = `${pathname}?${searchParams.toString()}`;
-  const isCheckout = pathname === "/checkout";
+  const isCheckout = isStorePath(pathname, "/checkout");
 
   return (
     <div

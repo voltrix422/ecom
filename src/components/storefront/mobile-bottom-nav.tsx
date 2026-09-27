@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { Home, Search, X } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { brand } from "@/lib/data";
+import { isStoreHomePath, storePath } from "@/lib/site-mode";
 import { useStore } from "@/lib/store";
 import { cn } from "cn";
 
@@ -27,7 +28,7 @@ export function MobileBottomNav() {
 
   const open = phase !== "idle";
   const typing = phase === "typing";
-  const isHome = pathname === "/";
+  const isHome = isStoreHomePath(pathname);
   // Home: always show notch. Other pages: show after a little scroll down.
   const hideNotch = cartOpen || sidebarOpen || (!isHome && !scrolled);
 
@@ -73,7 +74,11 @@ export function MobileBottomNav() {
   function submitSearch(event: React.FormEvent) {
     event.preventDefault();
     const value = query.trim();
-    router.push(value ? `/shop?q=${encodeURIComponent(value)}` : "/shop");
+    router.push(
+      value
+        ? `${storePath("/shop")}?q=${encodeURIComponent(value)}`
+        : storePath("/shop")
+    );
     setPhase("idle");
   }
 
@@ -104,7 +109,7 @@ export function MobileBottomNav() {
       aria-hidden={hideNotch}
     >
       <Link
-        href="/"
+        href={storePath("/")}
         className={cn(
           pillClass,
           "transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",

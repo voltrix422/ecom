@@ -8,6 +8,7 @@ import { MediaImage } from "@/components/media-image";
 import { SalePrice } from "@/components/storefront/sale-price";
 import { Button } from "@/components/ui/button";
 import { formatPrice } from "@/lib/format";
+import { storePath } from "@/lib/site-mode";
 import { useStore } from "@/lib/store";
 import "./staggered-menu.css";
 
@@ -216,7 +217,7 @@ export function CartDrawer() {
                 Your bag is empty.
               </p>
               <Button className="mt-8 w-fit" asChild>
-                <Link href="/shop" onClick={() => setCartOpen(false)}>
+                <Link href={storePath("/shop")} onClick={() => setCartOpen(false)}>
                   <span>Continue shopping</span>
                 </Link>
               </Button>
@@ -241,7 +242,7 @@ export function CartDrawer() {
                       <div className="flex items-start justify-between gap-2">
                         <div className="min-w-0">
                           <Link
-                            href={`/product/${product.slug}`}
+                            href={storePath(`/product/${product.slug}`)}
                             onClick={() => setCartOpen(false)}
                             className="font-nav-display block truncate text-[14px]"
                           >
@@ -315,7 +316,7 @@ export function CartDrawer() {
                   size="lg"
                   className="mt-4 h-12 w-full text-[15px] font-semibold"
                 >
-                  <Link href="/checkout" onClick={() => setCartOpen(false)}>
+                  <Link href={storePath("/checkout")} onClick={() => setCartOpen(false)}>
                     <span>Checkout</span>
                   </Link>
                 </Button>

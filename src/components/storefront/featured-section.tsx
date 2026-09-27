@@ -4,12 +4,13 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { MediaImage } from "@/components/media-image";
 import { cn } from "cn";
+import { storePath } from "@/lib/site-mode";
 import type { Product } from "@/lib/types";
 
 function FeaturedPanel({ product }: { product: Product }) {
   return (
     <Link
-      href={`/product/${product.slug}`}
+      href={storePath(`/product/${product.slug}`)}
       className="group relative block min-h-[78svh] overflow-hidden bg-muted/10 lg:min-h-[90svh]"
     >
       <MediaImage
@@ -72,7 +73,7 @@ export function FeaturedSection({ products }: { products: Product[] }) {
             Featured suits
           </h2>
           <Link
-            href="/shop"
+            href={storePath("/shop")}
             className="font-nav-display shrink-0 pb-1 text-[16px] text-muted-foreground transition-colors hover:text-foreground md:text-[18px]"
           >
             View all

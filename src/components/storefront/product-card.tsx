@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { MediaImage } from "@/components/media-image";
 import { formatPrice } from "@/lib/format";
+import { storePath } from "@/lib/site-mode";
 import type { Product } from "@/lib/types";
 
 export function ProductCard({
@@ -14,7 +15,7 @@ export function ProductCard({
   if (compact) {
     return (
       <Link
-        href={`/product/${product.slug}`}
+        href={storePath(`/product/${product.slug}`)}
         className="group flex min-w-0 flex-col bg-white"
       >
         <div className="relative aspect-[2/3] overflow-hidden bg-white">
@@ -45,7 +46,7 @@ export function ProductCard({
   }
 
   return (
-    <Link href={`/product/${product.slug}`} className="group block min-w-0">
+    <Link href={storePath(`/product/${product.slug}`)} className="group block min-w-0">
       <div className="relative overflow-hidden">
         <MediaImage
           src={product.image}

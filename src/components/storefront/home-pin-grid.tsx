@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useMemo } from "react";
 import { MediaImage } from "@/components/media-image";
+import { storePath } from "@/lib/site-mode";
 import { useStore } from "@/lib/store";
 import { cn } from "cn";
 
@@ -22,7 +23,7 @@ export function HomePinGrid() {
     () =>
       products.map((product, index) => ({
         key: product.id,
-        href: `/product/${product.slug}`,
+        href: storePath(`/product/${product.slug}`),
         src: product.image,
         title: product.name,
         aspect: ASPECTS[index % ASPECTS.length],

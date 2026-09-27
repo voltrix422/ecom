@@ -15,15 +15,16 @@ import {
 import { StaggeredMenu } from "@/components/storefront/staggered-menu";
 import { flashPageVeil } from "@/components/page-veil";
 import { brand, categories as seedCategories } from "@/lib/data";
+import { isStoreHomePath, storePath } from "@/lib/site-mode";
 import { useStore } from "@/lib/store";
 import { cn } from "cn";
 
 const navIcon = "size-7 stroke-[1.5]";
 
 const accountLinks = [
-  { href: "/track", label: "Track order", icon: Package },
-  { href: "/help", label: "Refund", icon: RotateCcw },
-  { href: "/about", label: "About", icon: Info },
+  { href: storePath("/track"), label: "Track order", icon: Package },
+  { href: storePath("/help"), label: "Refund", icon: RotateCcw },
+  { href: storePath("/about"), label: "About", icon: Info },
 ] as const;
 
 function HeaderLogo({
@@ -34,7 +35,7 @@ function HeaderLogo({
   className?: string;
 }) {
   return (
-    <Link href="/" aria-label="Ayesha's" className="inline-flex items-center">
+    <Link href={storePath("/")} aria-label="Ayesha's" className="inline-flex items-center">
       <img
         src={brand.wordmark}
         alt="Ayesha's"
@@ -220,8 +221,8 @@ export function Header({ hideSaleBanner = false }: { hideSaleBanner?: boolean })
   const { categories: storeCategories } = useStore();
   const categories =
     storeCategories.length > 0 ? storeCategories : [...seedCategories];
-  const overlay = pathname === "/";
-  const isHome = pathname === "/";
+  const overlay = isStoreHomePath(pathname);
+  const isHome = isStoreHomePath(pathname);
   const [menuOpen, setMenuOpen] = useState(false);
   const [overHero, setOverHero] = useState(overlay);
   const [searchOpen, setSearchOpen] = useState(false);
@@ -234,15 +235,27 @@ export function Header({ hideSaleBanner = false }: { hideSaleBanner?: boolean })
 
   const menuItems = useMemo(
     () => [
-      { label: "Shop all", ariaLabel: "Shop all products", link: "/shop" },
+      {
+        label: "Shop all",
+        ariaLabel: "Shop all products",
+        link: storePath("/shop"),
+      },
       ...categories.map((category) => ({
         label: category,
         ariaLabel: `Shop ${category}`,
-        link: `/shop?category=${encodeURIComponent(category)}`,
+        link: `${storePath("/shop")}?category=${encodeURIComponent(category)}`,
       })),
-      { label: "Track order", ariaLabel: "Track your order", link: "/track" },
-      { label: "Refund", ariaLabel: "Refund help", link: "/help" },
-      { label: "About", ariaLabel: "About Ayesha's", link: "/about" },
+      {
+        label: "Track order",
+        ariaLabel: "Track your order",
+        link: storePath("/track"),
+      },
+      { label: "Refund", ariaLabel: "Refund help", link: storePath("/help") },
+      {
+        label: "About",
+        ariaLabel: "About Ayesha's",
+        link: storePath("/about"),
+      },
     ],
     [categories]
   );
@@ -335,7 +348,11 @@ export function Header({ hideSaleBanner = false }: { hideSaleBanner?: boolean })
   function submitSearch(event: React.FormEvent) {
     event.preventDefault();
     const value = search.trim();
-    router.push(value ? `/shop?q=${encodeURIComponent(value)}` : "/shop");
+    router.push(
+      value
+        ? `${storePath("/shop")}?q=${encodeURIComponent(value)}`
+        : storePath("/shop")
+    );
     setSearchOpen(false);
   }
 

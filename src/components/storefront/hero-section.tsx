@@ -4,12 +4,13 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { usableHeroBanners } from "@/lib/hero-storage";
 import { flashPageVeil } from "@/components/page-veil";
+import { storePath } from "@/lib/site-mode";
 import { useStore } from "@/lib/store";
 import { cn } from "cn";
 
 const actions = [
-  { href: "/shop", label: "Shop all" },
-  { href: "/shop?category=Lawn", label: "Lawn" },
+  { href: storePath("/shop"), label: "Shop all" },
+  { href: `${storePath("/shop")}?category=Lawn`, label: "Lawn" },
 ];
 
 export function HeroSection() {

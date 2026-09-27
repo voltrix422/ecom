@@ -21,6 +21,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { formatPrice } from "@/lib/format";
 import { fileToDataUrl } from "@/lib/image-upload";
+import { storePath } from "@/lib/site-mode";
 import { useStore } from "@/lib/store";
 import type { PaymentMethod, Product } from "@/lib/types";
 
@@ -376,7 +377,9 @@ export default function CheckoutPage() {
         paymentProof: paymentProof || undefined,
         shipping,
       });
-      router.replace(`/checkout/success?order=${order.id}&pay=${payment}`);
+      router.replace(
+        `${storePath("/checkout/success")}?order=${order.id}&pay=${payment}`
+      );
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Could not place order");
       setSubmitting(false);
@@ -399,7 +402,7 @@ export default function CheckoutPage() {
           <h1 className="text-4xl tracking-tight md:text-5xl">Checkout</h1>
           <p className="mt-4 text-[14px] text-muted-foreground">Your bag is empty.</p>
           <Button asChild className={cn("mt-6", btnClass)}>
-            <Link href="/shop">
+            <Link href={storePath("/shop")}>
               <span>Continue shopping</span>
             </Link>
           </Button>

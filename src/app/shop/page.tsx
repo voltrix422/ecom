@@ -7,6 +7,7 @@ import { ProductCard } from "@/components/storefront/product-card";
 import { StoreShell } from "@/components/storefront/store-shell";
 import { Input } from "@/components/ui/input";
 import { categories as seedCategories } from "@/lib/data";
+import { storePath } from "@/lib/site-mode";
 import { useStore } from "@/lib/store";
 import type { Category } from "@/lib/types";
 import { cn } from "cn";
@@ -49,21 +50,26 @@ function ShopContent() {
     setCategory(item);
     const q = searchParams.get("q");
     if (item === "All") {
-      router.replace(q ? `/shop?q=${encodeURIComponent(q)}` : "/shop", {
-        scroll: false,
-      });
+      router.replace(
+        q ? `${storePath("/shop")}?q=${encodeURIComponent(q)}` : storePath("/shop"),
+        {
+          scroll: false,
+        }
+      );
     } else {
       const params = new URLSearchParams();
       params.set("category", item);
       if (q) params.set("q", q);
-      router.replace(`/shop?${params.toString()}`, { scroll: false });
+      router.replace(`${storePath("/shop")}?${params.toString()}`, {
+        scroll: false,
+      });
     }
   }
 
   function clearFilters() {
     setCategory("All");
     setQuery("");
-    router.replace("/shop", { scroll: false });
+    router.replace(storePath("/shop"), { scroll: false });
   }
 
   function renderFilters(mobile = false) {

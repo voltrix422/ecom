@@ -17,6 +17,7 @@ import {
 import { ProductShare } from "@/components/storefront/product-share";
 import { flyToCart } from "@/lib/fly-to-cart";
 import { formatPrice } from "@/lib/format";
+import { storePath } from "@/lib/site-mode";
 import { useStore } from "@/lib/store";
 import { cn } from "cn";
 
@@ -53,7 +54,7 @@ export default function ProductPage({
         <div className="mx-auto max-w-6xl px-6 py-24 text-center">
           <h1 className="text-3xl">Piece not found</h1>
           <Button asChild variant="outline" className="mt-6">
-            <Link href="/shop">
+            <Link href={storePath("/shop")}>
               <span>Return to shop</span>
             </Link>
           </Button>
@@ -99,7 +100,7 @@ export default function ProductPage({
     setBuying(true);
     addToCart(piece.id, quantity);
     window.setTimeout(() => {
-      router.push("/checkout");
+      router.push(storePath("/checkout"));
     }, 220);
   }
 

@@ -9,6 +9,7 @@ import { StoreShell } from "@/components/storefront/store-shell";
 import { StoreReceipt } from "@/components/storefront/store-receipt";
 import { Button } from "@/components/ui/button";
 import { downloadOrderReceiptPdf } from "@/lib/receipt-pdf";
+import { storePath } from "@/lib/site-mode";
 import { useStore } from "@/lib/store";
 import type { Order } from "@/lib/types";
 import { cn } from "cn";
@@ -154,7 +155,7 @@ function SuccessContent() {
                 asChild
                 className="font-nav-display h-11 w-full border-0 bg-black/6 text-[13px] shadow-none"
               >
-                <Link href="/shop">Continue shopping</Link>
+                <Link href={storePath("/shop")}>Continue shopping</Link>
               </Button>
             </div>
           </div>
