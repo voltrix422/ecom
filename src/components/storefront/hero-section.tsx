@@ -51,16 +51,16 @@ export function HeroSection() {
           ))
         : null}
 
-      <div className="absolute inset-x-0 bottom-[12%] z-10 flex items-center justify-center gap-3 px-6">
+      <div className="absolute inset-x-0 bottom-[12%] z-10 flex items-center justify-center gap-1.5 px-6">
         {actions.map((action) => (
           <Link
             key={action.label}
             href={action.href}
             onClick={() => flashPageVeil()}
-            className="group relative inline-flex h-12 min-w-[10rem] items-center justify-center overflow-hidden rounded-md border-0 bg-black/45 px-8 text-[11px] font-bold tracking-[0.28em] text-white uppercase shadow-[0_16px_40px_rgba(0,0,0,0.35)] backdrop-blur-xl backdrop-saturate-100"
+            className="group relative inline-flex h-12 min-w-[8.5rem] items-center justify-center overflow-hidden rounded-md border-0 bg-black/45 px-6 text-[13px] font-nav-display text-white shadow-[0_16px_40px_rgba(0,0,0,0.35)] backdrop-blur-xl backdrop-saturate-100 sm:text-[14px]"
           >
             <span className="absolute inset-x-0 bottom-0 h-0 bg-white transition-[height] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:h-full" />
-            <span className="relative font-bold transition-colors duration-500 ease-out group-hover:text-black">
+            <span className="relative font-nav-display transition-colors duration-500 ease-out group-hover:text-black">
               {action.label}
             </span>
           </Link>

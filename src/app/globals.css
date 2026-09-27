@@ -58,6 +58,7 @@
   --animate-panel-item: panel-item 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
   --animate-search-drop: search-drop 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
   --animate-account-link: account-link 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+  --font-nav-display: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
 }
 
 @keyframes panel-in {
@@ -136,6 +137,15 @@
     opacity: 1;
     transform: translateY(0);
     filter: blur(0);
+  }
+}
+
+@layer utilities {
+  .font-nav-display {
+    font-family: var(--font-nav-display), ui-sans-serif, system-ui, sans-serif;
+    font-weight: 700;
+    letter-spacing: -0.045em;
+    text-transform: uppercase;
   }
 }
 

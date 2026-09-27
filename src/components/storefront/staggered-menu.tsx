@@ -541,6 +541,17 @@ export function StaggeredMenu({
         className="staggered-menu-panel"
         aria-hidden={!open}
       >
+        <button
+          type="button"
+          className="sm-panel-close"
+          aria-label="Close menu"
+          onClick={closeMenu}
+        >
+          <span className="sm-panel-close-icon" aria-hidden="true">
+            <span />
+            <span />
+          </span>
+        </button>
         <div className="sm-panel-inner">
           <ul
             className="sm-panel-list"

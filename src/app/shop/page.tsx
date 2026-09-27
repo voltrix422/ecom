@@ -93,14 +93,14 @@ function ShopContent() {
               ) : null}
             </div>
 
-            <div className="mt-3 flex flex-row flex-wrap gap-1.5 lg:flex-col lg:flex-nowrap lg:gap-1">
+            <div className="mt-3 flex flex-row flex-wrap gap-0.5 lg:flex-col lg:flex-nowrap lg:gap-0">
               {(["All", ...allCategories] as const).map((item) => (
                 <button
                   key={item}
                   type="button"
                   onClick={() => selectCategory(item)}
                   className={cn(
-                    "cursor-pointer px-2 py-1.5 text-left text-[11px] tracking-[0.14em] uppercase transition-colors",
+                    "font-nav-display cursor-pointer px-2 py-1.5 text-left text-[15px] transition-colors sm:text-[16px]",
                     category === item
                       ? "bg-foreground text-background"
                       : "text-muted-foreground hover:text-foreground"
