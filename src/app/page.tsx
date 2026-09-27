@@ -6,8 +6,7 @@ import StoreHomePage from "@/app/main/page";
 export const metadata: Metadata = COMING_SOON
   ? {
       title: "Coming soon — ayeshaswear",
-      description:
-        "Women’s unstitched suits — launching shortly. Leave your email to get notified.",
+      description: "ayeshaswear is launching soon. Leave your email to get notified.",
     }
   : {
       title: "ayeshaswear — Women’s unstitched suits",

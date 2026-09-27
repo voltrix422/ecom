@@ -456,88 +456,11 @@
 
 /* Coming soon landing */
 .coming-soon {
-  background: #0c0c0c;
-}
-
-.coming-soon-bg {
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
-}
-
-.coming-soon-orb {
-  position: absolute;
-  border-radius: 9999px;
-  filter: blur(60px);
-  opacity: 0.55;
-  will-change: transform;
-}
-
-.coming-soon-orb-a {
-  width: 55vw;
-  height: 55vw;
-  top: -12%;
-  left: -10%;
-  background: radial-gradient(circle, #3a3530 0%, transparent 70%);
-  animation: coming-soon-drift-a 14s ease-in-out infinite alternate;
-}
-
-.coming-soon-orb-b {
-  width: 48vw;
-  height: 48vw;
-  right: -8%;
-  bottom: 5%;
-  background: radial-gradient(circle, #5c5248 0%, transparent 70%);
-  animation: coming-soon-drift-b 18s ease-in-out infinite alternate;
-}
-
-.coming-soon-orb-c {
-  width: 36vw;
-  height: 36vw;
-  left: 35%;
-  top: 40%;
-  background: radial-gradient(circle, #1f1c1a 0%, transparent 70%);
-  animation: coming-soon-drift-c 12s ease-in-out infinite alternate;
-}
-
-.coming-soon-grain {
-  position: absolute;
-  inset: 0;
-  opacity: 0.18;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
-  mix-blend-mode: overlay;
-  pointer-events: none;
+  background: #050505;
 }
 
 .coming-soon-title {
   animation: coming-soon-in 1s cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-
-@keyframes coming-soon-drift-a {
-  from {
-    transform: translate(0, 0) scale(1);
-  }
-  to {
-    transform: translate(8%, 12%) scale(1.12);
-  }
-}
-
-@keyframes coming-soon-drift-b {
-  from {
-    transform: translate(0, 0) scale(1);
-  }
-  to {
-    transform: translate(-10%, -8%) scale(1.15);
-  }
-}
-
-@keyframes coming-soon-drift-c {
-  from {
-    transform: translate(0, 0) scale(1);
-  }
-  to {
-    transform: translate(6%, -10%) scale(1.08);
-  }
 }
 
 @keyframes coming-soon-in {

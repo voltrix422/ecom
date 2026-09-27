@@ -2,6 +2,7 @@
 
 import { FormEvent, useState } from "react";
 import Image from "next/image";
+import LightRays from "@/components/light-rays";
 import { brand } from "@/lib/data";
 
 export default function ComingSoonPage() {
@@ -46,11 +47,22 @@ export default function ComingSoonPage() {
 
   return (
     <main className="coming-soon relative flex min-h-svh flex-col items-center justify-center overflow-hidden px-6 text-center">
-      <div className="coming-soon-bg" aria-hidden>
-        <span className="coming-soon-orb coming-soon-orb-a" />
-        <span className="coming-soon-orb coming-soon-orb-b" />
-        <span className="coming-soon-orb coming-soon-orb-c" />
-        <span className="coming-soon-grain" />
+      <div className="absolute inset-0 z-0" aria-hidden>
+        <LightRays
+          raysOrigin="top-center"
+          raysColor="#ffffff"
+          raysSpeed={1}
+          lightSpread={0.5}
+          rayLength={3}
+          followMouse
+          mouseInfluence={0.1}
+          noiseAmount={0}
+          distortion={0}
+          pulsating={false}
+          fadeDistance={1}
+          saturation={1}
+          className="custom-rays"
+        />
       </div>
 
       <div className="relative z-10 flex w-full max-w-md flex-col items-center">
@@ -64,13 +76,9 @@ export default function ComingSoonPage() {
           unoptimized
         />
 
-        <h1 className="coming-soon-title mt-10 font-nav-display text-[clamp(2.75rem,12vw,4.5rem)] leading-[0.92] tracking-tight text-white">
+        <h1 className="coming-soon-title mt-10 whitespace-nowrap font-nav-display text-[clamp(2.4rem,11vw,4.25rem)] leading-none tracking-tight text-white">
           Coming soon
         </h1>
-        <p className="mt-4 max-w-sm text-[14px] leading-relaxed text-white/65 normal-case">
-          Women’s unstitched suits — launching shortly. Leave your email and
-          we’ll let you know.
-        </p>
 
         <form
           onSubmit={onSubmit}
