@@ -178,18 +178,18 @@ export default function ProductPage({
                 className="size-10 rounded-none text-foreground hover:bg-transparent hover:text-foreground [&_svg]:size-5"
               />
             </div>
+
+            <p className="ml-auto font-nav-display text-[18px] font-semibold tracking-tight text-foreground tabular-nums">
+              {formatPrice(piece.price)}
+            </p>
           </div>
 
           <h1 className="mt-2 font-nav-display text-[22px] leading-none tracking-tight text-foreground">
             {piece.name}
           </h1>
 
-          <p className="mt-2.5 font-nav-display text-[20px] font-semibold tracking-tight text-foreground">
-            {formatPrice(piece.price)}
-          </p>
-
-          <p className="mt-2 truncate text-[13px] leading-snug text-foreground/55">
-            {piece.details.join(" · ")}
+          <p className="mt-2 line-clamp-3 text-[13px] leading-relaxed text-foreground/55">
+            {piece.description}
           </p>
 
           <Button
@@ -308,7 +308,7 @@ export default function ProductPage({
       </div>
 
       {related.length > 0 ? (
-        <section className="mx-auto max-w-7xl px-6 pt-6 pb-20 md:pt-10">
+        <section className="mx-auto hidden max-w-7xl px-6 pt-6 pb-20 md:block md:pt-10">
           <h2 className="font-nav-display text-2xl md:text-3xl">
             More {piece.category}
           </h2>
