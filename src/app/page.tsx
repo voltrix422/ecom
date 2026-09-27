@@ -4,6 +4,7 @@ import { useMemo } from "react";
 import { FeaturedSection } from "@/components/storefront/featured-section";
 import MorphSlider from "@/components/storefront/morph-slider";
 import { HeroSection } from "@/components/storefront/hero-section";
+import { HomePinGrid } from "@/components/storefront/home-pin-grid";
 import { StoreShell } from "@/components/storefront/store-shell";
 import {
   DEFAULT_COLLECTION_SLIDES,
@@ -31,41 +32,47 @@ export default function HomePage() {
 
   return (
     <StoreShell>
-      <HeroSection />
+      {/* Mobile: Pinterest-style image discovery */}
+      <HomePinGrid />
 
-      <FeaturedSection products={featured} />
+      {/* Desktop / tablet: existing hero + featured + collection */}
+      <div className="hidden md:block">
+        <HeroSection />
 
-      <section>
-        <div className="mx-auto max-w-7xl px-4 py-10 md:px-6 md:py-14">
-          <div
-            className="relative w-full"
-            style={{ height: "min(92svh, 920px)" }}
-          >
-            {morphItems.length > 0 ? (
-              <MorphSlider
-                key={morphItems.map((item) => item.image).join("|")}
-                items={morphItems}
-                transition="melt"
-                intensity={0.55}
-                aberration={0.35}
-                drift={0.4}
-                autoplay
-                overlayColor="#05060a"
-                duration={1.1}
-                ease="power2.inOut"
-                scale={2.4}
-                autoplayDelay={5}
-                loop
-                radius={4}
-                showCaptions
-                showControls
-                showIndicators
-                className="font-nav-display"
-              />
-            ) : null}
+        <FeaturedSection products={featured} />
+
+        <section>
+          <div className="mx-auto max-w-7xl px-4 py-10 md:px-6 md:py-14">
+            <div
+              className="relative w-full"
+              style={{ height: "min(92svh, 920px)" }}
+            >
+              {morphItems.length > 0 ? (
+                <MorphSlider
+                  key={morphItems.map((item) => item.image).join("|")}
+                  items={morphItems}
+                  transition="melt"
+                  intensity={0.55}
+                  aberration={0.35}
+                  drift={0.4}
+                  autoplay
+                  overlayColor="#05060a"
+                  duration={1.1}
+                  ease="power2.inOut"
+                  scale={2.4}
+                  autoplayDelay={5}
+                  loop
+                  radius={4}
+                  showCaptions
+                  showControls
+                  showIndicators
+                  className="font-nav-display"
+                />
+              ) : null}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      </div>
     </StoreShell>
   );
 }

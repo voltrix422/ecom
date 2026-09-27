@@ -12,7 +12,7 @@ export function WhatsAppFloat() {
       rel="noopener noreferrer"
       aria-label="Chat on WhatsApp"
       title="Chat on WhatsApp"
-      className="fixed right-4 bottom-4 z-50 inline-flex size-10 items-center justify-center rounded-full bg-[#25D366] text-white shadow-[0_6px_18px_rgba(37,211,102,0.35)] ring-1 ring-black/5 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_10px_22px_rgba(37,211,102,0.4)] active:translate-y-0 active:scale-95 sm:right-5 sm:bottom-5"
+      className="fixed right-4 bottom-[5.5rem] z-50 inline-flex size-10 items-center justify-center rounded-full bg-[#25D366] text-white shadow-[0_6px_18px_rgba(37,211,102,0.35)] ring-1 ring-black/5 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_10px_22px_rgba(37,211,102,0.4)] active:translate-y-0 active:scale-95 md:right-5 md:bottom-5"
     >
       <svg
         viewBox="0 0 24 24"

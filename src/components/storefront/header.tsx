@@ -270,11 +270,21 @@ export function Header({ hideSaleBanner = false }: { hideSaleBanner?: boolean })
       <header
         ref={headerRef}
         className={cn(
-          "sticky top-0 z-50 transition-colors duration-300",
-          light ? "bg-transparent text-white" : "bg-white text-black"
+          "sticky top-0 z-50 bg-white text-black transition-colors duration-300",
+          light && "md:bg-transparent md:text-white"
         )}
       >
-        <div className="relative flex h-16 items-center px-3 sm:px-6">
+        {/* Mobile: logo left, hamburger right */}
+        <div className="relative flex h-14 items-center justify-between px-3 md:hidden">
+          <HeaderLogo light={false} />
+          <Hamburger
+            open={menuOpen}
+            onClick={() => setMenuOpen((value) => !value)}
+          />
+        </div>
+
+        {/* Desktop / tablet header */}
+        <div className="relative hidden h-16 items-center px-3 sm:px-6 md:flex">
           <Hamburger
             open={menuOpen}
             onClick={() => setMenuOpen((value) => !value)}
@@ -303,7 +313,7 @@ export function Header({ hideSaleBanner = false }: { hideSaleBanner?: boolean })
 
         <div
           className={cn(
-            "grid transition-[grid-template-rows] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
+            "hidden transition-[grid-template-rows] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] md:grid",
             searchOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
           )}
         >
@@ -339,7 +349,7 @@ export function Header({ hideSaleBanner = false }: { hideSaleBanner?: boolean })
       </header>
 
       <StaggeredMenu
-        position="left"
+        position="right"
         hideChrome
         isFixed
         open={menuOpen}
