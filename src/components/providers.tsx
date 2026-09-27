@@ -26,13 +26,18 @@ export function Providers({ children }: { children: React.ReactNode }) {
         {children}
         <Toaster
           position="top-center"
-          offset={18}
+          offset={{ top: "4.75rem" }}
+          mobileOffset={{ top: "4.75rem" }}
           gap={10}
+          duration={3200}
+          richColors={false}
+          closeButton
+          style={{ zIndex: 120 }}
           toastOptions={{
             classNames: {
               toast:
-                "cn-toast !rounded-none !border-border !bg-background !text-foreground !shadow-none ring-1 ring-foreground/10",
-              title: "font-heading !text-base !font-normal !tracking-tight",
+                "cn-toast !rounded-none !border-border !bg-background !text-foreground !shadow-md ring-1 ring-foreground/10",
+              title: "font-heading !text-sm !font-medium !tracking-tight",
               description: "!text-xs !tracking-wide !text-muted-foreground",
               actionButton:
                 "!rounded-none !bg-foreground !text-background !text-xs !px-3 !h-7",

@@ -192,7 +192,7 @@ export function CartDrawer() {
 
       <aside
         ref={panelRef}
-        className="staggered-menu-panel staggered-cart-panel"
+        className="staggered-menu-panel staggered-cart-panel flex h-full max-h-[100dvh] flex-col overflow-hidden"
         aria-label="Shopping bag"
       >
         <div className="flex h-16 shrink-0 items-center justify-between px-6">
@@ -207,11 +207,11 @@ export function CartDrawer() {
           </button>
         </div>
 
-        <div className="sm-panel-inner flex min-h-0 flex-1 flex-col px-0 pb-0">
+        <div className="sm-panel-inner flex min-h-0 flex-1 flex-col overflow-hidden px-0 pb-0">
           {lines.length === 0 ? (
             <div
               data-cart-line
-              className="flex flex-1 flex-col justify-center px-6"
+              className="flex flex-1 flex-col justify-center px-5"
             >
               <p className="font-nav-display text-[15px] text-neutral-500">
                 Your bag is empty.
@@ -224,33 +224,36 @@ export function CartDrawer() {
             </div>
           ) : (
             <>
-              <div className="flex-1 space-y-7 overflow-y-auto px-6 py-2">
+              <div className="min-h-0 flex-1 space-y-5 overflow-y-auto overscroll-contain px-5 py-2">
                 {lines.map(({ product, quantity }) => (
                   <div
                     key={product.id}
                     data-cart-line
-                    className="grid grid-cols-[88px_1fr] gap-5"
+                    className="grid grid-cols-[72px_1fr] gap-3"
                   >
-                    <div className="relative w-[88px] shrink-0">
+                    <div className="relative w-[72px] shrink-0">
                       <SaleBadge compact />
                       <MediaImage
                         src={product.image}
                         alt={product.name}
-                        sizes="88px"
+                        sizes="72px"
                       />
                     </div>
-                    <div className="flex min-w-0 flex-col justify-between">
-                      <div className="flex items-start justify-between gap-3">
+                    <div className="flex min-w-0 flex-col justify-between gap-2">
+                      <div className="flex items-start justify-between gap-2">
                         <div className="min-w-0">
                           <Link
                             href={`/product/${product.slug}`}
                             onClick={() => setCartOpen(false)}
-                            className="font-nav-display block truncate text-[15px]"
+                            className="font-nav-display block truncate text-[14px]"
                           >
                             {product.name}
                           </Link>
-                          <div className="mt-1.5">
-                            <SalePrice price={product.price} />
+                          <div className="mt-1">
+                            <SalePrice
+                              price={product.price}
+                              className="flex-wrap gap-1.5 [&_span:last-child]:text-[14px]"
+                            />
                           </div>
                         </div>
                         <button
@@ -261,22 +264,22 @@ export function CartDrawer() {
                           Remove
                         </button>
                       </div>
-                      <div className="mt-4 flex h-11 w-fit items-center rounded-md border border-black/15">
+                      <div className="flex h-9 w-fit items-center rounded-md border border-black/15">
                         <button
                           type="button"
-                          className="inline-flex size-10 items-center justify-center text-lg transition-colors hover:bg-neutral-100"
+                          className="inline-flex size-9 items-center justify-center text-base transition-colors hover:bg-neutral-100"
                           onClick={() =>
                             updateCartQuantity(product.id, quantity - 1)
                           }
                         >
                           −
                         </button>
-                        <span className="font-nav-display w-8 text-center text-[14px] tabular-nums">
+                        <span className="font-nav-display w-7 text-center text-[13px] tabular-nums">
                           {quantity}
                         </span>
                         <button
                           type="button"
-                          className="inline-flex size-10 items-center justify-center text-lg transition-colors hover:bg-neutral-100"
+                          className="inline-flex size-9 items-center justify-center text-base transition-colors hover:bg-neutral-100"
                           onClick={() =>
                             updateCartQuantity(product.id, quantity + 1)
                           }
@@ -291,9 +294,9 @@ export function CartDrawer() {
 
               <div
                 data-cart-footer
-                className="border-t border-black/8 px-6 py-6"
+                className="shrink-0 border-t border-black/10 bg-white px-5 pt-4 pb-[max(1rem,env(safe-area-inset-bottom))]"
               >
-                <div className="space-y-3 font-nav-display text-[15px]">
+                <div className="space-y-2 font-nav-display text-[14px]">
                   <div className="flex justify-between">
                     <span className="text-neutral-500">Subtotal</span>
                     <span>{formatPrice(cartTotal)}</span>
@@ -304,7 +307,7 @@ export function CartDrawer() {
                       {shipping === 0 ? "Free" : formatPrice(shipping)}
                     </span>
                   </div>
-                  <div className="flex justify-between pt-2 text-[16px]">
+                  <div className="flex justify-between pt-1 text-[15px] font-semibold">
                     <span>Total</span>
                     <span>{formatPrice(cartTotal + shipping)}</span>
                   </div>
@@ -312,7 +315,7 @@ export function CartDrawer() {
                 <Button
                   asChild
                   size="lg"
-                  className="mt-6 h-12 w-full"
+                  className="mt-4 h-12 w-full text-[15px] font-semibold"
                 >
                   <Link href="/checkout" onClick={() => setCartOpen(false)}>
                     <span>Checkout</span>

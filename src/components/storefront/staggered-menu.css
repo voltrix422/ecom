@@ -11,7 +11,8 @@
   inset: 0;
   width: 100vw;
   height: 100vh;
-  z-index: 60;
+  height: 100dvh;
+  z-index: 80;
   overflow: hidden;
   pointer-events: none;
   visibility: hidden;
@@ -338,12 +339,16 @@
 .staggered-cart-panel .sm-panel-inner {
   gap: 0;
   min-height: 0;
+  overflow: hidden;
 }
 
 .staggered-cart-panel {
   padding: 0;
   background: #fff;
   color: #000;
+  overflow: hidden;
+  height: 100%;
+  max-height: 100dvh;
 }
 
 @media (max-width: 1024px) {

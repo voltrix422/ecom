@@ -75,7 +75,7 @@ function ShopContent() {
         className={cn(
           "font-nav-display shrink-0 cursor-pointer transition-colors",
           mobile
-            ? "rounded-md px-2.5 py-1 text-[12px]"
+            ? "rounded-sm px-2 py-0.5 text-[10px] tracking-wide uppercase"
             : "w-full px-2.5 py-2 text-left text-[16px] xl:text-[17px]",
           category === item
             ? "bg-foreground text-background"
@@ -92,14 +92,14 @@ function ShopContent() {
       {/* Mobile filters: tight under header */}
       <div className="lg:hidden">
         <nav
-          className="flex gap-1 overflow-x-auto px-2 pb-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          className="flex gap-0.5 overflow-x-auto px-2 pt-0 pb-1.5 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
           aria-label="Categories"
         >
           {renderFilters(true)}
         </nav>
       </div>
 
-      <div className="mx-auto max-w-7xl px-6 pt-1 pb-16 md:pt-6 md:pb-20">
+      <div className="mx-auto max-w-7xl px-2 pt-0 pb-16 sm:px-6 sm:pt-1 md:pt-6 md:pb-20">
         <div className="grid items-start gap-10 lg:grid-cols-[200px_minmax(0,1fr)] lg:gap-14">
           <aside className="hidden lg:sticky lg:top-28 lg:block lg:self-start">
             <div className="relative">
@@ -149,12 +149,13 @@ function ShopContent() {
                 Nothing matches this view.
               </p>
             ) : (
-              <div className="grid gap-x-4 gap-y-8 sm:grid-cols-2 sm:gap-x-7 sm:gap-y-14 xl:grid-cols-3">
+              <div className="grid grid-cols-3 gap-1.5 sm:gap-x-4 sm:gap-y-6 md:grid-cols-3 xl:grid-cols-3 xl:gap-x-5 xl:gap-y-8">
                 {filtered.map((product) => (
                   <ProductCard
                     key={product.id}
                     product={product}
                     badgeTone="soft"
+                    compact
                   />
                 ))}
               </div>
