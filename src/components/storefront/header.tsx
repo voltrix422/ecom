@@ -158,7 +158,7 @@ function AccountMenu() {
       >
         <div
           className={cn(
-            "origin-top-right overflow-hidden rounded-2xl border border-white/35 bg-white/45 shadow-[0_18px_50px_rgba(0,0,0,0.14)] backdrop-blur-2xl backdrop-saturate-150 transition-[width,opacity,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
+            "origin-top-right overflow-hidden rounded-none border border-white/15 bg-black/55 text-white shadow-[0_24px_80px_rgba(0,0,0,0.45)] backdrop-blur-2xl backdrop-saturate-100 transition-[width,opacity,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
             open
               ? "w-[min(92vw,320px)] scale-x-100 opacity-100"
               : "w-10 scale-x-0 opacity-0"
@@ -172,14 +172,14 @@ function AccountMenu() {
                   key={item.href}
                   href={item.href}
                   className={cn(
-                    "group flex min-w-0 flex-1 flex-col items-center justify-center gap-2 px-3 py-4 text-center transition-colors hover:bg-white/50",
+                    "group flex min-w-0 flex-1 flex-col items-center justify-center gap-2.5 px-3 py-5 text-center transition-colors hover:bg-white/10",
                     open ? "animate-account-link" : ""
                   )}
                   style={{ animationDelay: `${80 + index * 60}ms` }}
                   onClick={() => setOpen(false)}
                 >
-                  <Icon className="size-5 stroke-[1.5] transition-transform duration-300 group-hover:-translate-y-0.5" />
-                  <span className="text-[10px] leading-tight tracking-[0.14em] uppercase">
+                  <Icon className="size-5 stroke-[1.25] text-white transition-transform duration-300 group-hover:-translate-y-0.5" />
+                  <span className="text-[10px] leading-tight tracking-[0.18em] text-white/85 uppercase">
                     {item.label}
                   </span>
                 </Link>
@@ -327,20 +327,20 @@ export function Header({ hideSaleBanner = false }: { hideSaleBanner?: boolean })
         <SheetContent
           side="left"
           showCloseButton={false}
-          className="w-[min(100%,360px)] gap-0 rounded-none border-0 border-r border-white/30 bg-white/35 p-0 text-black shadow-[0_0_60px_rgba(0,0,0,0.18)] backdrop-blur-2xl backdrop-saturate-150 duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] data-open:slide-in-from-left-16 data-closed:slide-out-to-left-16"
+          className="w-[min(100%,360px)] gap-0 rounded-none border-0 border-r border-white/10 bg-black/60 p-0 text-white shadow-[0_0_80px_rgba(0,0,0,0.55)] backdrop-blur-2xl backdrop-saturate-100 duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] data-open:slide-in-from-left-16 data-closed:slide-out-to-left-16"
         >
           <SheetTitle className="sr-only">Menu</SheetTitle>
           <div className="flex h-16 shrink-0 items-center justify-between px-6">
-            <p className="text-[11px] tracking-[0.22em] text-black/45 uppercase">
+            <p className="text-[11px] tracking-[0.28em] text-white/45 uppercase">
               Menu
             </p>
             <button
               type="button"
-              className="inline-flex size-11 cursor-pointer items-center justify-center rounded-full bg-white/40 transition-transform duration-300 hover:rotate-90 hover:bg-white/60"
+              className="inline-flex size-11 cursor-pointer items-center justify-center rounded-full border border-white/15 bg-white/5 transition-all duration-300 hover:rotate-90 hover:border-white/35 hover:bg-white/10"
               aria-label="Close menu"
               onClick={() => setOpen(false)}
             >
-              <X className="size-5 stroke-[1.5]" />
+              <X className="size-5 stroke-[1.25]" />
             </button>
           </div>
 
@@ -348,25 +348,25 @@ export function Header({ hideSaleBanner = false }: { hideSaleBanner?: boolean })
             <Link
               href="/shop"
               onClick={() => setOpen(false)}
-              className="animate-panel-item rounded-2xl bg-white/40 px-4 py-4 text-[18px] tracking-[0.04em] transition-colors hover:bg-white/65"
+              className="animate-panel-item border border-white/15 bg-white/5 px-5 py-4 text-[17px] tracking-[0.16em] uppercase transition-colors hover:border-white/40 hover:bg-white/10"
               style={{ animationDelay: "40ms" }}
             >
               Shop all
             </Link>
 
             <p
-              className="animate-panel-item mt-8 px-1 pb-3 text-[10px] tracking-[0.22em] text-black/40 uppercase"
+              className="animate-panel-item mt-10 px-1 pb-3 text-[10px] tracking-[0.28em] text-white/40 uppercase"
               style={{ animationDelay: "90ms" }}
             >
               Category
             </p>
-            <div className="flex flex-col gap-1.5">
+            <div className="flex flex-col gap-0.5">
               {categories.map((category, index) => (
                 <Link
                   key={category}
                   href={`/shop?category=${category}`}
                   onClick={() => setOpen(false)}
-                  className="animate-panel-item rounded-xl px-4 py-3 text-[16px] transition-colors hover:bg-white/50"
+                  className="animate-panel-item px-4 py-3 text-[15px] tracking-[0.04em] text-white/80 transition-colors hover:bg-white/10 hover:text-white"
                   style={{ animationDelay: `${130 + index * 45}ms` }}
                 >
                   {category}
@@ -374,13 +374,13 @@ export function Header({ hideSaleBanner = false }: { hideSaleBanner?: boolean })
               ))}
             </div>
 
-            <div className="mt-8 flex flex-col gap-1.5">
+            <div className="mt-10 flex flex-col gap-0.5">
               {accountLinks.map((item, index) => (
                 <Link
                   key={item.href}
                   href={item.href}
                   onClick={() => setOpen(false)}
-                  className="animate-panel-item rounded-xl px-4 py-3 text-[15px] text-black/75 transition-colors hover:bg-white/50 hover:text-black"
+                  className="animate-panel-item px-4 py-3 text-[13px] tracking-[0.14em] text-white/55 uppercase transition-colors hover:bg-white/10 hover:text-white"
                   style={{ animationDelay: `${360 + index * 50}ms` }}
                 >
                   {item.label}
