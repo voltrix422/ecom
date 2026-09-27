@@ -459,6 +459,12 @@
   background: #12081f;
 }
 
+.coming-soon canvas {
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+}
+
 .coming-soon-title {
   animation: coming-soon-in 1s cubic-bezier(0.22, 1, 0.36, 1) both;
 }

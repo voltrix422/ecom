@@ -178,13 +178,26 @@ export default function Silk({
   }, [speed, scale, noiseIntensity, color, rotation, lightMode, uniforms]);
 
   return (
-    <div className={`absolute inset-0 ${className}`.trim()}>
+    <div className={`absolute inset-0 h-full w-full overflow-hidden ${className}`.trim()}>
       <Canvas
         dpr={[1, 1.75]}
         frameloop="always"
-        gl={{ antialias: false, alpha: false, powerPreference: "high-performance" }}
-        style={{ width: "100%", height: "100%" }}
+        resize={{ scroll: false, debounce: { scroll: 0, resize: 0 } }}
+        gl={{
+          antialias: false,
+          alpha: false,
+          powerPreference: "high-performance",
+        }}
+        style={{
+          position: "absolute",
+          inset: 0,
+          width: "100%",
+          height: "100%",
+          display: "block",
+        }}
+        className="!absolute !inset-0 !h-full !w-full"
       >
+        <color attach="background" args={[color]} />
         <SilkPlane ref={meshRef} uniforms={uniforms} />
       </Canvas>
     </div>

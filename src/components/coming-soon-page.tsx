@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import { brand } from "@/lib/data";
@@ -12,13 +12,43 @@ export default function ComingSoonPage() {
   const [status, setStatus] = useState<"idle" | "loading" | "done" | "error">(
     "idle"
   );
-  const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    const html = document.documentElement;
+    const body = document.body;
+    const prev = {
+      htmlOverflow: html.style.overflow,
+      htmlBg: html.style.background,
+      htmlH: html.style.height,
+      bodyOverflow: body.style.overflow,
+      bodyBg: body.style.background,
+      bodyH: body.style.height,
+      bodyMinH: body.style.minHeight,
+    };
+    html.style.overflow = "hidden";
+    html.style.height = "100%";
+    html.style.background = "#12081f";
+    body.style.overflow = "hidden";
+    body.style.height = "100%";
+    body.style.minHeight = "100%";
+    body.style.background = "#12081f";
+    return () => {
+      html.style.overflow = prev.htmlOverflow;
+      html.style.background = prev.htmlBg;
+      html.style.height = prev.htmlH;
+      body.style.overflow = prev.bodyOverflow;
+      body.style.background = prev.bodyBg;
+      body.style.height = prev.bodyH;
+      body.style.minHeight = prev.bodyMinH;
+    };
+  }, []);
 
   async function onSubmit(event: FormEvent) {
     event.preventDefault();
     if (status === "loading" || status === "done") return;
     setStatus("loading");
-    setMessage("");
+    setError("");
     try {
       const response = await fetch("/api/notify", {
         method: "POST",
@@ -27,29 +57,23 @@ export default function ComingSoonPage() {
       });
       const data = (await response.json().catch(() => null)) as {
         error?: string;
-        already?: boolean;
       } | null;
       if (!response.ok) {
         setStatus("error");
-        setMessage(data?.error || "Something went wrong");
+        setError(data?.error || "Something went wrong");
         return;
       }
       setStatus("done");
-      setMessage(
-        data?.already
-          ? "You’re already on the list — we’ll notify you at launch."
-          : "We’ll notify you when we launch."
-      );
       setEmail("");
     } catch {
       setStatus("error");
-      setMessage("Something went wrong");
+      setError("Something went wrong");
     }
   }
 
   return (
-    <main className="coming-soon fixed inset-0 overflow-hidden text-center">
-      <div className="absolute inset-0 z-0 bg-[#12081f]" aria-hidden>
+    <main className="coming-soon fixed inset-0 z-[100] h-[100dvh] w-screen max-w-[100vw] overflow-hidden text-center">
+      <div className="absolute inset-0 z-0 h-full w-full bg-[#12081f]" aria-hidden>
         <Silk
           speed={5}
           scale={1}
@@ -59,7 +83,7 @@ export default function ComingSoonPage() {
         />
       </div>
 
-      <div className="relative z-10 flex h-full w-full flex-col items-center px-5 pt-[16svh] sm:justify-center sm:pt-0">
+      <div className="relative z-10 flex h-full w-full flex-col items-center justify-center px-5 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-[max(1.5rem,env(safe-area-inset-top))]">
         <div className="flex w-full max-w-md flex-col items-center">
           <Image
             src={brand.wordmark}
@@ -76,8 +100,8 @@ export default function ComingSoonPage() {
           </h1>
 
           {status === "done" ? (
-            <p className="mt-6 max-w-xs text-[15px] leading-relaxed text-white/80 normal-case">
-              {message}
+            <p className="mt-6 text-[15px] leading-relaxed text-white/85 normal-case">
+              We’ll notify you at launch.
             </p>
           ) : (
             <form
@@ -98,7 +122,10 @@ export default function ComingSoonPage() {
                 value={email}
                 onChange={(e) => {
                   setEmail(e.target.value);
-                  if (status === "error") setStatus("idle");
+                  if (status === "error") {
+                    setStatus("idle");
+                    setError("");
+                  }
                 }}
                 className="h-12 w-full rounded-full border border-white/25 bg-black/25 px-5 text-[14px] text-white outline-none placeholder:text-white/50 backdrop-blur-sm focus:border-white/50"
               />
@@ -109,8 +136,8 @@ export default function ComingSoonPage() {
               >
                 {status === "loading" ? "Saving…" : "Notify me"}
               </button>
-              {status === "error" && message ? (
-                <p className="text-[13px] text-red-200 normal-case">{message}</p>
+              {status === "error" && error ? (
+                <p className="text-[13px] text-red-200 normal-case">{error}</p>
               ) : null}
             </form>
           )}
