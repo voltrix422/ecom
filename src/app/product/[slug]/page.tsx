@@ -8,8 +8,13 @@ import { MediaImage } from "@/components/media-image";
 import { ProductCard } from "@/components/storefront/product-card";
 import { StoreShell } from "@/components/storefront/store-shell";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { ProductShare } from "@/components/storefront/product-share";
-import { SalePrice } from "@/components/storefront/sale-price";
 import { flyToCart } from "@/lib/fly-to-cart";
 import { formatPrice } from "@/lib/format";
 import { useStore } from "@/lib/store";
@@ -32,6 +37,8 @@ export default function ProductPage({
   const [activeImage, setActiveImage] = useState(0);
   const [liked, setLiked] = useState(false);
   const [bagPulse, setBagPulse] = useState(false);
+  const [detailsOpen, setDetailsOpen] = useState(false);
+  const [buying, setBuying] = useState(false);
   const mobileGalleryRef = useRef<HTMLDivElement>(null);
   const desktopGalleryRef = useRef<HTMLDivElement>(null);
 
@@ -88,8 +95,12 @@ export default function ProductPage({
   }
 
   function handleBuy() {
+    if (buying) return;
+    setBuying(true);
     addToCart(piece.id, quantity);
-    router.push("/checkout");
+    window.setTimeout(() => {
+      router.push("/checkout");
+    }, 220);
   }
 
   return (
@@ -178,7 +189,7 @@ export default function ProductPage({
                 />
               </div>
 
-              <p className="ml-auto font-nav-display text-[16px] font-semibold tracking-tight text-foreground tabular-nums">
+              <p className="ml-auto font-nav-display text-[20px] font-semibold tracking-tight text-foreground tabular-nums">
                 {formatPrice(piece.price)}
               </p>
             </div>
@@ -187,17 +198,29 @@ export default function ProductPage({
               {piece.name}
             </h1>
 
-            <p className="mt-0.5 line-clamp-1 text-[11px] leading-snug text-foreground/55">
-              {piece.description}
-            </p>
+            <div className="mt-0.5">
+              <p className="line-clamp-2 text-[11px] leading-snug text-foreground/55">
+                {piece.description}
+              </p>
+              <button
+                type="button"
+                onClick={() => setDetailsOpen(true)}
+                className="mt-0.5 text-[11px] font-medium tracking-wide text-foreground underline underline-offset-2"
+              >
+                Read more
+              </button>
+            </div>
 
             <Button
               size="lg"
-              className="mt-2 h-11 w-full rounded-md border-0 bg-black text-[16px] font-bold tracking-wide text-white shadow-none hover:bg-black/90"
-              disabled={piece.stock <= 0}
+              className={cn(
+                "mt-2 h-11 w-full rounded-md border-0 bg-black text-[16px] font-bold tracking-wide text-white shadow-none transition-opacity hover:bg-black/90",
+                buying && "opacity-70"
+              )}
+              disabled={piece.stock <= 0 || buying}
               onClick={handleBuy}
             >
-              Buy
+              {buying ? "Opening…" : "Buy"}
             </Button>
           </div>
         </div>
@@ -269,12 +292,19 @@ export default function ProductPage({
             <h1 className="font-nav-display truncate whitespace-nowrap text-[34px] leading-none tracking-tight text-foreground/90">
               {piece.name}
             </h1>
-            <div className="mt-3">
-              <SalePrice price={piece.price} size="md" className="gap-3" />
-            </div>
-            <p className="mt-4 font-nav-display text-[13px] leading-snug tracking-wide text-foreground/45">
-              {piece.details.join(" · ")}
+            <p className="mt-3 font-nav-display text-[26px] font-semibold tracking-tight text-foreground tabular-nums">
+              {formatPrice(piece.price)}
             </p>
+            <p className="mt-4 text-[13px] leading-snug tracking-wide text-foreground/55 normal-case">
+              {piece.description}
+            </p>
+            <button
+              type="button"
+              onClick={() => setDetailsOpen(true)}
+              className="mt-2 text-[12px] font-medium tracking-wide text-foreground underline underline-offset-2"
+            >
+              Read more
+            </button>
             <div className="mt-6 flex w-full max-w-md flex-col gap-2.5">
               <div className="mx-auto flex h-12 items-center justify-center gap-1">
                 <button
@@ -313,10 +343,10 @@ export default function ProductPage({
                 size="lg"
                 variant="outline"
                 className="h-12 w-full border-0 bg-black/8 shadow-none"
-                disabled={piece.stock <= 0}
+                disabled={piece.stock <= 0 || buying}
                 onClick={handleBuy}
               >
-                Buy now
+                {buying ? "Opening…" : "Buy now"}
               </Button>
             </div>
           </div>
@@ -335,6 +365,66 @@ export default function ProductPage({
           </div>
         </section>
       ) : null}
+
+      <Dialog open={detailsOpen} onOpenChange={setDetailsOpen}>
+        <DialogContent className="max-w-md rounded-lg p-5 sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="font-nav-display text-left text-[18px] tracking-tight uppercase">
+              {piece.name}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 text-left normal-case">
+            <p className="text-[13px] leading-relaxed text-foreground/70">
+              {piece.description}
+            </p>
+            <div>
+              <p className="text-[11px] tracking-[0.14em] text-foreground/40 uppercase">
+                Details
+              </p>
+              <ul className="mt-2 space-y-1.5">
+                {piece.details.map((detail) => (
+                  <li
+                    key={detail}
+                    className="text-[13px] leading-snug text-foreground/75"
+                  >
+                    {detail}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="grid grid-cols-2 gap-3 border-t border-black/8 pt-3 text-[13px]">
+              <div>
+                <p className="text-[10px] tracking-[0.14em] text-foreground/40 uppercase">
+                  Category
+                </p>
+                <p className="mt-0.5 text-foreground/80">{piece.category}</p>
+              </div>
+              <div>
+                <p className="text-[10px] tracking-[0.14em] text-foreground/40 uppercase">
+                  Color
+                </p>
+                <p className="mt-0.5 text-foreground/80">{piece.color}</p>
+              </div>
+              <div>
+                <p className="text-[10px] tracking-[0.14em] text-foreground/40 uppercase">
+                  Price
+                </p>
+                <p className="mt-0.5 font-nav-display text-foreground tabular-nums">
+                  {formatPrice(piece.price)}
+                </p>
+              </div>
+              <div>
+                <p className="text-[10px] tracking-[0.14em] text-foreground/40 uppercase">
+                  Stock
+                </p>
+                <p className="mt-0.5 text-foreground/80">
+                  {piece.stock > 0 ? `${piece.stock} available` : "Out of stock"}
+                </p>
+              </div>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </StoreShell>
   );
 }

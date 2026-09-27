@@ -31,12 +31,14 @@ export function ProductCard({
           <p className="font-nav-display truncate text-[12px] leading-none tracking-wide text-foreground uppercase sm:text-[14px]">
             {product.name}
           </p>
-          <p className="mt-1 font-nav-display text-[13px] font-semibold leading-none tracking-tight text-foreground tabular-nums sm:text-[15px]">
-            {formatPrice(product.price)}
-          </p>
-          <span className="mt-1 inline-block text-[9px] font-medium tracking-[0.14em] text-foreground/45 uppercase sm:text-[10px]">
-            {product.category}
-          </span>
+          <div className="mt-1 flex min-w-0 items-baseline justify-between gap-2">
+            <p className="font-nav-display shrink-0 text-[15px] font-semibold leading-none tracking-tight text-foreground tabular-nums sm:text-[17px]">
+              {formatPrice(product.price)}
+            </p>
+            <span className="truncate text-[9px] font-medium tracking-[0.12em] text-foreground/45 uppercase sm:text-[10px]">
+              {product.category}
+            </span>
+          </div>
         </div>
       </Link>
     );
@@ -56,12 +58,14 @@ export function ProductCard({
         <p className="font-nav-display truncate text-[14px] leading-tight text-foreground sm:text-[16px]">
           {product.name}
         </p>
-        <p className="mt-1.5 font-nav-display text-[16px] font-semibold tracking-tight text-foreground tabular-nums">
-          {formatPrice(product.price)}
-        </p>
-        <span className="mt-1 inline-block text-[11px] tracking-[0.12em] text-foreground/45 uppercase">
-          {product.category}
-        </span>
+        <div className="mt-1.5 flex min-w-0 items-baseline justify-between gap-3">
+          <p className="font-nav-display shrink-0 text-[18px] font-semibold tracking-tight text-foreground tabular-nums">
+            {formatPrice(product.price)}
+          </p>
+          <span className="truncate text-[11px] tracking-[0.12em] text-foreground/45 uppercase">
+            {product.category}
+          </span>
+        </div>
       </div>
     </Link>
   );
