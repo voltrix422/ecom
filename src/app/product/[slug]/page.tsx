@@ -99,108 +99,122 @@ export default function ProductPage({
     <StoreShell>
       {/* Mobile detail layout */}
       <div className="md:hidden">
-        <div
-          ref={mobileGalleryRef}
-          className="relative flex max-h-[46svh] w-full items-center justify-center bg-white px-3 pt-1"
-        >
-          <MediaImage
-            src={currentSrc}
-            alt={piece.name}
-            priority
-            sizes="100vw"
-            className="max-h-[46svh] w-full object-contain"
-          />
-        </div>
+        <div className="flex h-[calc(100svh-4rem)] flex-col pb-[4.75rem]">
+          <div
+            ref={mobileGalleryRef}
+            className="relative min-h-0 w-full flex-1 bg-white"
+          >
+            <MediaImage
+              src={currentSrc}
+              alt={piece.name}
+              fill
+              priority
+              fit="contain"
+              sizes="100vw"
+            />
+          </div>
 
-        {gallery.length > 1 ? (
-          <div className="flex gap-2 overflow-x-auto px-3 pt-1.5">
-            {gallery.map((src, index) => (
+          {gallery.length > 1 ? (
+            <div className="flex shrink-0 gap-2 overflow-x-auto px-3 pt-1.5">
+              {gallery.map((src, index) => (
+                <button
+                  key={`${src.slice(0, 32)}-${index}`}
+                  type="button"
+                  onClick={() => setActiveImage(index)}
+                  className={cn(
+                    "relative h-11 w-8 shrink-0 overflow-hidden rounded-md border",
+                    activeImage === index
+                      ? "border-foreground"
+                      : "border-transparent opacity-70"
+                  )}
+                >
+                  <MediaImage
+                    src={src}
+                    alt={`${piece.name} ${index + 1}`}
+                    fill
+                    fit="cover"
+                    sizes="32px"
+                  />
+                </button>
+              ))}
+            </div>
+          ) : null}
+
+          <div className="shrink-0 px-4 pt-1.5 pb-1">
+            <div className="flex items-center gap-0.5 text-foreground">
               <button
-                key={`${src.slice(0, 32)}-${index}`}
                 type="button"
-                onClick={() => setActiveImage(index)}
-                className={cn(
-                  "relative h-12 w-9 shrink-0 overflow-hidden rounded-md border",
-                  activeImage === index
-                    ? "border-foreground"
-                    : "border-transparent opacity-70"
-                )}
+                onClick={toggleLike}
+                className="inline-flex size-10 items-center justify-center text-foreground"
+                aria-label={liked ? "Remove from wishlist" : "Save to wishlist"}
+                aria-pressed={liked}
               >
-                <MediaImage
-                  src={src}
-                  alt={`${piece.name} ${index + 1}`}
-                  fill
-                  fit="cover"
-                  sizes="36px"
+                <Heart
+                  className={cn(
+                    "size-5 text-foreground transition-transform",
+                    liked && "fill-foreground scale-110"
+                  )}
+                  strokeWidth={1.7}
                 />
               </button>
-            ))}
-          </div>
-        ) : null}
 
-        <div className="px-4 pt-2 pb-6">
-          <div className="flex items-center gap-0.5 text-foreground">
-            <button
-              type="button"
-              onClick={toggleLike}
-              className="inline-flex size-10 items-center justify-center text-foreground"
-              aria-label={liked ? "Remove from wishlist" : "Save to wishlist"}
-              aria-pressed={liked}
-            >
-              <Heart
+              <button
+                type="button"
+                onClick={handleAddToBag}
+                disabled={piece.stock <= 0}
                 className={cn(
-                  "size-5 text-foreground transition-transform",
-                  liked && "fill-foreground scale-110"
+                  "inline-flex size-10 items-center justify-center text-foreground transition-transform disabled:opacity-40",
+                  bagPulse && "scale-110"
                 )}
-                strokeWidth={1.7}
-              />
-            </button>
+                aria-label="Add to bag"
+              >
+                <ShoppingBag
+                  className="size-5 text-foreground"
+                  strokeWidth={1.7}
+                />
+              </button>
 
-            <button
-              type="button"
-              onClick={handleAddToBag}
-              disabled={piece.stock <= 0}
-              className={cn(
-                "inline-flex size-10 items-center justify-center text-foreground transition-transform disabled:opacity-40",
-                bagPulse && "scale-110"
-              )}
-              aria-label="Add to bag"
-            >
-              <ShoppingBag
-                className="size-5 text-foreground"
-                strokeWidth={1.7}
-              />
-            </button>
+              <div className="inline-flex size-10 items-center justify-center">
+                <ProductShare
+                  product={piece}
+                  className="size-10 rounded-none text-foreground hover:bg-transparent hover:text-foreground [&_svg]:size-5"
+                />
+              </div>
 
-            <div className="inline-flex size-10 items-center justify-center">
-              <ProductShare
-                product={piece}
-                className="size-10 rounded-none text-foreground hover:bg-transparent hover:text-foreground [&_svg]:size-5"
-              />
+              <p className="ml-auto font-nav-display text-[18px] font-semibold tracking-tight text-foreground tabular-nums">
+                {formatPrice(piece.price)}
+              </p>
             </div>
 
-            <p className="ml-auto font-nav-display text-[18px] font-semibold tracking-tight text-foreground tabular-nums">
-              {formatPrice(piece.price)}
+            <h1 className="mt-1.5 font-nav-display text-[22px] leading-none tracking-tight text-foreground">
+              {piece.name}
+            </h1>
+
+            <p className="mt-1.5 line-clamp-3 text-[13px] leading-relaxed text-foreground/55">
+              {piece.description}
             </p>
+
+            <Button
+              size="lg"
+              className="mt-3 h-14 w-full rounded-md border-0 bg-black text-[18px] font-bold tracking-wide text-white shadow-none hover:bg-black/90"
+              disabled={piece.stock <= 0}
+              onClick={handleBuy}
+            >
+              Buy
+            </Button>
           </div>
-
-          <h1 className="mt-2 font-nav-display text-[22px] leading-none tracking-tight text-foreground">
-            {piece.name}
-          </h1>
-
-          <p className="mt-2 line-clamp-3 text-[13px] leading-relaxed text-foreground/55">
-            {piece.description}
-          </p>
-
-          <Button
-            size="lg"
-            className="mt-4 h-14 w-full rounded-md border-0 bg-black text-[18px] font-bold tracking-wide text-white shadow-none hover:bg-black/90"
-            disabled={piece.stock <= 0}
-            onClick={handleBuy}
-          >
-            Buy
-          </Button>
         </div>
+
+        {related.length > 0 ? (
+          <section className="px-4 pt-8 pb-4">
+            <h2 className="font-nav-display text-xl">More like this</h2>
+            <div className="mt-5 grid grid-cols-2 gap-x-4 gap-y-8">
+              {related.map((item) => (
+                <ProductCard key={item.id} product={item} badgeTone="soft" />
+              ))}
+            </div>
+          </section>
+        ) : null}
       </div>
 
       {/* Desktop / tablet layout */}
