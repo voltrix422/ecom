@@ -217,6 +217,36 @@
   }
 }
 
+@keyframes featured-caption {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.featured-carousel-scroller {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.featured-carousel-scroller::-webkit-scrollbar {
+  display: none;
+}
+
+.featured-carousel-caption {
+  animation: featured-caption 480ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .featured-carousel-caption {
+    animation: none;
+  }
+}
+
 :root {
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
