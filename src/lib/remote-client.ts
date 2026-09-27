@@ -1,6 +1,7 @@
 import type {
   AdminUser,
   BankDetails,
+  CollectionSlide,
   HeroBanner,
   Order,
   Product,
@@ -16,6 +17,7 @@ export type RemoteAdminState = {
   categories: string[];
   bank: BankDetails;
   heroes: HeroBanner[];
+  collections: CollectionSlide[];
 };
 
 let remote = false;

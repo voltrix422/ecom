@@ -22,6 +22,10 @@ import { salePrice } from "@/lib/format";
 import { isDeliveredStatus } from "@/lib/orders";
 import { adminMutate, setRemoteMode, type RemoteAdminState } from "@/lib/remote-client";
 import {
+  DEFAULT_COLLECTION_SLIDES,
+  usableCollectionSlides,
+} from "@/lib/collection-slides";
+import {
   loadHeroBanners,
   persistHeroBanners,
   subscribeHeroBanners,
@@ -37,6 +41,7 @@ import type {
   AdminUser,
   BankDetails,
   CartItem,
+  CollectionSlide,
   Customer,
   CustomerInfo,
   HeroBanner,
@@ -58,6 +63,7 @@ const KEYS = {
   categories: "form-suits-categories-v1",
   bankDetails: "form-suits-bank-v1",
   refunds: "form-suits-refunds-v1",
+  collections: "form-suits-collections-v1",
 };
 
 function normalizeProduct(product: Product): Product {
@@ -226,6 +232,15 @@ type StoreContextValue = {
   heroBanners: HeroBanner[];
   addHeroBanners: (srcs: string[]) => void;
   removeHeroBanner: (id: string) => void;
+  collectionSlides: CollectionSlide[];
+  addCollectionSlides: (
+    slides: { src: string; caption?: string; href?: string }[]
+  ) => void;
+  updateCollectionSlide: (
+    id: string,
+    patch: { caption?: string; href?: string }
+  ) => void;
+  removeCollectionSlide: (id: string) => void;
 };
 
 const StoreContext = createContext<StoreContextValue | null>(null);
@@ -245,14 +260,19 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   const [heroBanners, setHeroBanners] = useState<HeroBanner[]>([]);
   const [heroHydrated, setHeroHydrated] = useState(false);
   const heroTouched = useRef(false);
+  const [collectionSlides, setCollectionSlides] = useState<CollectionSlide[]>(
+    DEFAULT_COLLECTION_SLIDES
+  );
+  const [collectionsHydrated, setCollectionsHydrated] = useState(false);
+  const collectionsTouched = useRef(false);
   const remoteRef = useRef(false);
 
   function applyRemote(data: Partial<RemoteAdminState> & { user?: AdminUser | null }) {
     if (data.products) setProducts(data.products.map(normalizeProduct));
     if (data.categories) setCategories(data.categories);
     if (data.bank) setBankDetails(data.bank);
-    if (data.heroes && !heroTouched.current) setHeroBanners(data.heroes);
-    else if (data.heroes && heroTouched.current) setHeroBanners(data.heroes);
+    if (data.heroes) setHeroBanners(data.heroes);
+    if (data.collections) setCollectionSlides(usableCollectionSlides(data.collections));
     if (data.orders) setOrders(data.orders.map(normalizeOrder));
     if (data.refunds) setRefundTickets(data.refunds);
     if (data.users) setAdminUsers(data.users.map(normalizeAdminUser));
@@ -273,6 +293,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
               categories?: string[];
               bank?: BankDetails;
               heroes?: HeroBanner[];
+              collections?: CollectionSlide[];
               admin?: RemoteAdminState | null;
             }
           | null;
@@ -298,6 +319,12 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
           );
           setBankDetails(boot.bank ?? seedBankDetails);
           if (!heroTouched.current) setHeroBanners(boot.heroes ?? []);
+          if (!collectionsTouched.current) {
+            setCollectionSlides(
+              usableCollectionSlides(boot.collections ?? DEFAULT_COLLECTION_SLIDES)
+            );
+          }
+          setCollectionsHydrated(true);
           if (boot.admin) {
             setOrders((boot.admin.orders ?? []).map(normalizeOrder));
             setRefundTickets(boot.admin.refunds ?? []);
@@ -358,15 +385,29 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
 
         const tickets = await loadRefunds();
         const banners = await loadHeroBanners();
+        const storedCollections = readJson<CollectionSlide[]>(
+          KEYS.collections,
+          DEFAULT_COLLECTION_SLIDES
+        );
         if (cancelled) return;
         setRefundTickets((current) => mergeTickets(tickets, current));
         if (!heroTouched.current) setHeroBanners(banners);
+        if (!collectionsTouched.current) {
+          setCollectionSlides(
+            usableCollectionSlides(
+              storedCollections.length > 0
+                ? storedCollections
+                : DEFAULT_COLLECTION_SLIDES
+            )
+          );
+        }
       } catch (error) {
         console.error("Failed to hydrate store", error);
       } finally {
         if (!cancelled) {
           setRefundsHydrated(true);
           setHeroHydrated(true);
+          setCollectionsHydrated(true);
           setReady(true);
         }
       }
@@ -429,6 +470,11 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     if (!heroHydrated || remoteRef.current) return;
     persistHeroBanners(heroBanners);
   }, [heroBanners, heroHydrated]);
+
+  useEffect(() => {
+    if (!collectionsHydrated || remoteRef.current) return;
+    writeJson(KEYS.collections, collectionSlides);
+  }, [collectionSlides, collectionsHydrated]);
 
   const login = useCallback(
     async (email: string, password: string) => {
@@ -1173,6 +1219,83 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     [adminUser]
   );
 
+  const addCollectionSlides = useCallback(
+    (slides: { src: string; caption?: string; href?: string }[]) => {
+      if (!canWrite(adminUser) || !canAccessModule(adminUser, "website")) return;
+      const next = slides
+        .filter((slide) => slide.src)
+        .map((slide) => ({
+          id: `collection-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+          src: slide.src,
+          caption: slide.caption?.trim() || undefined,
+          href: slide.href?.trim() || undefined,
+        }));
+      if (!next.length) return;
+      collectionsTouched.current = true;
+      setCollectionSlides((current) => {
+        const slidesNext = [...current, ...next];
+        if (!remoteRef.current) writeJson(KEYS.collections, slidesNext);
+        return slidesNext;
+      });
+      if (remoteRef.current) {
+        void adminMutate({ op: "collection-add", slides: next })
+          .then((data) => applyRemote(data))
+          .catch((error) => console.error(error));
+      }
+    },
+    [adminUser]
+  );
+
+  const updateCollectionSlide = useCallback(
+    (id: string, patch: { caption?: string; href?: string }) => {
+      if (!canWrite(adminUser) || !canAccessModule(adminUser, "website")) return;
+      collectionsTouched.current = true;
+      setCollectionSlides((current) => {
+        const slidesNext = current.map((slide) => {
+          if (slide.id !== id) return slide;
+          return {
+            ...slide,
+            caption:
+              patch.caption === undefined
+                ? slide.caption
+                : patch.caption.trim() || undefined,
+            href:
+              patch.href === undefined
+                ? slide.href
+                : patch.href.trim() || undefined,
+          };
+        });
+        const updated = slidesNext.find((slide) => slide.id === id) ?? null;
+        if (!remoteRef.current) writeJson(KEYS.collections, slidesNext);
+        if (remoteRef.current && updated) {
+          void adminMutate({ op: "collection-update", slide: updated })
+            .then((data) => applyRemote(data))
+            .catch((error) => console.error(error));
+        }
+        return slidesNext;
+      });
+    },
+    [adminUser]
+  );
+
+  const removeCollectionSlide = useCallback(
+    (id: string) => {
+      if (!canWrite(adminUser) || !canAccessModule(adminUser, "website")) return;
+      collectionsTouched.current = true;
+      setCollectionSlides((current) => {
+        const slidesNext = current.filter((slide) => slide.id !== id);
+        if (!remoteRef.current) writeJson(KEYS.collections, slidesNext);
+        return slidesNext;
+      });
+      if (remoteRef.current) {
+        void adminMutate({ op: "collection-remove", id })
+          .then((data) => applyRemote(data))
+          .catch((error) => console.error(error));
+      }
+    },
+    [adminUser]
+  );
+
   const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
   const cartTotal = cart.reduce((sum, item) => {
     const product = products.find((entry) => entry.id === item.productId);
@@ -1227,6 +1350,10 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       heroBanners,
       addHeroBanners,
       removeHeroBanner,
+      collectionSlides,
+      addCollectionSlides,
+      updateCollectionSlide,
+      removeCollectionSlide,
     }),
     [
       ready,
@@ -1271,6 +1398,10 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       heroBanners,
       addHeroBanners,
       removeHeroBanner,
+      collectionSlides,
+      addCollectionSlides,
+      updateCollectionSlide,
+      removeCollectionSlide,
     ]
   );
 

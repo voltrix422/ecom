@@ -9,6 +9,7 @@ import { isDeliveredStatus, findOrdersByQuery } from "@/lib/orders";
 import type {
   AdminUser,
   BankDetails,
+  CollectionSlide,
   HeroBanner,
   Order,
   OrderStatus,
@@ -18,6 +19,7 @@ import type {
 } from "@/lib/types";
 import { withClient } from "@/lib/server/db";
 import { hashPassword, verifyPassword } from "@/lib/server/password";
+import { DEFAULT_COLLECTION_SLIDES } from "@/lib/collection-slides";
 
 export type Docs = {
   products: Product[];
@@ -27,6 +29,7 @@ export type Docs = {
   users: AdminUser[];
   refunds: RefundTicket[];
   heroes: HeroBanner[];
+  collections: CollectionSlide[];
 };
 
 const KEYS = [
@@ -37,6 +40,7 @@ const KEYS = [
   "users",
   "refunds",
   "heroes",
+  "collections",
 ] as const;
 
 type DocKey = (typeof KEYS)[number];
@@ -63,6 +67,7 @@ function seedDocs(): Docs {
     users: seedUsers(),
     refunds: [],
     heroes: [],
+    collections: DEFAULT_COLLECTION_SLIDES,
   };
 }
 
@@ -146,6 +151,8 @@ async function readDocs(client: PoolClient): Promise<Docs> {
   docs.users = (found.get("users") as AdminUser[]) ?? seed.users;
   docs.refunds = (found.get("refunds") as RefundTicket[]) ?? seed.refunds;
   docs.heroes = (found.get("heroes") as HeroBanner[]) ?? seed.heroes;
+  docs.collections =
+    (found.get("collections") as CollectionSlide[]) ?? seed.collections;
   return docs;
 }
 
@@ -184,6 +191,7 @@ export function publicCatalog(docs: Docs) {
     categories: docs.categories,
     bank: docs.bank,
     heroes: docs.heroes,
+    collections: docs.collections,
   };
 }
 
@@ -198,6 +206,7 @@ export function adminPayload(docs: Docs, user: AdminUser) {
     categories: docs.categories,
     bank: docs.bank,
     heroes: docs.heroes,
+    collections: docs.collections,
   };
 }
 
@@ -446,6 +455,8 @@ type MutateBody = {
   user?: AdminUser;
   patch?: Partial<RefundTicket>;
   banners?: HeroBanner[];
+  slides?: CollectionSlide[];
+  slide?: CollectionSlide;
 };
 
 export async function mutateAs(actor: AdminUser, body: MutateBody) {
@@ -465,6 +476,7 @@ export async function mutateAs(actor: AdminUser, body: MutateBody) {
         "users",
         "refunds",
         "heroes",
+        "collections",
       ]);
       await client.query("COMMIT");
       return { docs, user: docs.users.find((user) => user.id === current.id) ?? current };
@@ -593,6 +605,40 @@ function applyMutation(docs: Docs, user: AdminUser, body: MutateBody) {
   if (body.op === "hero-remove") {
     if (!can(user, "website") || !body.id) throw new Error("You cannot edit the website");
     docs.heroes = docs.heroes.filter((banner) => banner.id !== body.id);
+    return;
+  }
+
+  if (body.op === "collection-add") {
+    if (!can(user, "website") || !body.slides?.length) {
+      throw new Error("You cannot edit the website");
+    }
+    docs.collections = [
+      ...docs.collections,
+      ...body.slides.filter((slide) => slide.src),
+    ];
+    return;
+  }
+
+  if (body.op === "collection-remove") {
+    if (!can(user, "website") || !body.id) throw new Error("You cannot edit the website");
+    docs.collections = docs.collections.filter((slide) => slide.id !== body.id);
+    return;
+  }
+
+  if (body.op === "collection-update") {
+    if (!can(user, "website") || !body.slide?.id) {
+      throw new Error("You cannot edit the website");
+    }
+    docs.collections = docs.collections.map((slide) =>
+      slide.id === body.slide!.id
+        ? {
+            ...slide,
+            caption: body.slide!.caption ?? slide.caption,
+            href: body.slide!.href ?? slide.href,
+            src: body.slide!.src || slide.src,
+          }
+        : slide
+    );
     return;
   }
 

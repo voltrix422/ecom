@@ -132,3 +132,10 @@ export type HeroBanner = {
   id: string;
   src: string;
 };
+
+export type CollectionSlide = {
+  id: string;
+  src: string;
+  caption?: string;
+  href?: string;
+};

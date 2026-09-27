@@ -7,35 +7,15 @@ import FlexCarousel from "@/components/storefront/flex-carousel";
 import MorphSlider from "@/components/storefront/morph-slider";
 import { HeroSection } from "@/components/storefront/hero-section";
 import { StoreShell } from "@/components/storefront/store-shell";
+import {
+  DEFAULT_COLLECTION_SLIDES,
+  usableCollectionSlides,
+} from "@/lib/collection-slides";
 import { useStore } from "@/lib/store";
-
-const collections = [
-  {
-    title: "Lawn",
-    href: "/shop?category=Lawn",
-    image: "/products/suit-ivory-garden.png",
-  },
-  {
-    title: "Chiffon",
-    href: "/shop?category=Chiffon",
-    image: "/products/suit-midnight.png",
-  },
-  {
-    title: "Khaddar",
-    href: "/shop?category=Khaddar",
-    image: "/products/suit-dust-rose.png",
-  },
-];
-
-const morphItems = collections.map((collection) => ({
-  image: collection.image,
-  caption: collection.title,
-  href: collection.href,
-}));
 
 export default function HomePage() {
   const router = useRouter();
-  const { products } = useStore();
+  const { products, collectionSlides } = useStore();
   const featured = useMemo(
     () => products.filter((product) => product.featured),
     [products]
@@ -51,6 +31,17 @@ export default function HomePage() {
       })),
     [featured]
   );
+
+  const morphItems = useMemo(() => {
+    const slides = usableCollectionSlides(
+      collectionSlides.length > 0 ? collectionSlides : DEFAULT_COLLECTION_SLIDES
+    );
+    return slides.map((slide) => ({
+      image: slide.src,
+      caption: slide.caption,
+      href: slide.href,
+    }));
+  }, [collectionSlides]);
 
   const imageKey = carouselItems.map((item) => item.src).join("|");
 
@@ -103,64 +94,70 @@ export default function HomePage() {
           className="relative w-screen max-w-[100vw] text-foreground"
           style={{ height: "min(78svh, 720px)", marginLeft: "calc(50% - 50vw)" }}
         >
-            {carouselItems.length > 0 ? (
-              <FlexCarousel
-                items={carouselItems}
-                preset="liquid"
-                intro="glide"
-                cardHeight={0.68}
-                gap={18}
-                squeeze={0.08}
-                focusOnClick
-                captions
-                fit="natural"
-                radius={0}
-                lensWidth={0.82}
-                lensHeight={1.12}
-                tilt={28}
-                roundness={0.6}
-                bend={0.12}
-                reach={0.22}
-                curl="twist"
-                dispersion={0.12}
-                liquid={0}
-                followCursor={false}
-                autoplay
-                interval={4}
-                captureWheel
-                className="font-nav-display"
-                onSelect={(index) => {
-                  const item = carouselItems[index];
-                  if (item?.slug) router.push(`/product/${item.slug}`);
-                }}
-              />
-            ) : null}
+          {carouselItems.length > 0 ? (
+            <FlexCarousel
+              items={carouselItems}
+              preset="liquid"
+              intro="glide"
+              cardHeight={0.68}
+              gap={18}
+              squeeze={0.08}
+              focusOnClick
+              captions
+              fit="natural"
+              radius={0}
+              lensWidth={0.82}
+              lensHeight={1.12}
+              tilt={28}
+              roundness={0.6}
+              bend={0.12}
+              reach={0.22}
+              curl="twist"
+              dispersion={0.12}
+              liquid={0}
+              followCursor={false}
+              autoplay
+              interval={4}
+              captureWheel
+              className="font-nav-display"
+              onSelect={(index) => {
+                const item = carouselItems[index];
+                if (item?.slug) router.push(`/product/${item.slug}`);
+              }}
+            />
+          ) : null}
         </div>
         <div className="pb-16 md:pb-20" />
       </section>
 
       <section className="border-t">
         <div className="mx-auto max-w-7xl px-6 py-16 md:py-20">
-          <div className="relative w-full" style={{ height: "500px" }}>
-            <MorphSlider
-              items={morphItems}
-              transition="melt"
-              intensity={0.55}
-              aberration={0.35}
-              drift={0.4}
-              autoplay={false}
-              overlayColor="#05060a"
-              duration={1.1}
-              ease="power2.inOut"
-              scale={2.4}
-              autoplayDelay={4}
-              loop
-              radius={16}
-              showCaptions
-              showControls
-              showIndicators
-              className="font-nav-display"
-            />
+          <div
+            className="relative w-full"
+            style={{ height: "min(78svh, 720px)" }}
+          >
+            {morphItems.length > 0 ? (
+              <MorphSlider
+                key={morphItems.map((item) => item.image).join("|")}
+                items={morphItems}
+                transition="melt"
+                intensity={0.55}
+                aberration={0.35}
+                drift={0.4}
+                autoplay
+                overlayColor="#05060a"
+                duration={1.1}
+                ease="power2.inOut"
+                scale={2.4}
+                autoplayDelay={5}
+                loop
+                radius={20}
+                showCaptions
+                showControls
+                showIndicators
+                className="font-nav-display"
+              />
+            ) : null}
           </div>
         </div>
       </section>
