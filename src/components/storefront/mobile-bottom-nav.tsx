@@ -22,11 +22,12 @@ export function MobileBottomNav() {
   const [phase, setPhase] = useState<SearchPhase>("idle");
   const [query, setQuery] = useState("");
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const searchRef = useRef<HTMLInputElement>(null);
 
   const open = phase !== "idle";
   const typing = phase === "typing";
-  const hideNotch = cartOpen || sidebarOpen;
+  const hideNotch = cartOpen || sidebarOpen || !scrolled;
 
   useEffect(() => {
     if (typing) searchRef.current?.focus();
@@ -49,6 +50,15 @@ export function MobileBottomNav() {
       attributeFilter: ["data-sidebar-open"],
     });
     return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    function onScroll() {
+      setScrolled(window.scrollY > 18);
+    }
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
   useEffect(() => {
@@ -82,12 +92,16 @@ export function MobileBottomNav() {
 
   const isHome = pathname === "/";
 
-  if (hideNotch) return null;
-
   return (
     <nav
-      className="pointer-events-none fixed inset-x-0 bottom-0 z-[60] flex items-end justify-center gap-1 px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] md:hidden"
+      className={cn(
+        "pointer-events-none fixed inset-x-0 bottom-0 z-[60] flex items-end justify-center gap-1 px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] md:hidden",
+        hideNotch
+          ? "pointer-events-none translate-y-4 opacity-0 [&_a]:pointer-events-none [&_button]:pointer-events-none [&_form]:pointer-events-none"
+          : "translate-y-0 opacity-100"
+      )}
       aria-label="Mobile"
+      aria-hidden={hideNotch}
     >
       <Link
         href="/"
