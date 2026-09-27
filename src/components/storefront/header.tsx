@@ -39,7 +39,7 @@ function HeaderLogo({
         src={brand.wordmark}
         alt="Ayesha's"
         className={cn(
-          "h-10 w-auto transition-[filter] duration-300 sm:h-11 md:h-12",
+          "h-11 w-auto transition-[filter] duration-300 sm:h-12 md:h-[3.25rem]",
           light ? "brightness-0 invert" : "brightness-0",
           className
         )}
@@ -48,19 +48,28 @@ function HeaderLogo({
   );
 }
 
-function CartButton({ light }: { light: boolean }) {
+function CartButton({
+  light,
+  compact = false,
+}: {
+  light: boolean;
+  compact?: boolean;
+}) {
   const { cartCount, ready, setCartOpen } = useStore();
   const count = ready ? cartCount : 0;
 
   return (
     <button
       type="button"
-      className="relative inline-flex size-10 cursor-pointer items-center justify-center"
+      className={cn(
+        "relative inline-flex cursor-pointer items-center justify-center",
+        compact ? "size-9" : "size-10"
+      )}
       aria-label="Bag"
       onClick={() => setCartOpen(true)}
     >
       <span className="relative inline-flex" data-cart-target>
-        <ShoppingBag className={navIcon} />
+        <ShoppingBag className={compact ? "size-5 stroke-[1.6]" : navIcon} />
         <span
           className={cn(
             "absolute -top-1.5 -right-2 flex size-4 items-center justify-center rounded-full text-[9px]",
@@ -304,14 +313,17 @@ export function Header({ hideSaleBanner = false }: { hideSaleBanner?: boolean })
           light && "md:text-white"
         )}
       >
-        {/* Mobile: hamburger + logo left */}
-        <div className="relative flex h-14 items-center gap-0.5 px-2 md:hidden">
-          <Hamburger
-            compact
-            open={menuOpen}
-            onClick={() => setMenuOpen((value) => !value)}
-          />
-          <HeaderLogo light={false} className="h-8 sm:h-8" />
+        {/* Mobile: hamburger + logo left, bag right */}
+        <div className="relative flex h-16 items-center justify-between px-2 md:hidden">
+          <div className="flex items-center gap-0.5">
+            <Hamburger
+              compact
+              open={menuOpen}
+              onClick={() => setMenuOpen((value) => !value)}
+            />
+            <HeaderLogo light={false} className="h-10 sm:h-10" />
+          </div>
+          <CartButton light={false} compact />
         </div>
 
         {/* Desktop / tablet header */}
@@ -386,7 +398,7 @@ export function Header({ hideSaleBanner = false }: { hideSaleBanner?: boolean })
         open={menuOpen}
         onOpenChange={setMenuOpen}
         items={menuItems}
-        displayItemNumbering
+        displayItemNumbering={false}
         displaySocials={false}
         colors={["#111111", "#cfcfcf"]}
         accentColor="#111111"

@@ -241,14 +241,14 @@
   color: #000;
   font-family: var(--font-nav-display), ui-sans-serif, system-ui, sans-serif;
   font-weight: 700;
-  font-size: clamp(2.45rem, 5.8vw, 3.85rem);
+  font-size: clamp(1.55rem, 4.2vw, 2.35rem);
   cursor: pointer;
   line-height: 1.02;
   letter-spacing: -0.045em;
   text-transform: uppercase;
   display: inline-block;
   text-decoration: none;
-  padding-right: 1.4em;
+  padding-right: 0.2em;
   transition: color 0.25s;
 }
 
@@ -360,6 +360,6 @@
   }
 
   .sm-panel-item {
-    font-size: 2.55rem;
+    font-size: 1.7rem;
   }
 }
