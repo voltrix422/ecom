@@ -63,7 +63,7 @@ function ShopContent() {
   return (
     <StoreShell>
       <div className="mx-auto max-w-7xl px-6 pt-2 pb-14 md:pt-3">
-        <h1 className="text-3xl md:text-4xl">Suits</h1>
+        <h1 className="font-nav-display text-4xl md:text-5xl">Suits</h1>
 
         <div className="mt-8 grid items-start gap-8 lg:grid-cols-[160px_minmax(0,1fr)] lg:gap-12">
           <aside className="lg:sticky lg:top-28 lg:self-start">
@@ -100,7 +100,7 @@ function ShopContent() {
                   type="button"
                   onClick={() => selectCategory(item)}
                   className={cn(
-                    "font-nav-display cursor-pointer px-2 py-1.5 text-left text-[15px] transition-colors sm:text-[16px]",
+                    "font-nav-display cursor-pointer px-2 py-1.5 text-left text-[17px] transition-colors sm:text-[18px]",
                     category === item
                       ? "bg-foreground text-background"
                       : "text-muted-foreground hover:text-foreground"

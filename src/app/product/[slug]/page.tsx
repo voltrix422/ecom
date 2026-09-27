@@ -97,7 +97,7 @@ export default function ProductPage({
             <ProductShare product={product} />
           </div>
           <div className="relative mt-24 max-w-md md:mt-40">
-            <h1 className="font-heading text-4xl leading-[0.95] text-foreground/90 md:text-5xl">
+            <h1 className="font-nav-display text-4xl leading-[0.95] text-foreground/90 md:text-5xl">
               {product.name}
             </h1>
             <div className="mt-5">

@@ -57,7 +57,7 @@ export function HeroSection() {
             key={action.label}
             href={action.href}
             onClick={() => flashPageVeil()}
-            className="group relative inline-flex h-12 min-w-[8.5rem] items-center justify-center overflow-hidden rounded-md border-0 bg-black/45 px-6 text-[13px] font-nav-display text-white shadow-[0_16px_40px_rgba(0,0,0,0.35)] backdrop-blur-xl backdrop-saturate-100 sm:text-[14px]"
+            className="group relative inline-flex h-12 min-w-[9rem] items-center justify-center overflow-hidden rounded-md border-0 bg-black/45 px-6 text-[15px] font-nav-display text-white shadow-[0_16px_40px_rgba(0,0,0,0.35)] backdrop-blur-xl backdrop-saturate-100 sm:h-[3.25rem] sm:text-[16px]"
           >
             <span className="absolute inset-x-0 bottom-0 h-0 bg-white transition-[height] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:h-full" />
             <span className="relative font-nav-display transition-colors duration-500 ease-out group-hover:text-black">
