@@ -40,7 +40,7 @@ function HeaderLogo({
         alt="Ayesha's"
         className={cn(
           "h-8 w-auto transition-[filter] duration-300 sm:h-9 md:h-10",
-          light ? "" : "brightness-0",
+          light ? "brightness-0 invert" : "brightness-0",
           className
         )}
       />

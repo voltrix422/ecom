@@ -12,7 +12,7 @@ export const brand = {
   name: "ayeshaswear",
   tagline: "Your fit. Your stitch",
   logo: "/brand/logo-mark.png",
-  wordmark: "/brand/logo-wordmark.png",
+  wordmark: "/brand/logo-wordmark.png?v=hanger",
   /** Full lockup artwork: the name curved above the mark, transparent bg */
   lockup: "/brand/logo-lockup.png",
   /** Digits only for wa.me links */

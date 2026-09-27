@@ -5,8 +5,8 @@ import type { BankDetails, Order } from "@/lib/types";
 
 const RECEIPT_WIDTH = 80;
 
-/** Wordmark aspect (w/h) — 720×160 */
-const WORDMARK_RATIO = 720 / 160;
+/** Wordmark aspect (w/h) — 1024×512 */
+const WORDMARK_RATIO = 1024 / 512;
 
 async function loadLogoDataUrl() {
   const response = await fetch(brand.wordmark);
