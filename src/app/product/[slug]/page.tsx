@@ -10,7 +10,6 @@ import { ProductCard } from "@/components/storefront/product-card";
 import { StoreShell } from "@/components/storefront/store-shell";
 import { Button } from "@/components/ui/button";
 import { ProductShare } from "@/components/storefront/product-share";
-import { SaleBadge } from "@/components/storefront/sale-badge";
 import { SalePrice } from "@/components/storefront/sale-price";
 import { flyToCart } from "@/lib/fly-to-cart";
 import { useStore } from "@/lib/store";
@@ -101,28 +100,26 @@ export default function ProductPage({
       <div className="md:hidden">
         <div
           ref={mobileGalleryRef}
-          className="relative h-[60svh] w-full bg-[#efeae4]"
+          className="relative flex max-h-[46svh] w-full items-center justify-center bg-[#efeae4] px-3 pt-1"
         >
-          <SaleBadge />
           <MediaImage
             src={currentSrc}
             alt={piece.name}
-            fill
             priority
-            fit="cover"
             sizes="100vw"
+            className="max-h-[46svh] w-full object-contain"
           />
         </div>
 
         {gallery.length > 1 ? (
-          <div className="flex gap-2 overflow-x-auto px-3 pt-2">
+          <div className="flex gap-2 overflow-x-auto px-3 pt-1.5">
             {gallery.map((src, index) => (
               <button
                 key={`${src.slice(0, 32)}-${index}`}
                 type="button"
                 onClick={() => setActiveImage(index)}
                 className={cn(
-                  "relative h-14 w-11 shrink-0 overflow-hidden rounded-md border",
+                  "relative h-12 w-9 shrink-0 overflow-hidden rounded-md border",
                   activeImage === index
                     ? "border-foreground"
                     : "border-transparent opacity-70"
@@ -133,85 +130,71 @@ export default function ProductPage({
                   alt={`${piece.name} ${index + 1}`}
                   fill
                   fit="cover"
-                  sizes="44px"
+                  sizes="36px"
                 />
               </button>
             ))}
           </div>
         ) : null}
 
-        <div className="px-4 pt-3 pb-8">
-          <div className="flex items-center justify-between gap-4">
-            <div className="flex items-center gap-1">
-              <button
-                type="button"
-                onClick={toggleLike}
-                className="inline-flex size-11 items-center justify-center text-foreground"
-                aria-label={liked ? "Remove from wishlist" : "Save to wishlist"}
-                aria-pressed={liked}
-              >
-                <Heart
-                  className={cn(
-                    "size-5 transition-transform",
-                    liked && "fill-foreground scale-110"
-                  )}
-                  strokeWidth={1.7}
-                />
-              </button>
-
-              <button
-                type="button"
-                onClick={handleAddToBag}
-                disabled={piece.stock <= 0}
+        <div className="px-4 pt-2 pb-6">
+          <div className="flex items-center gap-0.5">
+            <button
+              type="button"
+              onClick={toggleLike}
+              className="inline-flex size-10 items-center justify-center text-foreground"
+              aria-label={liked ? "Remove from wishlist" : "Save to wishlist"}
+              aria-pressed={liked}
+            >
+              <Heart
                 className={cn(
-                  "inline-flex size-11 items-center justify-center text-foreground transition-transform disabled:opacity-40",
-                  bagPulse && "scale-110"
+                  "size-5 transition-transform",
+                  liked && "fill-foreground scale-110"
                 )}
-                aria-label="Add to bag"
-              >
-                <ShoppingBag className="size-5" strokeWidth={1.7} />
-              </button>
+                strokeWidth={1.7}
+              />
+            </button>
 
-              <div className="inline-flex size-11 items-center justify-center [&_button]:size-11 [&_svg]:size-3.5">
-                <ProductShare product={piece} />
-              </div>
+            <button
+              type="button"
+              onClick={handleAddToBag}
+              disabled={piece.stock <= 0}
+              className={cn(
+                "inline-flex size-10 items-center justify-center text-foreground transition-transform disabled:opacity-40",
+                bagPulse && "scale-110"
+              )}
+              aria-label="Add to bag"
+            >
+              <ShoppingBag className="size-5" strokeWidth={1.7} />
+            </button>
+
+            <div className="inline-flex size-10 items-center justify-center [&_button]:size-10 [&_svg]:size-3.5">
+              <ProductShare product={piece} />
             </div>
           </div>
 
-          <Button
-            size="lg"
-            className="mt-3 h-12 w-full rounded-md border-0 bg-black text-[14px] font-semibold tracking-wide text-white shadow-none hover:bg-black/90"
-            disabled={piece.stock <= 0}
-            onClick={handleBuy}
-          >
-            Buy
-          </Button>
-
-          <h1 className="mt-5 font-nav-display text-[26px] leading-none tracking-tight text-foreground">
+          <h1 className="mt-1.5 font-nav-display text-[22px] leading-none tracking-tight text-foreground">
             {piece.name}
           </h1>
-          <div className="mt-3">
-            <SalePrice price={piece.price} size="md" className="gap-3" />
+          <div className="mt-2">
+            <SalePrice price={piece.price} size="md" className="gap-2.5" />
           </div>
-          <p className="mt-3 text-[13px] leading-relaxed text-foreground/55">
-            {piece.details.join(" · ")}
-          </p>
 
-          <div className="mt-5 flex h-11 items-center justify-center gap-1">
+          <div className="mt-2.5 flex h-10 items-center justify-center gap-1">
             <button
               type="button"
-              className="inline-flex size-10 items-center justify-center text-[22px] leading-none text-foreground/70"
+              className="inline-flex size-9 items-center justify-center text-[20px] leading-none text-foreground/70"
               onClick={() => setQuantity((value) => Math.max(1, value - 1))}
               aria-label="Decrease quantity"
             >
               −
             </button>
-            <span className="font-nav-display min-w-8 text-center text-[18px] tabular-nums">
+            <span className="font-nav-display min-w-7 text-center text-[17px] tabular-nums">
               {quantity}
             </span>
             <button
               type="button"
-              className="inline-flex size-10 items-center justify-center text-[22px] leading-none text-foreground/70"
+              className="inline-flex size-9 items-center justify-center text-[20px] leading-none text-foreground/70"
               onClick={() =>
                 setQuantity((value) => Math.min(piece.stock || 1, value + 1))
               }
@@ -220,6 +203,15 @@ export default function ProductPage({
               +
             </button>
           </div>
+
+          <Button
+            size="lg"
+            className="mt-2.5 h-11 w-full rounded-md border-0 bg-black text-[14px] font-semibold tracking-wide text-white shadow-none hover:bg-black/90"
+            disabled={piece.stock <= 0}
+            onClick={handleBuy}
+          >
+            Buy
+          </Button>
         </div>
       </div>
 
@@ -230,7 +222,6 @@ export default function ProductPage({
             ref={desktopGalleryRef}
             className="relative h-[calc(100svh-11rem)] w-full"
           >
-            <SaleBadge />
             <MediaImage
               src={currentSrc}
               alt={piece.name}
