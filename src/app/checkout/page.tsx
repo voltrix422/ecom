@@ -443,26 +443,38 @@ export default function CheckoutPage() {
                       className="hidden"
                       onChange={(e) => onProofSelected(e.target.files)}
                     />
-                    <Button
+                    <button
                       type="button"
-                      variant="outline"
-                      className="font-nav-display h-9 w-full border-0 bg-white text-[12px] shadow-none"
                       disabled={uploading}
                       onClick={() => proofRef.current?.click()}
+                      className={cn(
+                        "flex w-full items-center gap-3 rounded-md border border-dashed border-black/20 bg-white px-3 py-2.5 text-left transition-colors hover:border-black/35 hover:bg-black/[0.02] disabled:opacity-50"
+                      )}
                     >
-                      <Upload className="size-3.5" />
-                      {uploading
-                        ? "Uploading…"
-                        : paymentProof
-                          ? "Replace proof"
-                          : "Attach screenshot"}
-                    </Button>
+                      <span className="inline-flex size-8 shrink-0 items-center justify-center rounded-full bg-black/[0.06]">
+                        <Upload className="size-3.5 text-foreground" strokeWidth={2} />
+                      </span>
+                      <span className="min-w-0 flex-1">
+                        <span className="block text-[13px] font-medium tracking-normal text-foreground normal-case">
+                          {uploading
+                            ? "Uploading…"
+                            : paymentProof
+                              ? "Replace screenshot"
+                              : "Attach screenshot"}
+                        </span>
+                        <span className="mt-0.5 block text-[11px] tracking-normal text-muted-foreground normal-case">
+                          {paymentProof
+                            ? "Tap to choose a different image"
+                            : "Transfer receipt image"}
+                        </span>
+                      </span>
+                    </button>
                     {paymentProof ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img
                         src={paymentProof}
                         alt="Payment proof preview"
-                        className="max-h-20 object-contain"
+                        className="mt-1 max-h-16 w-full rounded-md object-contain"
                       />
                     ) : null}
                   </div>
