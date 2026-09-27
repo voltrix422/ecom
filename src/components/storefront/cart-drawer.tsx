@@ -10,7 +10,6 @@ import { SalePrice } from "@/components/storefront/sale-price";
 import { Button } from "@/components/ui/button";
 import { formatPrice } from "@/lib/format";
 import { useStore } from "@/lib/store";
-import { cn } from "cn";
 import "./staggered-menu.css";
 
 const LAYER_COLORS = ["#111111", "#d4d4d4"];
@@ -197,7 +196,7 @@ export function CartDrawer() {
         aria-label="Shopping bag"
       >
         <div className="flex h-16 shrink-0 items-center justify-between px-6">
-          <p className="text-[13px] tracking-[0.22em] uppercase">Bag</p>
+          <p className="font-nav-display text-[15px]">Bag</p>
           <button
             type="button"
             className="inline-flex size-11 cursor-pointer items-center justify-center transition-transform duration-300 hover:rotate-90"
@@ -214,10 +213,12 @@ export function CartDrawer() {
               data-cart-line
               className="flex flex-1 flex-col justify-center px-6"
             >
-              <p className="text-base text-neutral-500">Your bag is empty.</p>
-              <Button className="mt-8 w-fit rounded-none" asChild>
+              <p className="font-nav-display text-[15px] text-neutral-500">
+                Your bag is empty.
+              </p>
+              <Button className="mt-8 w-fit" asChild>
                 <Link href="/shop" onClick={() => setCartOpen(false)}>
-                  Continue shopping
+                  <span>Continue shopping</span>
                 </Link>
               </Button>
             </div>
@@ -244,7 +245,7 @@ export function CartDrawer() {
                           <Link
                             href={`/product/${product.slug}`}
                             onClick={() => setCartOpen(false)}
-                            className="block truncate text-[15px]"
+                            className="font-nav-display block truncate text-[15px]"
                           >
                             {product.name}
                           </Link>
@@ -254,7 +255,7 @@ export function CartDrawer() {
                         </div>
                         <button
                           type="button"
-                          className="shrink-0 text-xs tracking-[0.08em] text-neutral-500 uppercase transition-colors hover:text-black"
+                          className="font-nav-display shrink-0 text-[11px] text-neutral-500 transition-colors hover:text-black"
                           onClick={() => removeFromCart(product.id)}
                         >
                           Remove
@@ -292,7 +293,7 @@ export function CartDrawer() {
                 data-cart-footer
                 className="border-t border-black/8 px-6 py-6"
               >
-                <div className="space-y-3 text-[15px]">
+                <div className="space-y-3 font-nav-display text-[15px]">
                   <div className="flex justify-between">
                     <span className="text-neutral-500">Subtotal</span>
                     <span>{formatPrice(cartTotal)}</span>
@@ -303,7 +304,7 @@ export function CartDrawer() {
                       {shipping === 0 ? "Free" : formatPrice(shipping)}
                     </span>
                   </div>
-                  <div className="flex justify-between pt-2 text-base font-medium">
+                  <div className="flex justify-between pt-2 text-[16px]">
                     <span>Total</span>
                     <span>{formatPrice(cartTotal + shipping)}</span>
                   </div>
@@ -311,12 +312,10 @@ export function CartDrawer() {
                 <Button
                   asChild
                   size="lg"
-                  className={cn(
-                    "mt-6 h-12 w-full rounded-none text-[12px] tracking-[0.18em] uppercase"
-                  )}
+                  className="mt-6 h-12 w-full"
                 >
                   <Link href="/checkout" onClick={() => setCartOpen(false)}>
-                    Checkout
+                    <span>Checkout</span>
                   </Link>
                 </Button>
               </div>

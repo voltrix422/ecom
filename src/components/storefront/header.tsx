@@ -157,11 +157,11 @@ function AccountMenu() {
           className={cn(
             "origin-top-right overflow-hidden rounded-md border-0 bg-black/55 text-white shadow-[0_24px_80px_rgba(0,0,0,0.45)] backdrop-blur-2xl backdrop-saturate-100 transition-[width,opacity,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
             open
-              ? "w-[min(92vw,320px)] scale-x-100 opacity-100"
+              ? "w-[min(94vw,360px)] scale-x-100 opacity-100"
               : "w-10 scale-x-0 opacity-0"
           )}
         >
-          <div className="flex min-w-[260px] items-stretch gap-0">
+          <div className="flex min-w-[300px] items-stretch gap-0">
             {accountLinks.map((item, index) => {
               const Icon = item.icon;
               return (
@@ -169,7 +169,7 @@ function AccountMenu() {
                   key={item.href}
                   href={item.href}
                   className={cn(
-                    "group flex min-w-0 flex-1 flex-col items-center justify-center gap-2 px-2 py-4 text-center transition-colors hover:bg-white/10",
+                    "group flex min-w-0 flex-1 flex-col items-center justify-center gap-2.5 px-3 py-5 text-center transition-colors hover:bg-white/10",
                     open ? "animate-account-link" : ""
                   )}
                   style={{ animationDelay: `${80 + index * 60}ms` }}
@@ -178,8 +178,8 @@ function AccountMenu() {
                     setOpen(false);
                   }}
                 >
-                  <Icon className="size-5 stroke-[1.25] text-white transition-transform duration-300 group-hover:-translate-y-0.5" />
-                  <span className="font-nav-display text-[11px] leading-tight text-white/90">
+                  <Icon className="size-6 stroke-[1.25] text-white transition-transform duration-300 group-hover:-translate-y-0.5" />
+                  <span className="font-nav-display text-[13px] leading-tight text-white sm:text-[14px]">
                     {item.label}
                   </span>
                 </Link>

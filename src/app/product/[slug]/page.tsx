@@ -31,8 +31,10 @@ export default function ProductPage({
       <StoreShell>
         <div className="mx-auto max-w-6xl px-6 py-24 text-center">
           <h1 className="text-3xl">Piece not found</h1>
-          <Button asChild variant="outline" className="mt-6 rounded-none">
-            <Link href="/shop">Return to shop</Link>
+          <Button asChild variant="outline" className="mt-6">
+            <Link href="/shop">
+              <span>Return to shop</span>
+            </Link>
           </Button>
         </div>
       </StoreShell>
@@ -103,10 +105,10 @@ export default function ProductPage({
             <div className="mt-5">
               <SalePrice price={product.price} size="md" />
             </div>
-            <p className="mt-8 text-sm leading-5 text-foreground/50">
+            <p className="mt-8 text-[15px] leading-6 text-foreground/55">
               {product.description}
             </p>
-            <p className="mt-4 text-[13px] leading-5 text-foreground/40">
+            <p className="mt-4 font-nav-display text-[12px] leading-5 text-foreground/40">
               {product.details.join(" · ")}
             </p>
             <div className="mt-8 flex flex-wrap items-center gap-3">
@@ -133,7 +135,7 @@ export default function ProductPage({
               </div>
               <Button
                 size="lg"
-                className="rounded-none px-8"
+                className="px-8"
                 disabled={product.stock <= 0}
                 onClick={() => {
                   addToCart(product.id, quantity);
@@ -148,7 +150,7 @@ export default function ProductPage({
               <Button
                 size="lg"
                 variant="outline"
-                className="rounded-none px-8"
+                className="px-8"
                 disabled={product.stock <= 0}
                 onClick={() => {
                   addToCart(product.id, quantity);
@@ -164,7 +166,7 @@ export default function ProductPage({
 
       {related.length > 0 ? (
         <section className="mx-auto max-w-7xl px-6 pb-20 pt-10">
-          <h2 className="text-2xl">More {product.category.toLowerCase()}</h2>
+          <h2 className="font-nav-display text-3xl">More {product.category}</h2>
           <div className="mt-8 grid gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
             {related.map((item) => (
               <ProductCard key={item.id} product={item} badgeTone="soft" />

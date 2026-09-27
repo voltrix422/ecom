@@ -24,8 +24,10 @@ export function ProductCard({
       </div>
       <div className="mt-4 flex items-baseline justify-between gap-4">
         <div>
-          <p className="text-sm text-foreground">{product.name}</p>
-          <p className="mt-1 text-xs tracking-wide text-muted-foreground uppercase">
+          <p className="font-nav-display text-[15px] text-foreground sm:text-[16px]">
+            {product.name}
+          </p>
+          <p className="mt-1.5 font-nav-display text-[11px] text-muted-foreground sm:text-[12px]">
             {product.category} · 3-piece
           </p>
         </div>

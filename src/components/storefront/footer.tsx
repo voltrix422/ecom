@@ -13,7 +13,7 @@ export function Footer() {
             className="h-12 w-auto brightness-0"
           />
         </Link>
-        <nav className="mt-6 flex flex-row flex-wrap items-center gap-x-6 gap-y-2 text-sm text-muted-foreground">
+        <nav className="mt-6 flex flex-row flex-wrap items-center gap-x-5 gap-y-2 font-nav-display text-[14px] text-muted-foreground">
           <Link href="/shop" className="hover:text-foreground">
             Shop
           </Link>
