@@ -99,7 +99,7 @@ export default function ProductPage({
     <StoreShell>
       {/* Mobile detail layout */}
       <div className="md:hidden">
-        <div className="flex h-[calc(100svh-4rem)] flex-col pb-[4.75rem]">
+        <div className="flex h-[calc(100dvh-4rem)] flex-col">
           <div
             ref={mobileGalleryRef}
             className="relative min-h-0 w-full flex-1 bg-white"
@@ -115,14 +115,14 @@ export default function ProductPage({
           </div>
 
           {gallery.length > 1 ? (
-            <div className="flex shrink-0 gap-2 overflow-x-auto px-3 pt-1.5">
+            <div className="flex shrink-0 gap-2 overflow-x-auto px-3 pt-1">
               {gallery.map((src, index) => (
                 <button
                   key={`${src.slice(0, 32)}-${index}`}
                   type="button"
                   onClick={() => setActiveImage(index)}
                   className={cn(
-                    "relative h-11 w-8 shrink-0 overflow-hidden rounded-md border",
+                    "relative h-10 w-7 shrink-0 overflow-hidden rounded-md border",
                     activeImage === index
                       ? "border-foreground"
                       : "border-transparent opacity-70"
@@ -133,14 +133,14 @@ export default function ProductPage({
                     alt={`${piece.name} ${index + 1}`}
                     fill
                     fit="cover"
-                    sizes="32px"
+                    sizes="28px"
                   />
                 </button>
               ))}
             </div>
           ) : null}
 
-          <div className="shrink-0 px-4 pt-1.5 pb-1">
+          <div className="shrink-0 px-4 pt-1 pb-[max(0.5rem,env(safe-area-inset-bottom))]">
             <div className="flex items-center gap-0.5 text-foreground">
               <button
                 type="button"
@@ -186,17 +186,17 @@ export default function ProductPage({
               </p>
             </div>
 
-            <h1 className="mt-1.5 font-nav-display text-[22px] leading-none tracking-tight text-foreground">
+            <h1 className="mt-1 font-nav-display text-[20px] leading-none tracking-tight text-foreground">
               {piece.name}
             </h1>
 
-            <p className="mt-1.5 line-clamp-3 text-[13px] leading-relaxed text-foreground/55">
+            <p className="mt-1 line-clamp-2 text-[12px] leading-snug text-foreground/55">
               {piece.description}
             </p>
 
             <Button
               size="lg"
-              className="mt-3 h-14 w-full rounded-md border-0 bg-black text-[18px] font-bold tracking-wide text-white shadow-none hover:bg-black/90"
+              className="mt-2.5 h-12 w-full rounded-md border-0 bg-black text-[17px] font-bold tracking-wide text-white shadow-none hover:bg-black/90"
               disabled={piece.stock <= 0}
               onClick={handleBuy}
             >
@@ -206,9 +206,9 @@ export default function ProductPage({
         </div>
 
         {related.length > 0 ? (
-          <section className="px-4 pt-8 pb-4">
+          <section className="px-4 pt-10 pb-6">
             <h2 className="font-nav-display text-xl">More like this</h2>
-            <div className="mt-5 grid grid-cols-2 gap-x-4 gap-y-8">
+            <div className="mt-5 grid grid-cols-2 gap-x-3 gap-y-8">
               {related.map((item) => (
                 <ProductCard key={item.id} product={item} badgeTone="soft" />
               ))}

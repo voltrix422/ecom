@@ -1,5 +1,4 @@
 import { CartDrawer } from "@/components/storefront/cart-drawer";
-import { Footer } from "@/components/storefront/footer";
 import { Header } from "@/components/storefront/header";
 import { MobileBottomNav } from "@/components/storefront/mobile-bottom-nav";
 import { PageFade } from "@/components/page-fade";
@@ -15,10 +14,9 @@ export function StoreShell({
   return (
     <div className="flex min-h-svh flex-col">
       <Header hideSaleBanner={hideSaleBanner} />
-      <main className="flex-1 pb-24 md:pb-0">
+      <main className="flex-1 pb-20 md:pb-0">
         <PageFade>{children}</PageFade>
       </main>
-      <Footer />
       <CartDrawer />
       <MobileBottomNav />
       <PageVeil />

@@ -221,12 +221,15 @@ export function Header({ hideSaleBanner = false }: { hideSaleBanner?: boolean })
   const categories =
     storeCategories.length > 0 ? storeCategories : [...seedCategories];
   const overlay = pathname === "/";
+  const isHome = pathname === "/";
   const [menuOpen, setMenuOpen] = useState(false);
   const [overHero, setOverHero] = useState(overlay);
   const [searchOpen, setSearchOpen] = useState(false);
   const [search, setSearch] = useState("");
+  const [navHidden, setNavHidden] = useState(false);
   const headerRef = useRef<HTMLElement>(null);
   const searchRef = useRef<HTMLInputElement>(null);
+  const lastScrollY = useRef(0);
   const light = overHero && !searchOpen && !menuOpen;
 
   const menuItems = useMemo(
@@ -282,12 +285,44 @@ export function Header({ hideSaleBanner = false }: { hideSaleBanner?: boolean })
   }, [overlay]);
 
   useEffect(() => {
+    lastScrollY.current = window.scrollY;
+    setNavHidden(false);
+
+    function onScroll() {
+      // Home: navbar always visible
+      if (isHome || menuOpen || searchOpen) {
+        setNavHidden(false);
+        lastScrollY.current = window.scrollY;
+        return;
+      }
+
+      const y = window.scrollY;
+      const delta = y - lastScrollY.current;
+
+      // Near top always show; scroll up shows; scroll down hides
+      if (y < 24) {
+        setNavHidden(false);
+      } else if (delta < -6) {
+        setNavHidden(false);
+      } else if (delta > 6) {
+        setNavHidden(true);
+      }
+
+      lastScrollY.current = y;
+    }
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [isHome, menuOpen, searchOpen, pathname]);
+
+  useEffect(() => {
     if (searchOpen) searchRef.current?.focus();
   }, [searchOpen]);
 
   useEffect(() => {
     setMenuOpen(false);
     setSearchOpen(false);
+    setNavHidden(false);
   }, [pathname]);
 
   useEffect(() => {
@@ -309,8 +344,9 @@ export function Header({ hideSaleBanner = false }: { hideSaleBanner?: boolean })
       <header
         ref={headerRef}
         className={cn(
-          "relative z-50 bg-transparent text-black transition-colors duration-300",
-          light && "md:text-white"
+          "sticky top-0 z-50 bg-transparent text-black transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] md:relative md:translate-y-0",
+          light && "md:text-white",
+          navHidden ? "-translate-y-full md:translate-y-0" : "translate-y-0"
         )}
       >
         {/* Mobile: hamburger + logo left, bag right */}

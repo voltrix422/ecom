@@ -27,7 +27,9 @@ export function MobileBottomNav() {
 
   const open = phase !== "idle";
   const typing = phase === "typing";
-  const hideNotch = cartOpen || sidebarOpen || !scrolled;
+  const isHome = pathname === "/";
+  // Home: always show notch. Other pages: show after a little scroll down.
+  const hideNotch = cartOpen || sidebarOpen || (!isHome && !scrolled);
 
   useEffect(() => {
     if (typing) searchRef.current?.focus();
@@ -59,7 +61,7 @@ export function MobileBottomNav() {
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+  }, [pathname]);
 
   useEffect(() => {
     if (hideNotch) {
@@ -89,8 +91,6 @@ export function MobileBottomNav() {
     setPhase("idle");
     setQuery("");
   }
-
-  const isHome = pathname === "/";
 
   return (
     <nav
