@@ -10,14 +10,14 @@ function FeaturedPanel({ product }: { product: Product }) {
   return (
     <Link
       href={`/product/${product.slug}`}
-      className="group relative block min-h-[66svh] overflow-hidden bg-muted/10 lg:min-h-[80svh]"
+      className="group relative block min-h-[78svh] overflow-hidden bg-muted/10 lg:min-h-[90svh]"
     >
       <MediaImage
         src={product.image}
         alt={product.name}
         fill
         sizes="(min-width: 1024px) 50vw, 100vw"
-        className="object-contain p-3 transition-transform duration-700 group-hover:scale-[1.02] md:p-5"
+        className="object-contain p-1 transition-transform duration-700 group-hover:scale-[1.02] md:p-2"
       />
       <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-background via-background/70 to-transparent px-6 pb-8 pt-20 md:px-8 md:pb-10">
         <p className="font-nav-display text-[22px] tracking-tight text-foreground md:text-[28px]">
@@ -66,14 +66,14 @@ export function FeaturedSection({ products }: { products: Product[] }) {
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
     >
-      <div className="mx-auto max-w-7xl px-6 pt-16 md:pt-20">
-        <div className="mb-8 flex items-end justify-between gap-6 md:mb-10">
-          <h2 className="font-nav-display text-5xl leading-[0.95] tracking-tight md:text-6xl lg:text-7xl">
+      <div className="mx-auto max-w-7xl px-6 pt-12 md:pt-16">
+        <div className="mb-6 flex items-end justify-between gap-6 md:mb-8">
+          <h2 className="font-nav-display text-3xl leading-[0.95] tracking-tight md:text-4xl lg:text-[2.75rem]">
             Featured suits
           </h2>
           <Link
             href="/shop"
-            className="font-nav-display shrink-0 pb-1 text-[18px] text-muted-foreground transition-colors hover:text-foreground md:text-[20px]"
+            className="font-nav-display shrink-0 pb-1 text-[16px] text-muted-foreground transition-colors hover:text-foreground md:text-[18px]"
           >
             View all
           </Link>

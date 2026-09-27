@@ -35,11 +35,11 @@ export default function HomePage() {
 
       <FeaturedSection products={featured} />
 
-      <section className="border-t">
-        <div className="mx-auto max-w-7xl px-6 py-16 md:py-20">
+      <section>
+        <div className="mx-auto max-w-7xl px-4 py-10 md:px-6 md:py-14">
           <div
             className="relative w-full"
-            style={{ height: "min(78svh, 720px)" }}
+            style={{ height: "min(92svh, 920px)" }}
           >
             {morphItems.length > 0 ? (
               <MorphSlider
@@ -56,7 +56,7 @@ export default function HomePage() {
                 scale={2.4}
                 autoplayDelay={5}
                 loop
-                radius={20}
+                radius={4}
                 showCaptions
                 showControls
                 showIndicators
