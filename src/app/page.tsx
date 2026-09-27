@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { MediaImage } from "@/components/media-image";
+import FlexCarousel from "@/components/storefront/flex-carousel";
 import { HeroSection } from "@/components/storefront/hero-section";
-import { ProductCard } from "@/components/storefront/product-card";
 import { StoreShell } from "@/components/storefront/store-shell";
 import { useStore } from "@/lib/store";
 
@@ -26,8 +27,16 @@ const collections = [
 ];
 
 export default function HomePage() {
+  const router = useRouter();
   const { products } = useStore();
-  const featured = products.filter((product) => product.featured).slice(0, 3);
+  const featured = products.filter((product) => product.featured);
+  const carouselItems = featured.map((product) => ({
+    src: product.image,
+    alt: product.name,
+    title: product.name,
+    subtitle: product.category,
+    slug: product.slug,
+  }));
 
   return (
     <StoreShell>
@@ -51,10 +60,42 @@ export default function HomePage() {
               View all
             </Link>
           </div>
-          <div className="grid gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
-            {featured.map((product) => (
-              <ProductCard key={product.id} product={product} badgeTone="soft" />
-            ))}
+          <div
+            className="relative w-full text-foreground"
+            style={{ height: "560px" }}
+          >
+            {carouselItems.length > 0 ? (
+              <FlexCarousel
+                items={carouselItems}
+                preset="liquid"
+                intro="rise"
+                cardHeight={0.5}
+                gap={12}
+                squeeze={0.2}
+                focusOnClick
+                captions
+                fit="natural"
+                radius={0}
+                lensWidth={0.74}
+                lensHeight={1.18}
+                tilt={62}
+                roundness={1}
+                bend={0.34}
+                reach={0.38}
+                curl="twist"
+                dispersion={0.45}
+                liquid={0}
+                followCursor={false}
+                autoplay={false}
+                interval={4}
+                captureWheel
+                className="font-nav-display"
+                onSelect={(index) => {
+                  const item = carouselItems[index];
+                  if (item?.slug) router.push(`/product/${item.slug}`);
+                }}
+              />
+            ) : null}
           </div>
         </div>
       </section>

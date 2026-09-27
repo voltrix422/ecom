@@ -104,28 +104,25 @@ export default function ProductPage({
             <div className="mt-3">
               <SalePrice price={product.price} size="md" className="gap-3" />
             </div>
-            <p className="mt-4 text-[15px] leading-snug text-foreground/60">
-              {product.description}
-            </p>
-            <p className="mt-2.5 font-nav-display text-[12px] leading-snug text-foreground/40">
+            <p className="mt-4 font-nav-display text-[13px] leading-snug tracking-wide text-foreground/45">
               {product.details.join(" · ")}
             </p>
             <div className="mt-6 flex w-full max-w-md flex-col gap-2.5">
-              <div className="flex h-11 w-fit items-center gap-0.5">
+              <div className="mx-auto flex h-12 items-center justify-center gap-1">
                 <button
                   type="button"
-                  className="inline-flex size-9 items-center justify-center text-[20px] leading-none text-foreground/70 hover:text-foreground"
+                  className="inline-flex size-11 items-center justify-center text-[26px] leading-none text-foreground/75 hover:text-foreground"
                   onClick={() => setQuantity((value) => Math.max(1, value - 1))}
                   aria-label="Decrease quantity"
                 >
                   −
                 </button>
-                <span className="font-nav-display min-w-7 text-center text-[17px] tabular-nums text-foreground/85">
+                <span className="font-nav-display min-w-9 text-center text-[22px] tabular-nums text-foreground/90">
                   {quantity}
                 </span>
                 <button
                   type="button"
-                  className="inline-flex size-9 items-center justify-center text-[20px] leading-none text-foreground/70 hover:text-foreground"
+                  className="inline-flex size-11 items-center justify-center text-[26px] leading-none text-foreground/75 hover:text-foreground"
                   onClick={() =>
                     setQuantity((value) => Math.min(product.stock || 1, value + 1))
                   }
