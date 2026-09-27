@@ -2,8 +2,14 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { FormEvent, useRef, useState } from "react";
-import { ArrowLeft, ArrowRight, Upload } from "lucide-react";
+import {
+  FormEvent,
+  PointerEvent as ReactPointerEvent,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
+import { ArrowLeft, ArrowRight, ChevronRight, Upload } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "cn";
 import { StoreShell } from "@/components/storefront/store-shell";
@@ -15,6 +21,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { formatPrice } from "@/lib/format";
 import { fileToDataUrl } from "@/lib/image-upload";
 import { useStore } from "@/lib/store";
 import type { PaymentMethod, Product } from "@/lib/types";
@@ -22,6 +29,27 @@ import type { PaymentMethod, Product } from "@/lib/types";
 type Step = 1 | 2 | 3;
 
 type Line = { product: Product; quantity: number };
+
+type SavedDetails = {
+  name: string;
+  email: string;
+  phone: string;
+  address: string;
+  city: string;
+  country: string;
+  notes?: string;
+};
+
+const DETAILS_KEY = "ayesha-checkout-details-v1";
+
+const emptyDetails = {
+  name: "",
+  email: "",
+  phone: "",
+  address: "",
+  city: "",
+  country: "Pakistan",
+};
 
 function StepDots({ step }: { step: Step }) {
   const labels = ["Details", "Payment", "Receipt"];
@@ -75,6 +103,129 @@ function StepDots({ step }: { step: Step }) {
   );
 }
 
+function SwipeToComplete({
+  disabled,
+  loading,
+  onComplete,
+}: {
+  disabled?: boolean;
+  loading?: boolean;
+  onComplete: () => void;
+}) {
+  const trackRef = useRef<HTMLDivElement>(null);
+  const [offset, setOffset] = useState(0);
+  const [dragging, setDragging] = useState(false);
+  const [done, setDone] = useState(false);
+  const [hint, setHint] = useState(true);
+  const startX = useRef(0);
+  const startOffset = useRef(0);
+  const offsetRef = useRef(0);
+  const maxRef = useRef(0);
+  const draggingRef = useRef(false);
+
+  function measureMax() {
+    const track = trackRef.current;
+    if (!track) return 0;
+    const knob = 48;
+    const pad = 4;
+    return Math.max(0, track.clientWidth - knob - pad * 2);
+  }
+
+  function setKnob(next: number) {
+    offsetRef.current = next;
+    setOffset(next);
+  }
+
+  function onPointerDown(e: ReactPointerEvent<HTMLDivElement>) {
+    if (disabled || loading || done) return;
+    e.currentTarget.setPointerCapture(e.pointerId);
+    setHint(false);
+    draggingRef.current = true;
+    setDragging(true);
+    startX.current = e.clientX;
+    startOffset.current = offsetRef.current;
+    maxRef.current = measureMax();
+  }
+
+  function onPointerMove(e: ReactPointerEvent<HTMLDivElement>) {
+    if (!draggingRef.current || disabled || loading || done) return;
+    const delta = e.clientX - startX.current;
+    const next = Math.min(
+      maxRef.current,
+      Math.max(0, startOffset.current + delta)
+    );
+    setKnob(next);
+  }
+
+  function finishSwipe(finalOffset: number) {
+    const max = maxRef.current || measureMax();
+    if (max > 0 && finalOffset >= max * 0.86) {
+      setKnob(max);
+      setDone(true);
+      onComplete();
+      return;
+    }
+    setKnob(0);
+  }
+
+  function onPointerUp(e: ReactPointerEvent<HTMLDivElement>) {
+    if (!draggingRef.current) return;
+    draggingRef.current = false;
+    setDragging(false);
+    try {
+      e.currentTarget.releasePointerCapture(e.pointerId);
+    } catch {
+      /* ignore */
+    }
+    finishSwipe(offsetRef.current);
+  }
+
+  return (
+    <div
+      ref={trackRef}
+      className={cn(
+        "relative h-14 w-full select-none overflow-hidden rounded-full bg-black touch-none",
+        (disabled || loading) && "opacity-60"
+      )}
+      role="button"
+      aria-label={loading ? "Placing order" : "Swipe right to complete order"}
+      aria-disabled={disabled || loading || done}
+    >
+      <div
+        className="pointer-events-none absolute inset-0 flex items-center justify-center gap-1.5 text-[13px] tracking-wide text-white/85"
+        aria-hidden
+      >
+        <span className="font-nav-display">
+          {loading ? "Placing…" : done ? "Order placed" : "Complete order"}
+        </span>
+        {!loading && !done ? (
+          <ChevronRight className="size-4 opacity-70" strokeWidth={2} />
+        ) : null}
+      </div>
+
+      <div
+        className={cn(
+          "absolute top-1 left-1 z-10 flex size-12 cursor-grab items-center justify-center rounded-full bg-white text-black active:cursor-grabbing",
+          hint && !dragging && !done && !loading
+            ? "animate-[swipe-hint_2.4s_ease-in-out_infinite]"
+            : "transition-transform duration-200 ease-out"
+        )}
+        style={
+          hint && !dragging && !done && !loading
+            ? undefined
+            : { transform: `translateX(${offset}px)` }
+        }
+        onPointerDown={onPointerDown}
+        onPointerMove={onPointerMove}
+        onPointerUp={onPointerUp}
+        onPointerCancel={onPointerUp}
+      >
+        <ArrowRight className="size-5 stroke-[2]" />
+      </div>
+    </div>
+  );
+}
+
 const fieldClass =
   "h-9 rounded-none border-0 border-b border-border/45 bg-transparent px-0 text-[14px] normal-case shadow-none focus-visible:border-foreground focus-visible:ring-0";
 
@@ -82,28 +233,50 @@ const labelClass =
   "text-[11px] font-normal normal-case tracking-normal text-muted-foreground";
 
 const btnClass = "font-nav-display h-11 w-full border-0 shadow-none sm:w-auto";
-const btnOutlineClass =
-  "font-nav-display h-11 w-full border-0 bg-black/8 shadow-none sm:w-auto";
 
 export default function CheckoutPage() {
   const router = useRouter();
   const proofRef = useRef<HTMLInputElement>(null);
   const { cart, products, cartTotal, placeOrder, bankDetails } = useStore();
-
   const [step, setStep] = useState<Step>(1);
   const [submitting, setSubmitting] = useState(false);
   const [payment, setPayment] = useState<PaymentMethod>("cod");
   const [notes, setNotes] = useState("");
   const [paymentProof, setPaymentProof] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
-  const [details, setDetails] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    address: "",
-    city: "",
-    country: "Pakistan",
-  });
+  const [details, setDetails] = useState(emptyDetails);
+  const [detailsReady, setDetailsReady] = useState(false);
+
+  useEffect(() => {
+    try {
+      const raw = window.localStorage.getItem(DETAILS_KEY);
+      if (raw) {
+        const saved = JSON.parse(raw) as SavedDetails;
+        setDetails({
+          name: saved.name || "",
+          email: saved.email || "",
+          phone: saved.phone || "",
+          address: saved.address || "",
+          city: saved.city || "",
+          country: saved.country || "Pakistan",
+        });
+        if (typeof saved.notes === "string") setNotes(saved.notes);
+      }
+    } catch {
+      /* ignore corrupt storage */
+    }
+    setDetailsReady(true);
+  }, []);
+
+  useEffect(() => {
+    if (!detailsReady) return;
+    try {
+      const payload: SavedDetails = { ...details, notes };
+      window.localStorage.setItem(DETAILS_KEY, JSON.stringify(payload));
+    } catch {
+      /* ignore quota */
+    }
+  }, [details, notes, detailsReady]);
 
   const lines = cart
     .map((item) => {
@@ -114,6 +287,18 @@ export default function CheckoutPage() {
 
   const shipping = cartTotal >= 15000 ? 0 : 250;
   const total = cartTotal + shipping;
+
+  function goBack() {
+    if (step === 3) {
+      setStep(2);
+      return;
+    }
+    if (step === 2) {
+      setStep(1);
+      return;
+    }
+    router.back();
+  }
 
   async function onProofSelected(files: FileList | null) {
     const file = files?.[0];
@@ -165,7 +350,7 @@ export default function CheckoutPage() {
   }
 
   async function onComplete() {
-    if (lines.length === 0) return;
+    if (lines.length === 0 || submitting) return;
     if (payment === "bank" && !paymentProof) {
       toast.error("Attach your payment screenshot to continue");
       return;
@@ -225,7 +410,7 @@ export default function CheckoutPage() {
         <div className="relative text-center">
           <button
             type="button"
-            onClick={() => router.back()}
+            onClick={goBack}
             className="absolute top-0.5 left-0 inline-flex size-9 items-center justify-center text-foreground/70 transition-colors hover:text-foreground"
             aria-label="Go back"
           >
@@ -374,6 +559,20 @@ export default function CheckoutPage() {
 
             {step === 2 ? (
               <div className="flex flex-col gap-3">
+                <div className="rounded-md bg-black/[0.04] px-3 py-3 text-center">
+                  <p className="text-[11px] tracking-wide text-muted-foreground">
+                    Amount to pay
+                  </p>
+                  <p className="mt-1 font-nav-display text-[28px] leading-none tracking-tight tabular-nums sm:text-[32px]">
+                    {formatPrice(total)}
+                  </p>
+                  <p className="mt-1.5 text-[11px] text-muted-foreground">
+                    {shipping === 0
+                      ? "Includes free shipping"
+                      : `Includes ${formatPrice(shipping)} shipping`}
+                  </p>
+                </div>
+
                 <div
                   role="tablist"
                   aria-label="Payment method"
@@ -523,27 +722,26 @@ export default function CheckoutPage() {
             ) : null}
 
             {step === 3 ? (
-              <div className="flex min-h-[calc(100svh-8.5rem)] flex-col gap-3 sm:min-h-0 sm:gap-4">
-                <div className="min-h-0 flex-1 overflow-y-auto rounded-md bg-black/[0.03] p-1 sm:overflow-visible sm:bg-transparent sm:p-0">
+              <div className="flex min-h-[calc(100svh-8.5rem)] flex-col gap-3 sm:min-h-0">
+                <div className="min-h-0 flex-1 overflow-hidden rounded-md bg-black/[0.03] px-2.5 py-2 sm:overflow-visible sm:bg-transparent sm:p-0">
                   <StoreReceipt
+                    compact
                     lines={checkoutReceiptLines(lines)}
                     shipping={shipping}
                     total={total}
                     payment={payment}
                     customer={details}
                     notes={notes}
-                    bankDetails={payment === "bank" ? bankDetails : undefined}
                     paymentProof={payment === "bank" ? paymentProof : null}
                   />
                 </div>
-                <Button
-                  type="button"
-                  className={cn(btnClass, "mt-auto shrink-0")}
-                  disabled={submitting}
-                  onClick={onComplete}
-                >
-                  {submitting ? "Placing…" : "Complete order"}
-                </Button>
+                <div className="mt-auto shrink-0 pb-[env(safe-area-inset-bottom)]">
+                  <SwipeToComplete
+                    disabled={submitting}
+                    loading={submitting}
+                    onComplete={onComplete}
+                  />
+                </div>
               </div>
             ) : null}
           </div>

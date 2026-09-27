@@ -14,11 +14,18 @@ import type {
 
 type Line = { product: Product; quantity: number };
 
-function Rule({ heavy = false }: { heavy?: boolean }) {
+function Rule({
+  heavy = false,
+  compact = false,
+}: {
+  heavy?: boolean;
+  compact?: boolean;
+}) {
   return (
     <div
       className={cn(
-        "my-4 border-t",
+        "border-t",
+        compact ? "my-1.5" : "my-4",
         heavy ? "border-foreground/35" : "border-dashed border-foreground/15"
       )}
       aria-hidden
@@ -44,8 +51,10 @@ export function ReceiptBrand({ className }: { className?: string }) {
 
 function CustomerBlock({
   customer,
+  compact = false,
 }: {
   customer: Partial<CustomerInfo>;
+  compact?: boolean;
 }) {
   const name = customer.name?.trim();
   const email = customer.email?.trim();
@@ -56,6 +65,21 @@ function CustomerBlock({
 
   if (!name && !email && !phone && !address && !city && !country) {
     return null;
+  }
+
+  if (compact) {
+    return (
+      <div className="rounded-md bg-black/[0.035] px-2.5 py-2">
+        {name ? (
+          <p className="text-[13px] leading-tight text-foreground">{name}</p>
+        ) : null}
+        <p className="mt-0.5 line-clamp-2 text-[11px] leading-snug text-muted-foreground">
+          {[phone, email, address, [city, country].filter(Boolean).join(", ")]
+            .filter(Boolean)
+            .join(" · ")}
+        </p>
+      </div>
+    );
   }
 
   return (
@@ -88,6 +112,7 @@ export function StoreReceipt({
   orderId,
   createdAt,
   onDownload,
+  compact = false,
 }: {
   lines: { name: string; quantity: number; price: number; key: string }[];
   shipping: number;
@@ -100,6 +125,7 @@ export function StoreReceipt({
   orderId?: string;
   createdAt?: string;
   onDownload?: () => void;
+  compact?: boolean;
 }) {
   const subtotal = total - shipping;
   const hasCustomer = Boolean(
@@ -112,7 +138,14 @@ export function StoreReceipt({
   );
 
   return (
-    <div className="relative mx-auto w-full max-w-[340px] px-1 py-2 text-[13px] leading-relaxed text-foreground normal-case">
+    <div
+      className={cn(
+        "relative mx-auto w-full max-w-[340px] text-foreground normal-case",
+        compact
+          ? "px-0.5 py-0 text-[12px] leading-snug"
+          : "px-1 py-2 text-[13px] leading-relaxed"
+      )}
+    >
       {onDownload ? (
         <button
           type="button"
@@ -126,26 +159,44 @@ export function StoreReceipt({
       ) : null}
 
       <div className="text-center">
-        <ReceiptBrand />
+        {compact ? (
+          <Image
+            src={brand.wordmark}
+            alt={brand.name}
+            width={160}
+            height={36}
+            className="mx-auto h-6 w-auto object-contain brightness-0"
+            unoptimized
+          />
+        ) : (
+          <ReceiptBrand />
+        )}
         {orderId ? (
-          <div className="mt-4 space-y-1 text-[11px] text-muted-foreground">
+          <div
+            className={cn(
+              "space-y-0.5 text-[11px] text-muted-foreground",
+              compact ? "mt-1.5" : "mt-4"
+            )}
+          >
             <p>
               <span className="text-muted-foreground/75">Order</span>{" "}
               <span className="text-foreground">{orderId}</span>
             </p>
             {createdAt ? <p>{formatDate(createdAt)}</p> : null}
           </div>
-        ) : (
+        ) : compact ? null : (
           <p className="mt-3 text-[12px] text-muted-foreground">Receipt</p>
         )}
       </div>
 
-      <Rule />
+      <Rule compact={compact} />
 
-      {hasCustomer && customer ? <CustomerBlock customer={customer} /> : null}
-      {hasCustomer ? <Rule /> : null}
+      {hasCustomer && customer ? (
+        <CustomerBlock customer={customer} compact={compact} />
+      ) : null}
+      {hasCustomer ? <Rule compact={compact} /> : null}
 
-      <div className="space-y-2.5">
+      <div className={cn(compact ? "space-y-1" : "space-y-2.5")}>
         {lines.map((line) => (
           <div key={line.key} className="flex justify-between gap-3">
             <span className="min-w-0 flex-1 truncate text-muted-foreground">
@@ -158,9 +209,9 @@ export function StoreReceipt({
         ))}
       </div>
 
-      <Rule />
+      <Rule compact={compact} />
 
-      <div className="space-y-2">
+      <div className={cn(compact ? "space-y-0.5" : "space-y-2")}>
         <div className="flex justify-between gap-2">
           <span className="text-muted-foreground">Subtotal</span>
           <span className="tabular-nums">{formatPrice(subtotal)}</span>
@@ -177,21 +228,32 @@ export function StoreReceipt({
         </div>
       </div>
 
-      <Rule heavy />
+      <Rule heavy compact={compact} />
 
-      <div className="flex justify-between gap-2 text-[16px]">
+      <div
+        className={cn(
+          "flex justify-between gap-2",
+          compact ? "text-[15px]" : "text-[16px]"
+        )}
+      >
         <span>Total</span>
         <span className="tabular-nums">{formatPrice(total)}</span>
       </div>
 
-      {notes ? (
+      {notes && !compact ? (
         <>
           <Rule />
           <p className="text-[12px] text-muted-foreground">Note: {notes}</p>
         </>
       ) : null}
 
-      {payment === "bank" && bankDetails ? (
+      {notes && compact ? (
+        <p className="mt-1 truncate text-[11px] text-muted-foreground">
+          Note: {notes}
+        </p>
+      ) : null}
+
+      {payment === "bank" && bankDetails && !compact ? (
         <>
           <Rule />
           <div className="space-y-1 text-[12px]">
@@ -203,7 +265,7 @@ export function StoreReceipt({
         </>
       ) : null}
 
-      {paymentProof ? (
+      {paymentProof && !compact ? (
         <>
           <Rule />
           <p className="mb-2 text-[11px] text-muted-foreground">Payment proof</p>
@@ -216,9 +278,20 @@ export function StoreReceipt({
         </>
       ) : null}
 
-      <p className="mt-7 text-center text-[12px] text-muted-foreground">
-        Thank you
-      </p>
+      {paymentProof && compact ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={paymentProof}
+          alt="Payment proof"
+          className="mt-1.5 max-h-10 w-full rounded object-contain"
+        />
+      ) : null}
+
+      {!compact ? (
+        <p className="mt-7 text-center text-[12px] text-muted-foreground">
+          Thank you
+        </p>
+      ) : null}
     </div>
   );
 }

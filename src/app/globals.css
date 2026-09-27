@@ -51,6 +51,7 @@
   --animate-page-fade: page-fade 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
   --animate-page-enter: page-enter 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
   --animate-checkout-enter: checkout-enter 0.85s cubic-bezier(0.22, 1, 0.36, 1) both;
+  --animate-swipe-hint: swipe-hint 2.4s ease-in-out infinite;
   --animate-thank-bag: thank-bag 0.85s cubic-bezier(0.22, 1.2, 0.36, 1) both;
   --animate-order-cart: order-cart 0.9s cubic-bezier(0.22, 1.15, 0.36, 1) both;
   --animate-cart-wiggle: cart-wiggle 0.7s ease-in-out 0.9s 2;
@@ -152,6 +153,23 @@
   }
   to {
     opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes swipe-hint {
+  0%,
+  12% {
+    transform: translateX(0);
+  }
+  45% {
+    transform: translateX(42%);
+  }
+  58% {
+    transform: translateX(42%);
+  }
+  82%,
+  100% {
     transform: translateX(0);
   }
 }
