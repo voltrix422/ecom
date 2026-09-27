@@ -8,25 +8,30 @@ import { useStore } from "@/lib/store";
 import { cn } from "cn";
 
 const pillClass =
-  "pointer-events-auto inline-flex h-12 min-w-[3.85rem] flex-col items-center justify-center gap-0.5 rounded-xl border border-black/[0.06] bg-white px-3 text-[10px] font-semibold tracking-tight text-black shadow-[0_6px_20px_rgba(0,0,0,0.1)]";
+  "pointer-events-auto inline-flex h-11 min-w-[3.35rem] flex-col items-center justify-center gap-0.5 rounded-xl border border-black/[0.06] bg-white px-2 text-[10px] font-semibold tracking-tight text-black shadow-[0_6px_20px_rgba(0,0,0,0.1)]";
 
-const iconClass = "size-[18px] stroke-[2.25]";
+const iconClass = "size-[17px] stroke-[2.25]";
+
+type SearchPhase = "idle" | "expanded" | "typing";
 
 export function MobileBottomNav() {
   const pathname = usePathname();
   const router = useRouter();
   const { cartCount, ready, setCartOpen } = useStore();
   const count = ready ? cartCount : 0;
-  const [searchOpen, setSearchOpen] = useState(false);
+  const [phase, setPhase] = useState<SearchPhase>("idle");
   const [query, setQuery] = useState("");
   const searchRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => {
-    if (searchOpen) searchRef.current?.focus();
-  }, [searchOpen]);
+  const open = phase !== "idle";
+  const typing = phase === "typing";
 
   useEffect(() => {
-    setSearchOpen(false);
+    if (typing) searchRef.current?.focus();
+  }, [typing]);
+
+  useEffect(() => {
+    setPhase("idle");
     setQuery("");
   }, [pathname]);
 
@@ -34,11 +39,21 @@ export function MobileBottomNav() {
     event.preventDefault();
     const value = query.trim();
     router.push(value ? `/shop?q=${encodeURIComponent(value)}` : "/shop");
-    setSearchOpen(false);
+    setPhase("idle");
+  }
+
+  function onSearchTap() {
+    if (phase === "idle") {
+      setPhase("expanded");
+      return;
+    }
+    if (phase === "expanded") {
+      setPhase("typing");
+    }
   }
 
   function closeSearch() {
-    setSearchOpen(false);
+    setPhase("idle");
     setQuery("");
   }
 
@@ -46,7 +61,7 @@ export function MobileBottomNav() {
 
   return (
     <nav
-      className="pointer-events-none fixed inset-x-0 bottom-0 z-[60] flex items-end justify-center gap-1.5 px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] md:hidden"
+      className="pointer-events-none fixed inset-x-0 bottom-0 z-[60] flex items-end justify-center gap-1 px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] md:hidden"
       aria-label="Mobile"
     >
       <Link
@@ -54,7 +69,7 @@ export function MobileBottomNav() {
         className={cn(
           pillClass,
           "transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
-          searchOpen && "-translate-x-1.5",
+          open && "-translate-x-2",
           !isHome && "text-black/75"
         )}
         aria-label="Home"
@@ -67,13 +82,13 @@ export function MobileBottomNav() {
         onSubmit={submitSearch}
         className={cn(
           pillClass,
-          "overflow-hidden transition-[width,min-width,padding,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
-          searchOpen
-            ? "h-12 min-w-[min(58vw,13.5rem)] flex-row justify-start gap-2 px-3"
-            : "min-w-[3.85rem]"
+          "overflow-hidden transition-[min-width,padding,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
+          open
+            ? "h-11 min-w-[min(52vw,12.5rem)] flex-row justify-start gap-1.5 px-2.5"
+            : "min-w-[3.35rem]"
         )}
       >
-        {searchOpen ? (
+        {typing ? (
           <>
             <Search className={cn(iconClass, "shrink-0 text-black/55")} />
             <input
@@ -86,19 +101,19 @@ export function MobileBottomNav() {
             />
             <button
               type="button"
-              className="inline-flex size-7 shrink-0 items-center justify-center rounded-lg text-black/55"
+              className="inline-flex size-6 shrink-0 items-center justify-center text-black/55"
               aria-label="Close search"
               onClick={closeSearch}
             >
-              <X className="size-4 stroke-[2.25]" />
+              <X className="size-3.5 stroke-[2.25]" />
             </button>
           </>
         ) : (
           <button
             type="button"
-            onClick={() => setSearchOpen(true)}
+            onClick={onSearchTap}
             className="inline-flex h-full w-full flex-col items-center justify-center gap-0.5"
-            aria-label="Search"
+            aria-label={open ? "Type to search" : "Search"}
           >
             <Search className={iconClass} />
             <span>Search</span>
@@ -112,7 +127,7 @@ export function MobileBottomNav() {
         className={cn(
           pillClass,
           "relative text-black/75 transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
-          searchOpen && "translate-x-1.5"
+          open && "translate-x-2"
         )}
         aria-label="Bag"
       >

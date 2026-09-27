@@ -3,8 +3,6 @@
 import Link from "next/link";
 import { useMemo } from "react";
 import { MediaImage } from "@/components/media-image";
-import { usableCollectionSlides } from "@/lib/collection-slides";
-import { usableHeroBanners } from "@/lib/hero-storage";
 import { useStore } from "@/lib/store";
 import { cn } from "cn";
 
@@ -17,61 +15,20 @@ const ASPECTS = [
   "aspect-[2/3]",
 ] as const;
 
-type Pin = {
-  key: string;
-  href: string;
-  src: string;
-  title: string;
-  aspect: (typeof ASPECTS)[number];
-};
-
 export function HomePinGrid() {
-  const { products, heroBanners, collectionSlides, ready } = useStore();
+  const { products, ready } = useStore();
 
-  const pins = useMemo(() => {
-    const list: Pin[] = [];
-
-    products.forEach((product, index) => {
-      list.push({
-        key: `p-${product.id}`,
+  const pins = useMemo(
+    () =>
+      products.map((product, index) => ({
+        key: product.id,
         href: `/product/${product.slug}`,
         src: product.image,
         title: product.name,
         aspect: ASPECTS[index % ASPECTS.length],
-      });
-      if (product.fabric) {
-        list.push({
-          key: `f-${product.id}`,
-          href: `/product/${product.slug}`,
-          src: product.fabric,
-          title: `${product.name} fabric`,
-          aspect: ASPECTS[(index + 2) % ASPECTS.length],
-        });
-      }
-    });
-
-    usableHeroBanners(heroBanners).forEach((banner, index) => {
-      list.push({
-        key: `h-${banner.id}`,
-        href: "/shop",
-        src: banner.src,
-        title: "Look",
-        aspect: ASPECTS[(index + 1) % ASPECTS.length],
-      });
-    });
-
-    usableCollectionSlides(collectionSlides).forEach((slide, index) => {
-      list.push({
-        key: `c-${slide.id}`,
-        href: slide.href || "/shop",
-        src: slide.src,
-        title: slide.caption || "Collection",
-        aspect: ASPECTS[(index + 3) % ASPECTS.length],
-      });
-    });
-
-    return list;
-  }, [products, heroBanners, collectionSlides]);
+      })),
+    [products]
+  );
 
   if (!ready && pins.length === 0) {
     return (
@@ -90,7 +47,7 @@ export function HomePinGrid() {
   }
 
   return (
-    <section className="md:hidden" aria-label="Discover">
+    <section className="md:hidden" aria-label="Shop">
       <div className="columns-2 gap-3 px-3 pt-2 pb-28">
         {pins.map((pin, index) => (
           <Link
@@ -111,7 +68,6 @@ export function HomePinGrid() {
                 fit="cover"
                 priority={index < 4}
                 sizes="50vw"
-                className="transition-transform duration-500 group-hover:scale-[1.02]"
               />
             </div>
             <p className="mt-2 truncate px-0.5 text-[12px] leading-snug text-foreground">
