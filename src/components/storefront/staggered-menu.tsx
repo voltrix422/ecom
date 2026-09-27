@@ -9,6 +9,7 @@ import {
   useState,
 } from "react";
 import { gsap } from "gsap";
+import { flashPageVeil } from "@/components/page-veil";
 import "./staggered-menu.css";
 
 export type StaggeredMenuItem = {
@@ -555,6 +556,7 @@ export function StaggeredMenu({
                     aria-label={item.ariaLabel || item.label}
                     data-index={idx + 1}
                     onClick={() => {
+                      flashPageVeil();
                       onNavigate?.();
                       closeMenu();
                     }}

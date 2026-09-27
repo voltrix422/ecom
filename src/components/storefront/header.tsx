@@ -154,7 +154,7 @@ function AccountMenu() {
       >
         <div
           className={cn(
-            "origin-top-right overflow-hidden rounded-none border border-white/15 bg-black/55 text-white shadow-[0_24px_80px_rgba(0,0,0,0.45)] backdrop-blur-2xl backdrop-saturate-100 transition-[width,opacity,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
+            "origin-top-right overflow-hidden rounded-md border-0 bg-black/55 text-white shadow-[0_24px_80px_rgba(0,0,0,0.45)] backdrop-blur-2xl backdrop-saturate-100 transition-[width,opacity,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
             open
               ? "w-[min(92vw,320px)] scale-x-100 opacity-100"
               : "w-10 scale-x-0 opacity-0"
@@ -172,10 +172,13 @@ function AccountMenu() {
                     open ? "animate-account-link" : ""
                   )}
                   style={{ animationDelay: `${80 + index * 60}ms` }}
-                  onClick={() => setOpen(false)}
+                  onClick={() => {
+                    flashPageVeil();
+                    setOpen(false);
+                  }}
                 >
                   <Icon className="size-5 stroke-[1.25] text-white transition-transform duration-300 group-hover:-translate-y-0.5" />
-                  <span className="text-[10px] leading-tight tracking-[0.18em] text-white/85 uppercase">
+                  <span className="text-[10px] font-bold leading-tight tracking-[0.18em] text-white/90 uppercase">
                     {item.label}
                   </span>
                 </Link>

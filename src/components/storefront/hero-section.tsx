@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { usableHeroBanners } from "@/lib/hero-storage";
+import { flashPageVeil } from "@/components/page-veil";
 import { useStore } from "@/lib/store";
 import { cn } from "cn";
 
@@ -55,10 +56,11 @@ export function HeroSection() {
           <Link
             key={action.label}
             href={action.href}
-            className="group relative inline-flex h-12 min-w-[10rem] items-center justify-center overflow-hidden rounded-none border border-white/50 bg-black/45 px-8 text-[11px] tracking-[0.28em] text-white uppercase shadow-[0_16px_40px_rgba(0,0,0,0.35)] backdrop-blur-xl backdrop-saturate-100"
+            onClick={() => flashPageVeil()}
+            className="group relative inline-flex h-12 min-w-[10rem] items-center justify-center overflow-hidden rounded-md border-0 bg-black/45 px-8 text-[11px] font-bold tracking-[0.28em] text-white uppercase shadow-[0_16px_40px_rgba(0,0,0,0.35)] backdrop-blur-xl backdrop-saturate-100"
           >
             <span className="absolute inset-x-0 bottom-0 h-0 bg-white transition-[height] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:h-full" />
-            <span className="relative transition-colors duration-500 ease-out group-hover:text-black">
+            <span className="relative font-bold transition-colors duration-500 ease-out group-hover:text-black">
               {action.label}
             </span>
           </Link>

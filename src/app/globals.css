@@ -47,7 +47,8 @@
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
   --animate-sale-marquee: sale-marquee 22s linear infinite;
-  --animate-page-fade: page-fade 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+  --animate-page-fade: page-fade 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+  --animate-page-enter: page-enter 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
   --animate-thank-bag: thank-bag 0.85s cubic-bezier(0.22, 1.2, 0.36, 1) both;
   --animate-order-cart: order-cart 0.9s cubic-bezier(0.22, 1.15, 0.36, 1) both;
   --animate-cart-wiggle: cart-wiggle 0.7s ease-in-out 0.9s 2;
@@ -115,9 +116,26 @@
 @keyframes page-fade {
   from {
     opacity: 0;
+    transform: translateY(14px);
+    filter: blur(4px);
   }
   to {
     opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+
+@keyframes page-enter {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+    filter: blur(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
   }
 }
 

@@ -239,7 +239,7 @@
 .sm-panel-item {
   position: relative;
   color: #000;
-  font-weight: 600;
+  font-weight: 700;
   font-size: clamp(2rem, 5vw, 3.25rem);
   cursor: pointer;
   line-height: 1;

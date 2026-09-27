@@ -1,14 +1,24 @@
 "use client";
 
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
+import { Suspense } from "react";
 
-export function PageFade({ children }: { children: React.ReactNode }) {
+function PageFadeInner({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  if (pathname === "/") return children;
+  const searchParams = useSearchParams();
+  const key = `${pathname}?${searchParams.toString()}`;
 
   return (
-    <div key={pathname} className="animate-page-fade">
+    <div key={key} className="animate-page-enter">
       {children}
     </div>
+  );
+}
+
+export function PageFade({ children }: { children: React.ReactNode }) {
+  return (
+    <Suspense fallback={<>{children}</>}>
+      <PageFadeInner>{children}</PageFadeInner>
+    </Suspense>
   );
 }
