@@ -3,60 +3,28 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { MediaImage } from "@/components/media-image";
-import { SaleBadge } from "@/components/storefront/sale-badge";
-import { SalePrice } from "@/components/storefront/sale-price";
-import { Button } from "@/components/ui/button";
 import { cn } from "cn";
 import type { Product } from "@/lib/types";
 
 function FeaturedPanel({ product }: { product: Product }) {
   return (
-    <article className="flex h-full flex-col">
-      <div className="relative min-h-[42svh] flex-1 bg-muted/15 lg:min-h-[52svh]">
-        <SaleBadge tone="soft" />
-        <MediaImage
-          src={product.image}
-          alt={product.name}
-          fill
-          sizes="(min-width: 1024px) 50vw, 100vw"
-          className="object-contain p-5 md:p-8"
-        />
-      </div>
-
-      <div className="flex flex-1 flex-col px-5 py-8 md:px-8 md:py-10">
-        <p className="font-nav-display text-[12px] tracking-wide text-muted-foreground md:text-[13px]">
-          {product.category} · {product.color}
-        </p>
-        <h3 className="font-nav-display mt-2 text-[26px] leading-[1.05] tracking-tight text-foreground md:text-[32px]">
+    <Link
+      href={`/product/${product.slug}`}
+      className="group relative block min-h-[58svh] overflow-hidden bg-muted/15 lg:min-h-[72svh]"
+    >
+      <MediaImage
+        src={product.image}
+        alt={product.name}
+        fill
+        sizes="(min-width: 1024px) 50vw, 100vw"
+        className="object-contain p-6 transition-transform duration-700 group-hover:scale-[1.02] md:p-10"
+      />
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-background via-background/70 to-transparent px-6 pb-8 pt-20 md:px-8 md:pb-10">
+        <p className="font-nav-display text-[22px] tracking-tight text-foreground md:text-[28px]">
           {product.name}
-        </h3>
-        <div className="mt-3">
-          <SalePrice price={product.price} size="md" />
-        </div>
-        <p className="mt-4 line-clamp-3 text-[14px] leading-snug text-foreground/60 md:text-[15px]">
-          {product.description}
         </p>
-        <p className="mt-3 line-clamp-2 font-nav-display text-[11px] leading-snug tracking-wide text-foreground/40 md:text-[12px]">
-          {product.details.join(" · ")}
-        </p>
-        <div className="mt-auto flex flex-wrap gap-2.5 pt-7">
-          <Button asChild className="h-11 border-0 shadow-none">
-            <Link href={`/product/${product.slug}`}>
-              <span>View suit</span>
-            </Link>
-          </Button>
-          <Button
-            asChild
-            variant="outline"
-            className="h-11 border-0 bg-black/8 shadow-none"
-          >
-            <Link href={`/shop?category=${encodeURIComponent(product.category)}`}>
-              <span>Shop {product.category}</span>
-            </Link>
-          </Button>
-        </div>
       </div>
-    </article>
+    </Link>
   );
 }
 
