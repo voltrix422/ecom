@@ -47,32 +47,33 @@ export default function ComingSoonPage() {
 
   return (
     <main className="coming-soon fixed inset-0 overflow-hidden text-center">
-      <div className="absolute inset-0 z-0" aria-hidden>
+      <div className="coming-soon-glow absolute inset-0 z-0" aria-hidden />
+      <div className="absolute inset-0 z-[1]" aria-hidden>
         <LightRays
           raysOrigin="top-center"
           raysColor="#ffffff"
-          raysSpeed={1}
-          lightSpread={0.5}
-          rayLength={3}
-          followMouse
-          mouseInfluence={0.1}
+          raysSpeed={1.15}
+          lightSpread={0.7}
+          rayLength={2.8}
+          followMouse={false}
+          mouseInfluence={0}
           noiseAmount={0}
           distortion={0}
           pulsating={false}
-          fadeDistance={1}
+          fadeDistance={1.2}
           saturation={1}
           className="custom-rays"
         />
       </div>
 
-      <div className="relative z-10 flex h-full w-full flex-col items-center px-5 pt-[18svh] sm:justify-center sm:pt-0">
+      <div className="relative z-10 flex h-full w-full flex-col items-center px-5 pt-[16svh] sm:justify-center sm:pt-0">
         <div className="flex w-full max-w-md flex-col items-center">
           <Image
             src={brand.wordmark}
             alt={brand.name}
-            width={220}
-            height={48}
-            className="h-8 w-auto object-contain brightness-0 invert sm:h-10"
+            width={280}
+            height={64}
+            className="h-12 w-auto object-contain brightness-0 invert sm:h-14"
             priority
             unoptimized
           />
@@ -83,7 +84,7 @@ export default function ComingSoonPage() {
 
           <form
             onSubmit={onSubmit}
-            className="mt-6 flex w-full flex-row items-stretch gap-2 sm:mt-8"
+            className="mt-6 flex w-full flex-col gap-2.5 sm:mt-8"
           >
             <label className="sr-only" htmlFor="notify-email">
               Email
@@ -101,12 +102,12 @@ export default function ComingSoonPage() {
                 setEmail(e.target.value);
                 if (status !== "idle" && status !== "loading") setStatus("idle");
               }}
-              className="h-11 min-w-0 flex-1 rounded-full border border-white/20 bg-white/10 px-4 text-[13px] text-white outline-none placeholder:text-white/45 backdrop-blur-sm focus:border-white/45 sm:h-12 sm:px-5 sm:text-[14px]"
+              className="h-12 w-full rounded-full border border-white/20 bg-white/10 px-5 text-[14px] text-white outline-none placeholder:text-white/45 backdrop-blur-sm focus:border-white/45"
             />
             <button
               type="submit"
               disabled={status === "loading" || status === "done"}
-              className="font-nav-display h-11 shrink-0 rounded-full bg-white px-4 text-[11px] tracking-wide text-black transition-opacity disabled:opacity-60 sm:h-12 sm:px-6 sm:text-[12px]"
+              className="font-nav-display h-12 w-full rounded-full bg-white px-6 text-[12px] tracking-wide text-black transition-opacity disabled:opacity-60"
             >
               {status === "loading"
                 ? "Saving…"

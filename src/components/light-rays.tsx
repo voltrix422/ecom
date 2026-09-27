@@ -93,18 +93,22 @@ export default function LightRays({
   const animationIdRef = useRef<number | null>(null);
   const meshRef = useRef<Mesh | null>(null);
   const cleanupFunctionRef = useRef<(() => void) | null>(null);
-  const [isVisible, setIsVisible] = useState(false);
+  const [isVisible, setIsVisible] = useState(true);
   const observerRef = useRef<IntersectionObserver | null>(null);
 
   useEffect(() => {
     if (!containerRef.current) return;
+
+    // Full-screen / fixed backgrounds should start immediately; still
+    // pause when scrolled far off-screen.
+    setIsVisible(true);
 
     observerRef.current = new IntersectionObserver(
       (entries) => {
         const entry = entries[0];
         if (entry) setIsVisible(entry.isIntersecting);
       },
-      { threshold: 0.1 }
+      { threshold: 0 }
     );
 
     observerRef.current.observe(containerRef.current);
@@ -128,13 +132,31 @@ export default function LightRays({
     const initializeWebGL = async () => {
       if (!containerRef.current) return;
 
-      await new Promise((resolve) => setTimeout(resolve, 10));
+      // Wait for layout so mobile containers have real width/height.
+      for (let i = 0; i < 8; i++) {
+        await new Promise((resolve) => requestAnimationFrame(resolve));
+        if (!containerRef.current) return;
+        if (
+          containerRef.current.clientWidth > 0 &&
+          containerRef.current.clientHeight > 0
+        ) {
+          break;
+        }
+      }
 
       if (!containerRef.current) return;
+      if (
+        containerRef.current.clientWidth === 0 ||
+        containerRef.current.clientHeight === 0
+      ) {
+        return;
+      }
 
       const renderer = new Renderer({
-        dpr: Math.min(window.devicePixelRatio, 2),
+        dpr: Math.min(window.devicePixelRatio || 1, 2),
         alpha: true,
+        antialias: false,
+        powerPreference: "high-performance",
       });
       rendererRef.current = renderer;
 
