@@ -26,26 +26,26 @@ type Line = { product: Product; quantity: number };
 function StepDots({ step }: { step: Step }) {
   const labels = ["Details", "Payment", "Receipt"];
   return (
-    <div className="flex items-center justify-center gap-2 sm:gap-3">
+    <div className="flex items-center justify-center gap-1.5 sm:gap-2.5">
       {labels.map((label, index) => {
         const n = (index + 1) as Step;
         const active = step === n;
         const done = step > n;
         return (
-          <div key={label} className="flex items-center gap-2 sm:gap-3">
+          <div key={label} className="flex items-center gap-1.5 sm:gap-2.5">
             {index > 0 ? (
               <span
                 className={cn(
-                  "h-px w-5 sm:w-8",
+                  "h-px w-4 sm:w-6",
                   done || active ? "bg-foreground/40" : "bg-border/50"
                 )}
                 aria-hidden
               />
             ) : null}
-            <div className="flex items-center gap-1.5">
+            <div className="flex items-center gap-1">
               <span
                 className={cn(
-                  "inline-flex size-6 items-center justify-center rounded-full text-[12px] tabular-nums",
+                  "inline-flex size-5 items-center justify-center rounded-full text-[11px] tabular-nums sm:size-6 sm:text-[12px]",
                   done
                     ? "bg-black text-white"
                     : active
@@ -57,7 +57,7 @@ function StepDots({ step }: { step: Step }) {
               </span>
               <span
                 className={cn(
-                  "text-[12px] sm:text-[13px]",
+                  "text-[11px] sm:text-[12px]",
                   active
                     ? "text-foreground"
                     : done
@@ -76,12 +76,14 @@ function StepDots({ step }: { step: Step }) {
 }
 
 const fieldClass =
-  "h-10 rounded-md border-0 border-b border-border/50 bg-transparent px-0 text-[14px] normal-case shadow-none focus-visible:border-foreground focus-visible:ring-0";
+  "h-9 rounded-none border-0 border-b border-border/45 bg-transparent px-0 text-[14px] normal-case shadow-none focus-visible:border-foreground focus-visible:ring-0";
 
-const labelClass = "text-[12px] font-normal normal-case tracking-normal text-muted-foreground";
+const labelClass =
+  "text-[11px] font-normal normal-case tracking-normal text-muted-foreground";
 
-const btnClass = "font-nav-display h-11 border-0 shadow-none";
-const btnOutlineClass = "font-nav-display h-11 border-0 bg-black/8 shadow-none";
+const btnClass = "font-nav-display h-11 w-full border-0 shadow-none sm:w-auto";
+const btnOutlineClass =
+  "font-nav-display h-11 w-full border-0 bg-black/8 shadow-none sm:w-auto";
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -219,35 +221,41 @@ export default function CheckoutPage() {
 
   return (
     <StoreShell hideSaleBanner>
-      <div className="mx-auto max-w-6xl px-6 py-8 md:py-14">
+      <div className="mx-auto max-w-6xl px-4 pt-2 pb-8 sm:px-6 sm:pt-4 md:pt-8 md:pb-14">
         <div className="relative text-center">
           <button
             type="button"
             onClick={() => router.back()}
-            className="absolute top-1 left-0 inline-flex items-center gap-1.5 text-[13px] text-foreground/70 transition-colors hover:text-foreground"
+            className="absolute top-0.5 left-0 inline-flex size-9 items-center justify-center text-foreground/70 transition-colors hover:text-foreground"
             aria-label="Go back"
           >
             <ArrowLeft className="size-4 stroke-[1.75]" />
-            <span className="hidden sm:inline">Back</span>
           </button>
-          <h1 className="font-nav-display text-4xl tracking-tight md:text-5xl">
+          <h1 className="font-nav-display text-[28px] leading-none tracking-tight sm:text-4xl md:text-5xl">
             Checkout
           </h1>
-          <div className="mt-6">
+          <div className="mt-3 sm:mt-5">
             <StepDots step={step} />
           </div>
         </div>
 
-        <div className="mt-10 grid gap-10 lg:grid-cols-[minmax(0,1.05fr)_minmax(280px,0.85fr)] lg:items-start">
+        <div
+          className={cn(
+            "mt-5 sm:mt-8",
+            step === 3
+              ? "grid gap-6 lg:grid-cols-[minmax(0,1.05fr)_minmax(280px,0.85fr)] lg:items-start lg:gap-10"
+              : "mx-auto max-w-xl"
+          )}
+        >
           <div className="normal-case">
             {step === 1 ? (
               <form
                 onSubmit={goPayment}
-                className="space-y-4"
+                className="space-y-2.5 sm:space-y-3"
                 autoComplete="on"
               >
-                <div className="grid grid-cols-1 gap-x-4 gap-y-3 sm:grid-cols-3">
-                  <div className="space-y-1">
+                <div className="grid grid-cols-1 gap-x-3 gap-y-2 sm:grid-cols-2 sm:gap-y-2.5">
+                  <div className="space-y-0.5">
                     <Label htmlFor="name" className={labelClass}>
                       Name
                     </Label>
@@ -264,11 +272,8 @@ export default function CheckoutPage() {
                       className={fieldClass}
                     />
                   </div>
-                  <div className="space-y-1">
-                    <Label
-                      htmlFor="email"
-                      className={labelClass}
-                    >
+                  <div className="space-y-0.5">
+                    <Label htmlFor="email" className={labelClass}>
                       Email
                     </Label>
                     <Input
@@ -286,11 +291,8 @@ export default function CheckoutPage() {
                       className={fieldClass}
                     />
                   </div>
-                  <div className="space-y-1">
-                    <Label
-                      htmlFor="phone"
-                      className={labelClass}
-                    >
+                  <div className="space-y-0.5">
+                    <Label htmlFor="phone" className={labelClass}>
                       Phone
                     </Label>
                     <Input
@@ -307,31 +309,8 @@ export default function CheckoutPage() {
                       className={fieldClass}
                     />
                   </div>
-                  <div className="space-y-1">
-                    <Label
-                      htmlFor="address"
-                      className={labelClass}
-                    >
-                      Address
-                    </Label>
-                    <Input
-                      id="address"
-                      name="street-address"
-                      autoComplete="street-address"
-                      value={details.address}
-                      onChange={(e) =>
-                        setDetails((d) => ({ ...d, address: e.target.value }))
-                      }
-                      required
-                      aria-label="Address"
-                      className={fieldClass}
-                    />
-                  </div>
-                  <div className="space-y-1">
-                    <Label
-                      htmlFor="city"
-                      className={labelClass}
-                    >
+                  <div className="space-y-0.5">
+                    <Label htmlFor="city" className={labelClass}>
                       City
                     </Label>
                     <Input
@@ -347,11 +326,25 @@ export default function CheckoutPage() {
                       className={fieldClass}
                     />
                   </div>
-                  <div className="space-y-1">
-                    <Label
-                      htmlFor="country"
-                      className={labelClass}
-                    >
+                  <div className="space-y-0.5 sm:col-span-2">
+                    <Label htmlFor="address" className={labelClass}>
+                      Address
+                    </Label>
+                    <Input
+                      id="address"
+                      name="street-address"
+                      autoComplete="street-address"
+                      value={details.address}
+                      onChange={(e) =>
+                        setDetails((d) => ({ ...d, address: e.target.value }))
+                      }
+                      required
+                      aria-label="Address"
+                      className={fieldClass}
+                    />
+                  </div>
+                  <div className="space-y-0.5 sm:col-span-2">
+                    <Label htmlFor="country" className={labelClass}>
                       Country
                     </Label>
                     <Input
@@ -368,11 +361,8 @@ export default function CheckoutPage() {
                     />
                   </div>
                 </div>
-                <div className="space-y-1">
-                  <Label
-                    htmlFor="notes"
-                    className={labelClass}
-                  >
+                <div className="space-y-0.5">
+                  <Label htmlFor="notes" className={labelClass}>
                     Remarks
                   </Label>
                   <Textarea
@@ -380,35 +370,35 @@ export default function CheckoutPage() {
                     value={notes}
                     onChange={(e) => setNotes(e.target.value)}
                     aria-label="Order notes"
-                    className="min-h-16 rounded-md border-0 border-b border-border/50 bg-transparent px-0 text-[14px] normal-case shadow-none focus-visible:border-foreground focus-visible:ring-0"
+                    className="min-h-12 rounded-none border-0 border-b border-border/45 bg-transparent px-0 text-[14px] normal-case shadow-none focus-visible:border-foreground focus-visible:ring-0"
                   />
                 </div>
-                <Button type="submit" className={btnClass}>
+                <Button type="submit" className={cn("mt-2", btnClass)}>
                   Continue to payment
                 </Button>
               </form>
             ) : null}
 
             {step === 2 ? (
-              <div className="space-y-5">
-                <p className="text-[13px] tracking-wide text-muted-foreground">
+              <div className="space-y-3 sm:space-y-4">
+                <p className="text-[12px] tracking-wide text-muted-foreground">
                   Payment method
                 </p>
-                <div className="grid gap-3 sm:grid-cols-2">
+                <div className="grid gap-2 sm:grid-cols-2 sm:gap-3">
                   <button
                     type="button"
                     onClick={() => setPayment("cod")}
                     className={cn(
-                      "rounded-md border-0 px-4 py-5 text-left transition-colors",
+                      "rounded-md border-0 px-3.5 py-3.5 text-left transition-colors sm:px-4 sm:py-4",
                       payment === "cod"
                         ? "bg-black text-white"
                         : "bg-black/6 hover:bg-black/10"
                     )}
                   >
-                    <p className="text-[15px]">Cash on delivery</p>
+                    <p className="text-[14px] sm:text-[15px]">Cash on delivery</p>
                     <p
                       className={cn(
-                        "mt-1.5 text-[13px]",
+                        "mt-1 text-[12px] sm:text-[13px]",
                         payment === "cod"
                           ? "text-white/70"
                           : "text-muted-foreground"
@@ -421,16 +411,16 @@ export default function CheckoutPage() {
                     type="button"
                     onClick={() => setPayment("bank")}
                     className={cn(
-                      "rounded-md border-0 px-4 py-5 text-left transition-colors",
+                      "rounded-md border-0 px-3.5 py-3.5 text-left transition-colors sm:px-4 sm:py-4",
                       payment === "bank"
                         ? "bg-black text-white"
                         : "bg-black/6 hover:bg-black/10"
                     )}
                   >
-                    <p className="text-[15px]">Bank transfer</p>
+                    <p className="text-[14px] sm:text-[15px]">Bank transfer</p>
                     <p
                       className={cn(
-                        "mt-1.5 text-[13px]",
+                        "mt-1 text-[12px] sm:text-[13px]",
                         payment === "bank"
                           ? "text-white/70"
                           : "text-muted-foreground"
@@ -442,8 +432,8 @@ export default function CheckoutPage() {
                 </div>
 
                 {payment === "bank" ? (
-                  <div className="space-y-4 rounded-md bg-black/5 px-4 py-4">
-                    <div className="space-y-2 text-[14px]">
+                  <div className="space-y-3 rounded-md bg-black/5 px-3.5 py-3.5 sm:px-4 sm:py-4">
+                    <div className="space-y-1.5 text-[13px] sm:text-[14px]">
                       <div className="flex justify-between gap-3">
                         <span className="text-muted-foreground">Bank</span>
                         <span>{bankDetails.bankName}</span>
@@ -456,7 +446,7 @@ export default function CheckoutPage() {
                       </div>
                       <div className="flex justify-between gap-3">
                         <span className="text-muted-foreground">IBAN</span>
-                        <span className="text-[13px] tracking-wide">
+                        <span className="text-[12px] tracking-wide sm:text-[13px]">
                           {bankDetails.iban}
                         </span>
                       </div>
@@ -485,77 +475,77 @@ export default function CheckoutPage() {
                             : "Attach payment screenshot"}
                       </Button>
                       {paymentProof ? (
-                        <div className="mt-3">
+                        <div className="mt-2.5">
                           {/* eslint-disable-next-line @next/next/no-img-element */}
                           <img
                             src={paymentProof}
                             alt="Payment proof preview"
-                            className="max-h-40 object-contain"
+                            className="max-h-32 object-contain sm:max-h-40"
                           />
-                          <p className="mt-3 text-[13px] text-muted-foreground">
+                          <p className="mt-2 text-[12px] text-muted-foreground sm:text-[13px]">
                             Payment usually confirmed within 3 hours after you
                             place the order.
                           </p>
                         </div>
                       ) : (
-                        <p className="mt-2 text-[13px] text-muted-foreground">
+                        <p className="mt-1.5 text-[12px] text-muted-foreground sm:text-[13px]">
                           Upload a clear screenshot of your transfer to continue.
                         </p>
                       )}
                     </div>
                   </div>
                 ) : (
-                  <div className="relative overflow-hidden rounded-md bg-black/5 px-5 py-5 sm:px-6 sm:py-6">
+                  <div className="relative overflow-hidden rounded-md bg-black/5 px-3.5 py-3.5 sm:px-5 sm:py-5">
                     <div className="flex items-start justify-between gap-3">
-                      <p className="text-[13px] tracking-wide text-muted-foreground">
+                      <p className="text-[12px] tracking-wide text-muted-foreground">
                         Delivery details
                       </p>
                       <button
                         type="button"
                         onClick={() => setStep(1)}
-                        className="text-[13px] text-muted-foreground transition-colors hover:text-foreground"
+                        className="text-[12px] text-muted-foreground transition-colors hover:text-foreground sm:text-[13px]"
                       >
                         Edit
                       </button>
                     </div>
 
-                    <div className="mt-5 grid gap-5 sm:grid-cols-2">
-                      <div className="space-y-1">
-                        <p className="text-[11px] tracking-wide text-muted-foreground/80">
+                    <div className="mt-3 grid gap-3 sm:mt-4 sm:grid-cols-2 sm:gap-4">
+                      <div className="space-y-0.5">
+                        <p className="text-[10px] tracking-wide text-muted-foreground/80">
                           Name
                         </p>
-                        <p className="text-[18px] leading-snug tracking-tight">
+                        <p className="text-[15px] leading-snug tracking-tight sm:text-[18px]">
                           {details.name || "—"}
                         </p>
                       </div>
-                      <div className="space-y-1">
-                        <p className="text-[11px] tracking-wide text-muted-foreground/80">
+                      <div className="space-y-0.5">
+                        <p className="text-[10px] tracking-wide text-muted-foreground/80">
                           Phone
                         </p>
-                        <p className="text-[14px] tabular-nums">
+                        <p className="text-[13px] tabular-nums sm:text-[14px]">
                           {details.phone || "—"}
                         </p>
                       </div>
-                      <div className="space-y-1 sm:col-span-2">
-                        <p className="text-[11px] tracking-wide text-muted-foreground/80">
+                      <div className="space-y-0.5 sm:col-span-2">
+                        <p className="text-[10px] tracking-wide text-muted-foreground/80">
                           Email
                         </p>
-                        <p className="break-all text-[14px]">
+                        <p className="break-all text-[13px] sm:text-[14px]">
                           {details.email || "—"}
                         </p>
                       </div>
                     </div>
 
-                    <div className="my-5 h-px bg-black/10" aria-hidden />
+                    <div className="my-3 h-px bg-black/10 sm:my-4" aria-hidden />
 
-                    <div className="space-y-1">
-                      <p className="text-[11px] tracking-wide text-muted-foreground/80">
+                    <div className="space-y-0.5">
+                      <p className="text-[10px] tracking-wide text-muted-foreground/80">
                         Address
                       </p>
-                      <p className="text-[14px] leading-relaxed">
+                      <p className="text-[13px] leading-relaxed sm:text-[14px]">
                         {details.address || "—"}
                       </p>
-                      <p className="pt-0.5 text-[14px] text-muted-foreground">
+                      <p className="pt-0.5 text-[13px] text-muted-foreground sm:text-[14px]">
                         {[details.city, details.country]
                           .filter(Boolean)
                           .join(", ") || "—"}
@@ -564,7 +554,7 @@ export default function CheckoutPage() {
                   </div>
                 )}
 
-                <div className="flex flex-wrap gap-2.5">
+                <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:gap-2.5">
                   <Button
                     type="button"
                     variant="outline"
@@ -585,50 +575,46 @@ export default function CheckoutPage() {
             ) : null}
 
             {step === 3 ? (
-              <div className="space-y-5">
-                <div className="relative overflow-hidden rounded-md bg-black/5 px-5 py-5 sm:px-6 sm:py-6">
-                  <p className="text-[13px] tracking-wide text-muted-foreground">
+              <div className="space-y-4 sm:space-y-5">
+                <div className="relative overflow-hidden rounded-md bg-black/5 px-4 py-4 sm:px-5 sm:py-5">
+                  <p className="text-[12px] tracking-wide text-muted-foreground sm:text-[13px]">
                     Confirm order
                   </p>
                   {payment === "bank" ? (
-                    <div className="mt-3 space-y-3">
-                      <p className="text-[28px] leading-snug tracking-tight md:text-[32px]">
+                    <div className="mt-2 space-y-2 sm:mt-3 sm:space-y-3">
+                      <p className="text-[22px] leading-snug tracking-tight sm:text-[28px] md:text-[32px]">
                         Ready to place your order
                       </p>
-                      <p className="max-w-md text-[14px] leading-relaxed text-muted-foreground">
+                      <p className="max-w-md text-[13px] leading-relaxed text-muted-foreground sm:text-[14px]">
                         Your transfer proof is attached. Confirmation usually
                         takes up to 3 hours after you place the order.
                       </p>
-                      <div className="border-t border-black/10 pt-3">
-                        <p className={labelClass}>
-                          Tracking ID
-                        </p>
-                        <p className="mt-1 text-[14px] text-foreground">
+                      <div className="border-t border-black/10 pt-2.5 sm:pt-3">
+                        <p className={labelClass}>Tracking ID</p>
+                        <p className="mt-0.5 text-[13px] text-foreground sm:text-[14px]">
                           You’ll get yours on the next screen.
                         </p>
                       </div>
                     </div>
                   ) : (
-                    <div className="mt-3 space-y-3">
-                      <p className="text-[28px] leading-snug tracking-tight md:text-[32px]">
+                    <div className="mt-2 space-y-2 sm:mt-3 sm:space-y-3">
+                      <p className="text-[22px] leading-snug tracking-tight sm:text-[28px] md:text-[32px]">
                         Review your receipt
                       </p>
-                      <p className="max-w-md text-[14px] leading-relaxed text-muted-foreground">
+                      <p className="max-w-md text-[13px] leading-relaxed text-muted-foreground sm:text-[14px]">
                         Then place your cash-on-delivery order. Pay when the
                         parcel arrives.
                       </p>
-                      <div className="border-t border-black/10 pt-3">
-                        <p className={labelClass}>
-                          Tracking ID
-                        </p>
-                        <p className="mt-1 text-[14px] text-foreground">
+                      <div className="border-t border-black/10 pt-2.5 sm:pt-3">
+                        <p className={labelClass}>Tracking ID</p>
+                        <p className="mt-0.5 text-[13px] text-foreground sm:text-[14px]">
                           You’ll get yours on the next screen.
                         </p>
                       </div>
                     </div>
                   )}
                 </div>
-                <div className="flex flex-wrap gap-2.5">
+                <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:gap-2.5">
                   <Button
                     type="button"
                     variant="outline"
@@ -650,20 +636,22 @@ export default function CheckoutPage() {
             ) : null}
           </div>
 
-          <aside className="lg:sticky lg:top-24">
-            <StoreReceipt
-              lines={checkoutReceiptLines(lines)}
-              shipping={shipping}
-              total={total}
-              payment={payment}
-              customer={details}
-              notes={notes}
-              bankDetails={payment === "bank" ? bankDetails : undefined}
-              paymentProof={
-                payment === "bank" && step >= 2 ? paymentProof : null
-              }
-            />
-          </aside>
+          {step === 3 ? (
+            <aside className="lg:sticky lg:top-24">
+              <StoreReceipt
+                lines={checkoutReceiptLines(lines)}
+                shipping={shipping}
+                total={total}
+                payment={payment}
+                customer={details}
+                notes={notes}
+                bankDetails={payment === "bank" ? bankDetails : undefined}
+                paymentProof={
+                  payment === "bank" ? paymentProof : null
+                }
+              />
+            </aside>
+          ) : null}
         </div>
       </div>
     </StoreShell>
