@@ -7,9 +7,13 @@ function PageFadeInner({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const key = `${pathname}?${searchParams.toString()}`;
+  const isCheckout = pathname === "/checkout";
 
   return (
-    <div key={key} className="animate-page-enter">
+    <div
+      key={key}
+      className={isCheckout ? "animate-checkout-enter" : "animate-page-enter"}
+    >
       {children}
     </div>
   );

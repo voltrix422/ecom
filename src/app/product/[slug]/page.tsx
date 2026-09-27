@@ -96,10 +96,10 @@ export default function ProductPage({
     <StoreShell>
       {/* Mobile detail layout */}
       <div className="md:hidden">
-        <div className="flex h-[calc(100lvh-4rem)] max-h-[calc(100lvh-4rem)] flex-col">
+        <div className="flex h-[calc(100svh-4rem)] max-h-[calc(100svh-4rem)] flex-col">
           <div
             ref={mobileGalleryRef}
-            className="relative min-h-0 w-full flex-1 bg-white"
+            className="relative min-h-0 w-full flex-[1_1_0%] bg-white"
           >
             <MediaImage
               src={currentSrc}
@@ -112,14 +112,14 @@ export default function ProductPage({
           </div>
 
           {gallery.length > 1 ? (
-            <div className="flex shrink-0 gap-2 overflow-x-auto px-3 pt-1">
+            <div className="flex shrink-0 gap-1.5 overflow-x-auto px-3 pt-0.5">
               {gallery.map((src, index) => (
                 <button
                   key={`${src.slice(0, 32)}-${index}`}
                   type="button"
                   onClick={() => setActiveImage(index)}
                   className={cn(
-                    "relative h-10 w-7 shrink-0 overflow-hidden rounded-md border",
+                    "relative h-9 w-6 shrink-0 overflow-hidden rounded-sm border",
                     activeImage === index
                       ? "border-foreground"
                       : "border-transparent opacity-70"
@@ -130,25 +130,25 @@ export default function ProductPage({
                     alt={`${piece.name} ${index + 1}`}
                     fill
                     fit="cover"
-                    sizes="28px"
+                    sizes="24px"
                   />
                 </button>
               ))}
             </div>
           ) : null}
 
-          <div className="shrink-0 px-4 pt-1 pb-[max(0.5rem,env(safe-area-inset-bottom))]">
+          <div className="shrink-0 px-4 pt-0.5 pb-[max(0.35rem,env(safe-area-inset-bottom))]">
             <div className="flex items-center gap-0.5 text-foreground">
               <button
                 type="button"
                 onClick={toggleLike}
-                className="inline-flex size-10 items-center justify-center text-foreground"
+                className="inline-flex size-9 items-center justify-center text-foreground"
                 aria-label={liked ? "Remove from wishlist" : "Save to wishlist"}
                 aria-pressed={liked}
               >
                 <Heart
                   className={cn(
-                    "size-5 text-foreground transition-transform",
+                    "size-[18px] text-foreground transition-transform",
                     liked && "fill-foreground scale-110"
                   )}
                   strokeWidth={1.7}
@@ -160,40 +160,40 @@ export default function ProductPage({
                 onClick={handleAddToBag}
                 disabled={piece.stock <= 0}
                 className={cn(
-                  "inline-flex size-10 items-center justify-center text-foreground transition-transform disabled:opacity-40",
+                  "inline-flex size-9 items-center justify-center text-foreground transition-transform disabled:opacity-40",
                   bagPulse && "scale-110"
                 )}
                 aria-label="Add to bag"
               >
                 <ShoppingBag
-                  className="size-5 text-foreground"
+                  className="size-[18px] text-foreground"
                   strokeWidth={1.7}
                 />
               </button>
 
-              <div className="inline-flex size-10 items-center justify-center">
+              <div className="inline-flex size-9 items-center justify-center">
                 <ProductShare
                   product={piece}
-                  className="size-10 rounded-none text-foreground hover:bg-transparent hover:text-foreground [&_svg]:size-5"
+                  className="size-9 rounded-none text-foreground hover:bg-transparent hover:text-foreground [&_svg]:size-[18px]"
                 />
               </div>
 
-              <p className="ml-auto font-nav-display text-[18px] font-semibold tracking-tight text-foreground tabular-nums">
+              <p className="ml-auto font-nav-display text-[16px] font-semibold tracking-tight text-foreground tabular-nums">
                 {formatPrice(piece.price)}
               </p>
             </div>
 
-            <h1 className="mt-1 font-nav-display text-[20px] leading-none tracking-tight text-foreground">
+            <h1 className="mt-0.5 font-nav-display text-[18px] leading-none tracking-tight text-foreground">
               {piece.name}
             </h1>
 
-            <p className="mt-1 line-clamp-2 text-[12px] leading-snug text-foreground/55">
+            <p className="mt-0.5 line-clamp-1 text-[11px] leading-snug text-foreground/55">
               {piece.description}
             </p>
 
             <Button
               size="lg"
-              className="mt-2.5 h-12 w-full rounded-md border-0 bg-black text-[17px] font-bold tracking-wide text-white shadow-none hover:bg-black/90"
+              className="mt-2 h-11 w-full rounded-md border-0 bg-black text-[16px] font-bold tracking-wide text-white shadow-none hover:bg-black/90"
               disabled={piece.stock <= 0}
               onClick={handleBuy}
             >
@@ -205,7 +205,7 @@ export default function ProductPage({
         {related.length > 0 ? (
           <section className="px-4 pt-10 pb-6">
             <h2 className="font-nav-display text-xl">More like this</h2>
-            <div className="mt-5 grid grid-cols-2 gap-2">
+            <div className="mt-5 grid grid-cols-2 gap-x-2.5 gap-y-4">
               {related.map((item) => (
                 <ProductCard
                   key={item.id}

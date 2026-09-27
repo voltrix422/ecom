@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, useRef, useState } from "react";
-import { Upload } from "lucide-react";
+import { ArrowLeft, Upload } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "cn";
 import { StoreShell } from "@/components/storefront/store-shell";
@@ -196,6 +196,15 @@ export default function CheckoutPage() {
     return (
       <StoreShell hideSaleBanner>
         <div className="font-nav-display mx-auto max-w-6xl px-6 py-24">
+          <button
+            type="button"
+            onClick={() => router.back()}
+            className="mb-6 inline-flex items-center gap-1.5 text-[13px] text-foreground/70 transition-colors hover:text-foreground"
+            aria-label="Go back"
+          >
+            <ArrowLeft className="size-4 stroke-[1.75]" />
+            Back
+          </button>
           <h1 className="text-4xl tracking-tight md:text-5xl">Checkout</h1>
           <p className="mt-4 text-[14px] text-muted-foreground">Your bag is empty.</p>
           <Button asChild className={cn("mt-6", btnClass)}>
@@ -210,8 +219,17 @@ export default function CheckoutPage() {
 
   return (
     <StoreShell hideSaleBanner>
-      <div className="mx-auto max-w-6xl px-6 py-10 md:py-14">
-        <div className="text-center">
+      <div className="mx-auto max-w-6xl px-6 py-8 md:py-14">
+        <div className="relative text-center">
+          <button
+            type="button"
+            onClick={() => router.back()}
+            className="absolute top-1 left-0 inline-flex items-center gap-1.5 text-[13px] text-foreground/70 transition-colors hover:text-foreground"
+            aria-label="Go back"
+          >
+            <ArrowLeft className="size-4 stroke-[1.75]" />
+            <span className="hidden sm:inline">Back</span>
+          </button>
           <h1 className="font-nav-display text-4xl tracking-tight md:text-5xl">
             Checkout
           </h1>
