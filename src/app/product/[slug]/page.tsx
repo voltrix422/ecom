@@ -94,48 +94,49 @@ export default function ProductPage({
         </div>
 
         <div className="relative">
-          <div className="pointer-events-none absolute -inset-y-8 -left-10 -right-6 hidden bg-gradient-to-l from-background via-background/70 to-transparent lg:block" />
-          <div className="relative mb-6 flex justify-end">
+          <div className="relative mb-3 flex justify-end">
             <ProductShare product={product} />
           </div>
-          <div className="relative mt-24 max-w-md md:mt-40">
-            <h1 className="font-nav-display text-4xl leading-[0.95] text-foreground/90 md:text-5xl">
+          <div className="relative mt-6 max-w-md md:mt-10">
+            <h1 className="font-nav-display truncate whitespace-nowrap text-[28px] leading-none tracking-tight text-foreground/90 md:text-[34px]">
               {product.name}
             </h1>
-            <div className="mt-5">
-              <SalePrice price={product.price} size="md" />
+            <div className="mt-3">
+              <SalePrice price={product.price} size="md" className="gap-3" />
             </div>
-            <p className="mt-8 text-[16px] leading-7 text-foreground/60">
+            <p className="mt-4 text-[15px] leading-snug text-foreground/60">
               {product.description}
             </p>
-            <p className="mt-4 font-nav-display text-[12px] leading-5 text-foreground/40">
+            <p className="mt-2.5 font-nav-display text-[12px] leading-snug text-foreground/40">
               {product.details.join(" · ")}
             </p>
-            <div className="mt-8 flex w-full max-w-md flex-col gap-3">
-              <div className="flex h-12 w-full items-center justify-between rounded-md border border-black/15 px-2">
+            <div className="mt-6 flex w-full max-w-md flex-col gap-2.5">
+              <div className="flex h-11 w-fit items-center gap-0.5">
                 <button
                   type="button"
-                  className="inline-flex size-10 items-center justify-center text-lg hover:text-foreground"
+                  className="inline-flex size-9 items-center justify-center text-[20px] leading-none text-foreground/70 hover:text-foreground"
                   onClick={() => setQuantity((value) => Math.max(1, value - 1))}
+                  aria-label="Decrease quantity"
                 >
                   −
                 </button>
-                <span className="font-nav-display min-w-8 text-center text-[15px] tabular-nums text-foreground/80">
+                <span className="font-nav-display min-w-7 text-center text-[17px] tabular-nums text-foreground/85">
                   {quantity}
                 </span>
                 <button
                   type="button"
-                  className="inline-flex size-10 items-center justify-center text-lg hover:text-foreground"
+                  className="inline-flex size-9 items-center justify-center text-[20px] leading-none text-foreground/70 hover:text-foreground"
                   onClick={() =>
                     setQuantity((value) => Math.min(product.stock || 1, value + 1))
                   }
+                  aria-label="Increase quantity"
                 >
                   +
                 </button>
               </div>
               <Button
                 size="lg"
-                className="h-12 w-full"
+                className="h-12 w-full border-0 shadow-none"
                 disabled={product.stock <= 0}
                 onClick={() => {
                   addToCart(product.id, quantity);
@@ -150,7 +151,7 @@ export default function ProductPage({
               <Button
                 size="lg"
                 variant="outline"
-                className="h-12 w-full"
+                className="h-12 w-full border-0 bg-black/8 shadow-none"
                 disabled={product.stock <= 0}
                 onClick={() => {
                   addToCart(product.id, quantity);

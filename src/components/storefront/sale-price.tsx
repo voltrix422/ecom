@@ -20,15 +20,15 @@ export function SalePrice({
       <span
         className={cn(
           "text-foreground/30 line-through",
-          size === "md" ? "text-[15px]" : "text-[13px]"
+          size === "md" ? "text-[14px] tracking-wide" : "text-[13px]"
         )}
       >
         {formatPrice(price)}
       </span>
       <span
         className={cn(
-          "font-bold text-foreground/85",
-          size === "md" ? "text-[20px]" : "text-[16px]"
+          "font-semibold tracking-tight text-foreground/90",
+          size === "md" ? "text-[22px]" : "text-[16px]"
         )}
       >
         {formatPrice(salePrice(price))}
