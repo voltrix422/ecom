@@ -55,10 +55,10 @@ export function HeroSection() {
           <Link
             key={action.label}
             href={action.href}
-            className="group relative inline-flex h-12 min-w-[9.5rem] items-center justify-center overflow-hidden border border-white bg-white px-7 text-[11px] tracking-[0.24em] text-black uppercase"
+            className="group relative inline-flex h-12 min-w-[9.5rem] items-center justify-center overflow-hidden rounded-full border border-white/45 bg-white/25 px-7 text-[11px] tracking-[0.24em] text-white uppercase shadow-[0_10px_30px_rgba(0,0,0,0.18)] backdrop-blur-xl backdrop-saturate-150"
           >
-            <span className="absolute inset-x-0 bottom-0 h-0 bg-black transition-[height] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:h-full" />
-            <span className="relative transition-colors duration-500 ease-out group-hover:text-white">
+            <span className="absolute inset-x-0 bottom-0 h-0 bg-white/85 transition-[height] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:h-full" />
+            <span className="relative transition-colors duration-500 ease-out group-hover:text-black">
               {action.label}
             </span>
           </Link>

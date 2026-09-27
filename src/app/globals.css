@@ -56,6 +56,7 @@
   --animate-panel-in: panel-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
   --animate-panel-item: panel-item 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
   --animate-search-drop: search-drop 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+  --animate-account-link: account-link 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 @keyframes panel-in {
@@ -88,6 +89,17 @@
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@keyframes account-link {
+  from {
+    opacity: 0;
+    transform: translateX(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
   }
 }
 
