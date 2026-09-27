@@ -255,6 +255,22 @@
   html {
     @apply font-sans;
     scroll-behavior: auto;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0, 0, 0, 0.35) transparent;
+  }
+  *::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+  }
+  *::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  *::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.28);
+    border-radius: 999px;
+  }
+  *::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.45);
   }
   h1,
   h2,

@@ -32,7 +32,7 @@ export function HeroSection() {
   const safeIndex = count ? index % count : 0;
 
   return (
-    <section className="relative isolate -mt-16 h-[calc(100dvh-var(--announce-h,40px))] max-h-[calc(100dvh-var(--announce-h,40px))] overflow-hidden bg-[#e8e2da]">
+    <section className="relative isolate -mt-16 h-dvh max-h-dvh overflow-hidden bg-[#e8e2da]">
       {ready && count > 0
         ? slides.map((slide, slideIndex) => (
             <img
@@ -57,7 +57,7 @@ export function HeroSection() {
             href={action.href}
             className="group relative inline-flex h-12 min-w-[9.5rem] items-center justify-center overflow-hidden border border-white bg-white px-7 text-[11px] tracking-[0.24em] text-black uppercase"
           >
-            <span className="absolute inset-y-0 left-0 w-0 bg-black transition-[width] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:w-full" />
+            <span className="absolute inset-x-0 bottom-0 h-0 bg-black transition-[height] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:h-full" />
             <span className="relative transition-colors duration-500 ease-out group-hover:text-white">
               {action.label}
             </span>
