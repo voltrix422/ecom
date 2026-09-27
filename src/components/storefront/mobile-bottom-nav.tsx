@@ -17,14 +17,16 @@ type SearchPhase = "idle" | "expanded" | "typing";
 export function MobileBottomNav() {
   const pathname = usePathname();
   const router = useRouter();
-  const { cartCount, ready, setCartOpen } = useStore();
+  const { cartCount, ready, setCartOpen, cartOpen } = useStore();
   const count = ready ? cartCount : 0;
   const [phase, setPhase] = useState<SearchPhase>("idle");
   const [query, setQuery] = useState("");
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const searchRef = useRef<HTMLInputElement>(null);
 
   const open = phase !== "idle";
   const typing = phase === "typing";
+  const hideNotch = cartOpen || sidebarOpen;
 
   useEffect(() => {
     if (typing) searchRef.current?.focus();
@@ -34,6 +36,27 @@ export function MobileBottomNav() {
     setPhase("idle");
     setQuery("");
   }, [pathname]);
+
+  useEffect(() => {
+    const root = document.documentElement;
+    function sync() {
+      setSidebarOpen(root.dataset.sidebarOpen === "1");
+    }
+    sync();
+    const observer = new MutationObserver(sync);
+    observer.observe(root, {
+      attributes: true,
+      attributeFilter: ["data-sidebar-open"],
+    });
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (hideNotch) {
+      setPhase("idle");
+      setQuery("");
+    }
+  }, [hideNotch]);
 
   function submitSearch(event: React.FormEvent) {
     event.preventDefault();
@@ -58,6 +81,8 @@ export function MobileBottomNav() {
   }
 
   const isHome = pathname === "/";
+
+  if (hideNotch) return null;
 
   return (
     <nav

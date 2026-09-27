@@ -39,7 +39,7 @@ function HeaderLogo({
         src={brand.wordmark}
         alt="Ayesha's"
         className={cn(
-          "h-8 w-auto transition-[filter] duration-300 sm:h-9 md:h-10",
+          "h-10 w-auto transition-[filter] duration-300 sm:h-11 md:h-12",
           light ? "brightness-0 invert" : "brightness-0",
           className
         )}
@@ -281,6 +281,13 @@ export function Header({ hideSaleBanner = false }: { hideSaleBanner?: boolean })
     setSearchOpen(false);
   }, [pathname]);
 
+  useEffect(() => {
+    document.documentElement.dataset.sidebarOpen = menuOpen ? "1" : "";
+    return () => {
+      document.documentElement.dataset.sidebarOpen = "";
+    };
+  }, [menuOpen]);
+
   function submitSearch(event: React.FormEvent) {
     event.preventDefault();
     const value = search.trim();
@@ -293,18 +300,18 @@ export function Header({ hideSaleBanner = false }: { hideSaleBanner?: boolean })
       <header
         ref={headerRef}
         className={cn(
-          "sticky top-0 z-50 bg-white text-black transition-colors duration-300",
-          light && "md:bg-transparent md:text-white"
+          "sticky top-0 z-50 bg-transparent text-black transition-colors duration-300",
+          light && "md:text-white"
         )}
       >
         {/* Mobile: hamburger + logo left */}
-        <div className="relative flex h-12 items-center gap-0.5 px-2 md:hidden">
+        <div className="relative flex h-14 items-center gap-0.5 px-2 md:hidden">
           <Hamburger
             compact
             open={menuOpen}
             onClick={() => setMenuOpen((value) => !value)}
           />
-          <HeaderLogo light={false} className="h-6 sm:h-6" />
+          <HeaderLogo light={false} className="h-8 sm:h-8" />
         </div>
 
         {/* Desktop / tablet header */}
