@@ -2,7 +2,9 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { use, useRef, useState } from "react";
+import { use, useEffect, useRef, useState } from "react";
+import { Heart, ShoppingBag } from "lucide-react";
+import { toast } from "sonner";
 import { MediaImage } from "@/components/media-image";
 import { ProductCard } from "@/components/storefront/product-card";
 import { StoreShell } from "@/components/storefront/store-shell";
@@ -12,6 +14,11 @@ import { SaleBadge } from "@/components/storefront/sale-badge";
 import { SalePrice } from "@/components/storefront/sale-price";
 import { flyToCart } from "@/lib/fly-to-cart";
 import { useStore } from "@/lib/store";
+import { cn } from "cn";
+
+function likedKey(id: string) {
+  return `ayeshaswear:liked:${id}`;
+}
 
 export default function ProductPage({
   params,
@@ -24,7 +31,15 @@ export default function ProductPage({
   const product = getProduct(slug);
   const [quantity, setQuantity] = useState(1);
   const [activeImage, setActiveImage] = useState(0);
-  const galleryRef = useRef<HTMLDivElement>(null);
+  const [liked, setLiked] = useState(false);
+  const [bagPulse, setBagPulse] = useState(false);
+  const mobileGalleryRef = useRef<HTMLDivElement>(null);
+  const desktopGalleryRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!product) return;
+    setLiked(window.localStorage.getItem(likedKey(product.id)) === "1");
+  }, [product]);
 
   if (!product) {
     return (
@@ -48,22 +63,179 @@ export default function ProductPage({
   const related = products
     .filter((item) => item.category === product.category && item.id !== product.id)
     .slice(0, 3);
+  const currentSrc = gallery[Math.min(activeImage, gallery.length - 1)];
+
+  function galleryRect() {
+    if (typeof window === "undefined") return null;
+    const node =
+      window.innerWidth < 768
+        ? mobileGalleryRef.current
+        : desktopGalleryRef.current;
+    return node?.getBoundingClientRect() ?? null;
+  }
+
+  function toggleLike() {
+    const next = !liked;
+    setLiked(next);
+    window.localStorage.setItem(likedKey(product.id), next ? "1" : "0");
+    toast.success(next ? "Saved to wishlist" : "Removed from wishlist");
+  }
+
+  function handleAddToBag() {
+    addToCart(product.id, quantity);
+    setBagPulse(true);
+    window.setTimeout(() => setBagPulse(false), 500);
+    flyToCart(currentSrc, galleryRect());
+    toast.success("Added to bag");
+  }
+
+  function handleBuy() {
+    addToCart(product.id, quantity);
+    router.push("/checkout");
+  }
 
   return (
     <StoreShell>
-      <div className="mx-auto grid max-w-7xl items-start gap-10 px-6 pt-1 pb-6 lg:grid-cols-2 lg:gap-16 lg:pt-2 lg:pb-8">
+      {/* Mobile detail layout */}
+      <div className="md:hidden">
+        <div
+          ref={mobileGalleryRef}
+          className="relative h-[60svh] w-full bg-[#efeae4]"
+        >
+          <SaleBadge />
+          <MediaImage
+            src={currentSrc}
+            alt={product.name}
+            fill
+            priority
+            fit="cover"
+            sizes="100vw"
+          />
+        </div>
+
+        {gallery.length > 1 ? (
+          <div className="flex gap-2 overflow-x-auto px-3 pt-2">
+            {gallery.map((src, index) => (
+              <button
+                key={`${src.slice(0, 32)}-${index}`}
+                type="button"
+                onClick={() => setActiveImage(index)}
+                className={cn(
+                  "relative h-14 w-11 shrink-0 overflow-hidden rounded-md border",
+                  activeImage === index
+                    ? "border-foreground"
+                    : "border-transparent opacity-70"
+                )}
+              >
+                <MediaImage
+                  src={src}
+                  alt={`${product.name} ${index + 1}`}
+                  fill
+                  fit="cover"
+                  sizes="44px"
+                />
+              </button>
+            ))}
+          </div>
+        ) : null}
+
+        <div className="px-4 pt-3 pb-8">
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex items-center gap-1">
+              <button
+                type="button"
+                onClick={toggleLike}
+                className="inline-flex size-11 items-center justify-center text-foreground"
+                aria-label={liked ? "Remove from wishlist" : "Save to wishlist"}
+                aria-pressed={liked}
+              >
+                <Heart
+                  className={cn(
+                    "size-5 transition-transform",
+                    liked && "fill-foreground scale-110"
+                  )}
+                  strokeWidth={1.7}
+                />
+              </button>
+
+              <button
+                type="button"
+                onClick={handleAddToBag}
+                disabled={product.stock <= 0}
+                className={cn(
+                  "inline-flex size-11 items-center justify-center text-foreground transition-transform disabled:opacity-40",
+                  bagPulse && "scale-110"
+                )}
+                aria-label="Add to bag"
+              >
+                <ShoppingBag className="size-5" strokeWidth={1.7} />
+              </button>
+
+              <div className="inline-flex size-11 items-center justify-center [&_button]:size-11 [&_svg]:size-3.5">
+                <ProductShare product={product} />
+              </div>
+            </div>
+          </div>
+
+          <Button
+            size="lg"
+            className="mt-3 h-12 w-full rounded-md border-0 bg-black text-[14px] font-semibold tracking-wide text-white shadow-none hover:bg-black/90"
+            disabled={product.stock <= 0}
+            onClick={handleBuy}
+          >
+            Buy
+          </Button>
+
+          <h1 className="mt-5 font-nav-display text-[26px] leading-none tracking-tight text-foreground">
+            {product.name}
+          </h1>
+          <div className="mt-3">
+            <SalePrice price={product.price} size="md" className="gap-3" />
+          </div>
+          <p className="mt-3 text-[13px] leading-relaxed text-foreground/55">
+            {product.details.join(" · ")}
+          </p>
+
+          <div className="mt-5 flex h-11 items-center justify-center gap-1">
+            <button
+              type="button"
+              className="inline-flex size-10 items-center justify-center text-[22px] leading-none text-foreground/70"
+              onClick={() => setQuantity((value) => Math.max(1, value - 1))}
+              aria-label="Decrease quantity"
+            >
+              −
+            </button>
+            <span className="font-nav-display min-w-8 text-center text-[18px] tabular-nums">
+              {quantity}
+            </span>
+            <button
+              type="button"
+              className="inline-flex size-10 items-center justify-center text-[22px] leading-none text-foreground/70"
+              onClick={() =>
+                setQuantity((value) => Math.min(product.stock || 1, value + 1))
+              }
+              aria-label="Increase quantity"
+            >
+              +
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Desktop / tablet layout */}
+      <div className="mx-auto hidden max-w-7xl grid-cols-2 items-start gap-16 px-6 pt-2 pb-8 md:grid">
         <div>
           <div
-            ref={galleryRef}
-            className="relative h-[66svh] w-full lg:h-[calc(100svh-11rem)]"
+            ref={desktopGalleryRef}
+            className="relative h-[calc(100svh-11rem)] w-full"
           >
             <SaleBadge />
             <MediaImage
-              src={gallery[Math.min(activeImage, gallery.length - 1)]}
+              src={currentSrc}
               alt={product.name}
               fill
               priority
-              sizes="(min-width: 1024px) 50vw, 100vw"
+              sizes="50vw"
               className="object-contain"
             />
           </div>
@@ -97,8 +269,8 @@ export default function ProductPage({
           <div className="relative mb-3 flex justify-end">
             <ProductShare product={product} />
           </div>
-          <div className="relative mt-6 max-w-md md:mt-10">
-            <h1 className="font-nav-display truncate whitespace-nowrap text-[28px] leading-none tracking-tight text-foreground/90 md:text-[34px]">
+          <div className="relative mt-10 max-w-md">
+            <h1 className="font-nav-display truncate whitespace-nowrap text-[34px] leading-none tracking-tight text-foreground/90">
               {product.name}
             </h1>
             <div className="mt-3">
@@ -124,7 +296,9 @@ export default function ProductPage({
                   type="button"
                   className="inline-flex size-11 items-center justify-center text-[26px] leading-none text-foreground/75 hover:text-foreground"
                   onClick={() =>
-                    setQuantity((value) => Math.min(product.stock || 1, value + 1))
+                    setQuantity((value) =>
+                      Math.min(product.stock || 1, value + 1)
+                    )
                   }
                   aria-label="Increase quantity"
                 >
@@ -135,13 +309,7 @@ export default function ProductPage({
                 size="lg"
                 className="h-12 w-full border-0 shadow-none"
                 disabled={product.stock <= 0}
-                onClick={() => {
-                  addToCart(product.id, quantity);
-                  flyToCart(
-                    gallery[Math.min(activeImage, gallery.length - 1)],
-                    galleryRef.current?.getBoundingClientRect() ?? null
-                  );
-                }}
+                onClick={handleAddToBag}
               >
                 Add to bag
               </Button>
@@ -150,10 +318,7 @@ export default function ProductPage({
                 variant="outline"
                 className="h-12 w-full border-0 bg-black/8 shadow-none"
                 disabled={product.stock <= 0}
-                onClick={() => {
-                  addToCart(product.id, quantity);
-                  router.push("/checkout");
-                }}
+                onClick={handleBuy}
               >
                 Buy now
               </Button>
@@ -163,9 +328,11 @@ export default function ProductPage({
       </div>
 
       {related.length > 0 ? (
-        <section className="mx-auto max-w-7xl px-6 pb-20 pt-10">
-          <h2 className="font-nav-display text-3xl">More {product.category}</h2>
-          <div className="mt-8 grid gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
+        <section className="mx-auto max-w-7xl px-6 pt-6 pb-20 md:pt-10">
+          <h2 className="font-nav-display text-2xl md:text-3xl">
+            More {product.category}
+          </h2>
+          <div className="mt-6 grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:mt-8 lg:grid-cols-3 lg:gap-x-8 lg:gap-y-12">
             {related.map((item) => (
               <ProductCard key={item.id} product={item} badgeTone="soft" />
             ))}
