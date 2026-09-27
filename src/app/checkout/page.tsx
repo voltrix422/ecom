@@ -239,14 +239,7 @@ export default function CheckoutPage() {
           </div>
         </div>
 
-        <div
-          className={cn(
-            "mt-5 sm:mt-8",
-            step === 3
-              ? "grid gap-6 lg:grid-cols-[minmax(0,1.05fr)_minmax(280px,0.85fr)] lg:items-start lg:gap-10"
-              : "mx-auto max-w-xl"
-          )}
-        >
+        <div className="mx-auto mt-5 max-w-xl sm:mt-8">
           <div className="normal-case">
             {step === 1 ? (
               <form
@@ -380,278 +373,177 @@ export default function CheckoutPage() {
             ) : null}
 
             {step === 2 ? (
-              <div className="space-y-3 sm:space-y-4">
-                <p className="text-[12px] tracking-wide text-muted-foreground">
-                  Payment method
-                </p>
-                <div className="grid gap-2 sm:grid-cols-2 sm:gap-3">
-                  <button
-                    type="button"
-                    onClick={() => setPayment("cod")}
-                    className={cn(
-                      "rounded-md border-0 px-3.5 py-3.5 text-left transition-colors sm:px-4 sm:py-4",
-                      payment === "cod"
-                        ? "bg-black text-white"
-                        : "bg-black/6 hover:bg-black/10"
-                    )}
-                  >
-                    <p className="text-[14px] sm:text-[15px]">Cash on delivery</p>
-                    <p
-                      className={cn(
-                        "mt-1 text-[12px] sm:text-[13px]",
-                        payment === "cod"
-                          ? "text-white/70"
-                          : "text-muted-foreground"
-                      )}
-                    >
-                      Pay in cash when your order arrives.
-                    </p>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setPayment("bank")}
-                    className={cn(
-                      "rounded-md border-0 px-3.5 py-3.5 text-left transition-colors sm:px-4 sm:py-4",
-                      payment === "bank"
-                        ? "bg-black text-white"
-                        : "bg-black/6 hover:bg-black/10"
-                    )}
-                  >
-                    <p className="text-[14px] sm:text-[15px]">Bank transfer</p>
-                    <p
-                      className={cn(
-                        "mt-1 text-[12px] sm:text-[13px]",
-                        payment === "bank"
-                          ? "text-white/70"
-                          : "text-muted-foreground"
-                      )}
-                    >
-                      Transfer, then attach payment proof.
-                    </p>
-                  </button>
-                </div>
-
-                {payment === "bank" ? (
-                  <div className="space-y-3 rounded-md bg-black/5 px-3.5 py-3.5 sm:px-4 sm:py-4">
-                    <div className="space-y-1.5 text-[13px] sm:text-[14px]">
-                      <div className="flex justify-between gap-3">
-                        <span className="text-muted-foreground">Bank</span>
-                        <span>{bankDetails.bankName}</span>
-                      </div>
-                      <div className="flex justify-between gap-3">
-                        <span className="text-muted-foreground">
-                          Account title
-                        </span>
-                        <span>{bankDetails.accountTitle}</span>
-                      </div>
-                      <div className="flex justify-between gap-3">
-                        <span className="text-muted-foreground">IBAN</span>
-                        <span className="text-[12px] tracking-wide sm:text-[13px]">
-                          {bankDetails.iban}
-                        </span>
-                      </div>
-                    </div>
-
-                    <div>
-                      <input
-                        ref={proofRef}
-                        type="file"
-                        accept="image/*"
-                        className="hidden"
-                        onChange={(e) => onProofSelected(e.target.files)}
-                      />
-                      <Button
-                        type="button"
-                        variant="outline"
-                        className={btnOutlineClass}
-                        disabled={uploading}
-                        onClick={() => proofRef.current?.click()}
-                      >
-                        <Upload className="size-3.5" />
-                        {uploading
-                          ? "Uploading…"
-                          : paymentProof
-                            ? "Replace payment proof"
-                            : "Attach payment screenshot"}
-                      </Button>
-                      {paymentProof ? (
-                        <div className="mt-2.5">
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img
-                            src={paymentProof}
-                            alt="Payment proof preview"
-                            className="max-h-32 object-contain sm:max-h-40"
-                          />
-                          <p className="mt-2 text-[12px] text-muted-foreground sm:text-[13px]">
-                            Payment usually confirmed within 3 hours after you
-                            place the order.
-                          </p>
-                        </div>
-                      ) : (
-                        <p className="mt-1.5 text-[12px] text-muted-foreground sm:text-[13px]">
-                          Upload a clear screenshot of your transfer to continue.
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                ) : (
-                  <div className="relative overflow-hidden rounded-md bg-black/5 px-3.5 py-3.5 sm:px-5 sm:py-5">
-                    <div className="flex items-start justify-between gap-3">
-                      <p className="text-[12px] tracking-wide text-muted-foreground">
-                        Delivery details
-                      </p>
-                      <button
-                        type="button"
-                        onClick={() => setStep(1)}
-                        className="text-[12px] text-muted-foreground transition-colors hover:text-foreground sm:text-[13px]"
-                      >
-                        Edit
-                      </button>
-                    </div>
-
-                    <div className="mt-3 grid gap-3 sm:mt-4 sm:grid-cols-2 sm:gap-4">
-                      <div className="space-y-0.5">
-                        <p className="text-[10px] tracking-wide text-muted-foreground/80">
-                          Name
-                        </p>
-                        <p className="text-[15px] leading-snug tracking-tight sm:text-[18px]">
-                          {details.name || "—"}
-                        </p>
-                      </div>
-                      <div className="space-y-0.5">
-                        <p className="text-[10px] tracking-wide text-muted-foreground/80">
-                          Phone
-                        </p>
-                        <p className="text-[13px] tabular-nums sm:text-[14px]">
-                          {details.phone || "—"}
-                        </p>
-                      </div>
-                      <div className="space-y-0.5 sm:col-span-2">
-                        <p className="text-[10px] tracking-wide text-muted-foreground/80">
-                          Email
-                        </p>
-                        <p className="break-all text-[13px] sm:text-[14px]">
-                          {details.email || "—"}
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="my-3 h-px bg-black/10 sm:my-4" aria-hidden />
-
-                    <div className="space-y-0.5">
-                      <p className="text-[10px] tracking-wide text-muted-foreground/80">
-                        Address
-                      </p>
-                      <p className="text-[13px] leading-relaxed sm:text-[14px]">
-                        {details.address || "—"}
-                      </p>
-                      <p className="pt-0.5 text-[13px] text-muted-foreground sm:text-[14px]">
-                        {[details.city, details.country]
-                          .filter(Boolean)
-                          .join(", ") || "—"}
-                      </p>
-                    </div>
-                  </div>
-                )}
-
-                <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:gap-2.5">
+              <div className="flex min-h-[calc(100svh-8.5rem)] flex-col gap-3 sm:min-h-0 sm:gap-4">
+                <div className="flex items-center justify-between gap-2">
+                  <p className="text-[12px] tracking-wide text-muted-foreground">
+                    Payment
+                  </p>
                   <Button
                     type="button"
-                    variant="outline"
-                    className={btnOutlineClass}
-                    onClick={() => setStep(1)}
-                  >
-                    Back
-                  </Button>
-                  <Button
-                    type="button"
-                    className={btnClass}
+                    className="font-nav-display h-9 shrink-0 border-0 px-4 text-[12px] shadow-none"
                     onClick={goReceipt}
                   >
                     Continue to receipt
                   </Button>
                 </div>
+
+                <div
+                  role="tablist"
+                  aria-label="Payment method"
+                  className="relative grid grid-cols-2 rounded-full bg-black/[0.06] p-1"
+                >
+                  <span
+                    aria-hidden
+                    className={cn(
+                      "absolute top-1 bottom-1 w-[calc(50%-4px)] rounded-full bg-black shadow-sm transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
+                      payment === "bank" ? "translate-x-[calc(100%+4px)]" : "translate-x-0"
+                    )}
+                    style={{ left: 4 }}
+                  />
+                  <button
+                    type="button"
+                    role="tab"
+                    aria-selected={payment === "cod"}
+                    onClick={() => setPayment("cod")}
+                    className={cn(
+                      "relative z-10 rounded-full py-2 text-center text-[12px] font-semibold tracking-wide transition-colors duration-300 sm:text-[13px]",
+                      payment === "cod" ? "text-white" : "text-foreground/55"
+                    )}
+                  >
+                    Cash on delivery
+                  </button>
+                  <button
+                    type="button"
+                    role="tab"
+                    aria-selected={payment === "bank"}
+                    onClick={() => setPayment("bank")}
+                    className={cn(
+                      "relative z-10 rounded-full py-2 text-center text-[12px] font-semibold tracking-wide transition-colors duration-300 sm:text-[13px]",
+                      payment === "bank" ? "text-white" : "text-foreground/55"
+                    )}
+                  >
+                    Bank transfer
+                  </button>
+                </div>
+
+                <p
+                  key={payment}
+                  className="animate-page-fade text-[11px] leading-snug text-muted-foreground sm:text-[12px]"
+                >
+                  {payment === "cod"
+                    ? "Pay in cash when your order arrives."
+                    : "Transfer, then attach payment proof below."}
+                </p>
+
+                {payment === "bank" ? (
+                  <div
+                    key="bank-panel"
+                    className="animate-page-fade space-y-2.5 rounded-md bg-black/[0.04] px-3 py-2.5"
+                  >
+                    <div className="space-y-1 text-[12px] sm:text-[13px]">
+                      <div className="flex justify-between gap-2">
+                        <span className="text-muted-foreground">Bank</span>
+                        <span>{bankDetails.bankName}</span>
+                      </div>
+                      <div className="flex justify-between gap-2">
+                        <span className="text-muted-foreground">Title</span>
+                        <span className="truncate">{bankDetails.accountTitle}</span>
+                      </div>
+                      <div className="flex justify-between gap-2">
+                        <span className="text-muted-foreground">IBAN</span>
+                        <span className="text-[11px] tracking-wide sm:text-[12px]">
+                          {bankDetails.iban}
+                        </span>
+                      </div>
+                    </div>
+                    <input
+                      ref={proofRef}
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={(e) => onProofSelected(e.target.files)}
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="font-nav-display h-9 w-full border-0 bg-white text-[12px] shadow-none"
+                      disabled={uploading}
+                      onClick={() => proofRef.current?.click()}
+                    >
+                      <Upload className="size-3.5" />
+                      {uploading
+                        ? "Uploading…"
+                        : paymentProof
+                          ? "Replace proof"
+                          : "Attach screenshot"}
+                    </Button>
+                    {paymentProof ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={paymentProof}
+                        alt="Payment proof preview"
+                        className="max-h-20 object-contain"
+                      />
+                    ) : null}
+                  </div>
+                ) : null}
+
+                <div className="mt-auto rounded-md bg-black/[0.04] px-3 py-2.5">
+                  <div className="flex items-center justify-between gap-2">
+                    <p className="text-[11px] tracking-wide text-muted-foreground">
+                      Delivery details
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => setStep(1)}
+                      className="text-[11px] text-muted-foreground transition-colors hover:text-foreground"
+                    >
+                      Edit
+                    </button>
+                  </div>
+                  <p className="mt-1.5 text-[14px] leading-tight tracking-tight">
+                    {details.name || "—"}
+                  </p>
+                  <p className="mt-0.5 text-[12px] text-foreground/70 tabular-nums">
+                    {details.phone || "—"}
+                  </p>
+                  <p className="mt-0.5 truncate text-[12px] text-foreground/70">
+                    {details.email || "—"}
+                  </p>
+                  <p className="mt-1.5 line-clamp-2 text-[12px] leading-snug text-foreground/75">
+                    {[details.address, details.city, details.country]
+                      .filter(Boolean)
+                      .join(", ") || "—"}
+                  </p>
+                </div>
               </div>
             ) : null}
 
             {step === 3 ? (
-              <div className="space-y-4 sm:space-y-5">
-                <div className="relative overflow-hidden rounded-md bg-black/5 px-4 py-4 sm:px-5 sm:py-5">
-                  <p className="text-[12px] tracking-wide text-muted-foreground sm:text-[13px]">
-                    Confirm order
-                  </p>
-                  {payment === "bank" ? (
-                    <div className="mt-2 space-y-2 sm:mt-3 sm:space-y-3">
-                      <p className="text-[22px] leading-snug tracking-tight sm:text-[28px] md:text-[32px]">
-                        Ready to place your order
-                      </p>
-                      <p className="max-w-md text-[13px] leading-relaxed text-muted-foreground sm:text-[14px]">
-                        Your transfer proof is attached. Confirmation usually
-                        takes up to 3 hours after you place the order.
-                      </p>
-                      <div className="border-t border-black/10 pt-2.5 sm:pt-3">
-                        <p className={labelClass}>Tracking ID</p>
-                        <p className="mt-0.5 text-[13px] text-foreground sm:text-[14px]">
-                          You’ll get yours on the next screen.
-                        </p>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="mt-2 space-y-2 sm:mt-3 sm:space-y-3">
-                      <p className="text-[22px] leading-snug tracking-tight sm:text-[28px] md:text-[32px]">
-                        Review your receipt
-                      </p>
-                      <p className="max-w-md text-[13px] leading-relaxed text-muted-foreground sm:text-[14px]">
-                        Then place your cash-on-delivery order. Pay when the
-                        parcel arrives.
-                      </p>
-                      <div className="border-t border-black/10 pt-2.5 sm:pt-3">
-                        <p className={labelClass}>Tracking ID</p>
-                        <p className="mt-0.5 text-[13px] text-foreground sm:text-[14px]">
-                          You’ll get yours on the next screen.
-                        </p>
-                      </div>
-                    </div>
-                  )}
+              <div className="flex min-h-[calc(100svh-8.5rem)] flex-col gap-3 sm:min-h-0 sm:gap-4">
+                <div className="min-h-0 flex-1 overflow-y-auto rounded-md bg-black/[0.03] p-1 sm:overflow-visible sm:bg-transparent sm:p-0">
+                  <StoreReceipt
+                    lines={checkoutReceiptLines(lines)}
+                    shipping={shipping}
+                    total={total}
+                    payment={payment}
+                    customer={details}
+                    notes={notes}
+                    bankDetails={payment === "bank" ? bankDetails : undefined}
+                    paymentProof={payment === "bank" ? paymentProof : null}
+                  />
                 </div>
-                <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:gap-2.5">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    className={btnOutlineClass}
-                    onClick={() => setStep(2)}
-                  >
-                    Back
-                  </Button>
-                  <Button
-                    type="button"
-                    className={btnClass}
-                    disabled={submitting}
-                    onClick={onComplete}
-                  >
-                    {submitting ? "Placing…" : "Complete order"}
-                  </Button>
-                </div>
+                <Button
+                  type="button"
+                  className={cn(btnClass, "mt-auto shrink-0")}
+                  disabled={submitting}
+                  onClick={onComplete}
+                >
+                  {submitting ? "Placing…" : "Complete order"}
+                </Button>
               </div>
             ) : null}
           </div>
-
-          {step === 3 ? (
-            <aside className="lg:sticky lg:top-24">
-              <StoreReceipt
-                lines={checkoutReceiptLines(lines)}
-                shipping={shipping}
-                total={total}
-                payment={payment}
-                customer={details}
-                notes={notes}
-                bankDetails={payment === "bank" ? bankDetails : undefined}
-                paymentProof={
-                  payment === "bank" ? paymentProof : null
-                }
-              />
-            </aside>
-          ) : null}
         </div>
       </div>
     </StoreShell>

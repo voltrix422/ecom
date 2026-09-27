@@ -54,6 +54,9 @@
   --animate-thank-bag: thank-bag 0.85s cubic-bezier(0.22, 1.2, 0.36, 1) both;
   --animate-order-cart: order-cart 0.9s cubic-bezier(0.22, 1.15, 0.36, 1) both;
   --animate-cart-wiggle: cart-wiggle 0.7s ease-in-out 0.9s 2;
+  --animate-order-placed: order-placed 0.75s cubic-bezier(0.22, 1.1, 0.36, 1) both;
+  --animate-order-tick: order-tick 0.55s cubic-bezier(0.22, 1.35, 0.36, 1) 0.12s both;
+  --animate-order-actions: order-actions 0.55s cubic-bezier(0.22, 1, 0.36, 1) 0.35s both;
   --animate-thank-in: thank-in 0.8s cubic-bezier(0.22, 1.1, 0.36, 1) both;
   --animate-puppy: puppy-bounce 1.4s ease-in-out infinite;
   --animate-panel-in: panel-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
@@ -202,6 +205,43 @@
   }
   75% {
     transform: rotate(8deg);
+  }
+}
+
+@keyframes order-placed {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes order-tick {
+  0% {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+  70% {
+    opacity: 1;
+    transform: scale(1.08);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes order-actions {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 

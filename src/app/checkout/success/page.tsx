@@ -1,14 +1,17 @@
 "use client";
 
+import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 import { Check } from "lucide-react";
 import { toast } from "sonner";
 import { StoreShell } from "@/components/storefront/store-shell";
 import { StoreReceipt } from "@/components/storefront/store-receipt";
+import { Button } from "@/components/ui/button";
 import { downloadOrderReceiptPdf } from "@/lib/receipt-pdf";
 import { useStore } from "@/lib/store";
 import type { Order } from "@/lib/types";
+import { cn } from "cn";
 
 function ReceiptView({
   orderId,
@@ -78,6 +81,7 @@ function SuccessContent() {
   const orderId = searchParams.get("order");
   const { orders, bankDetails } = useStore();
   const [fetched, setFetched] = useState<Order | null>(null);
+  const [showReceipt, setShowReceipt] = useState(false);
   const order =
     orders.find((entry) => entry.id === orderId) ?? fetched ?? undefined;
 
@@ -117,26 +121,60 @@ function SuccessContent() {
 
   return (
     <StoreShell hideSaleBanner>
-      <div className="font-nav-display relative mx-auto grid max-w-6xl gap-12 px-6 py-16 lg:grid-cols-[1fr_340px] lg:items-center lg:gap-16 lg:py-20">
-        <div className="relative flex min-h-[240px] items-center lg:min-h-[380px]">
-          <div className="select-none animate-order-cart">
-            <div className="flex items-end gap-3 sm:gap-4">
+      <div className="mx-auto flex min-h-[calc(100svh-4rem)] max-w-lg flex-col px-5 pt-6 pb-10 sm:max-w-xl sm:pt-10">
+        {!showReceipt ? (
+          <div className="flex flex-1 flex-col items-center justify-center text-center">
+            <div className="animate-order-placed select-none">
               <span
-                className="mb-1.5 inline-flex size-10 shrink-0 items-center justify-center rounded-full bg-foreground text-background animate-cart-wiggle sm:mb-2 sm:size-12"
+                className="mx-auto mb-5 inline-flex size-16 items-center justify-center rounded-full bg-foreground text-background animate-order-tick sm:size-[4.5rem]"
                 aria-hidden
               >
-                <Check className="size-5 sm:size-6" strokeWidth={2.5} />
+                <Check className="size-8 sm:size-9" strokeWidth={2.5} />
               </span>
-              <h1 className="text-[clamp(2.6rem,9vw,5rem)] leading-[0.9] tracking-tight text-foreground">
+              <h1 className="font-nav-display text-[clamp(2.4rem,10vw,3.75rem)] leading-[0.92] tracking-tight text-foreground">
                 Order placed
               </h1>
+              {orderId ? (
+                <p className="mt-3 text-[13px] text-muted-foreground tabular-nums">
+                  {orderId}
+                </p>
+              ) : null}
+            </div>
+
+            <div className="mt-10 flex w-full max-w-xs flex-col gap-2.5 animate-order-actions">
+              <Button
+                type="button"
+                className="font-nav-display h-12 w-full border-0 text-[14px] shadow-none"
+                onClick={() => setShowReceipt(true)}
+              >
+                Done and receipt
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                asChild
+                className="font-nav-display h-11 w-full border-0 bg-black/6 text-[13px] shadow-none"
+              >
+                <Link href="/shop">Continue shopping</Link>
+              </Button>
             </div>
           </div>
-        </div>
-
-        <div className="lg:border-l lg:border-black/8 lg:pl-12">
-          <ReceiptView orderId={orderId} onDownload={onDownload} />
-        </div>
+        ) : (
+          <div className={cn("animate-page-fade flex flex-1 flex-col")}>
+            <div className="mb-4 flex items-center justify-between gap-3">
+              <button
+                type="button"
+                onClick={() => setShowReceipt(false)}
+                className="text-[13px] text-muted-foreground transition-colors hover:text-foreground"
+              >
+                Back
+              </button>
+              <p className="font-nav-display text-[15px]">Receipt</p>
+              <span className="w-10" aria-hidden />
+            </div>
+            <ReceiptView orderId={orderId} onDownload={onDownload} />
+          </div>
+        )}
       </div>
     </StoreShell>
   );
