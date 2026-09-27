@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   Info,
   Package,
@@ -12,11 +12,7 @@ import {
   User,
   X,
 } from "lucide-react";
-import {
-  Sheet,
-  SheetContent,
-  SheetTitle,
-} from "@/components/ui/sheet";
+import { StaggeredMenu } from "@/components/storefront/staggered-menu";
 import { brand, categories as seedCategories } from "@/lib/data";
 import { useStore } from "@/lib/store";
 import { cn } from "cn";
@@ -74,7 +70,7 @@ function Hamburger({ open, onClick }: { open: boolean; onClick: () => void }) {
   return (
     <button
       type="button"
-      className="relative inline-flex size-12 cursor-pointer items-center justify-center"
+      className="relative z-[70] inline-flex size-12 cursor-pointer items-center justify-center"
       onClick={onClick}
       aria-label={open ? "Close menu" : "Open menu"}
       aria-expanded={open}
@@ -199,13 +195,28 @@ export function Header({ hideSaleBanner = false }: { hideSaleBanner?: boolean })
   const categories =
     storeCategories.length > 0 ? storeCategories : [...seedCategories];
   const overlay = pathname === "/";
-  const [open, setOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   const [overHero, setOverHero] = useState(overlay);
   const [searchOpen, setSearchOpen] = useState(false);
   const [search, setSearch] = useState("");
   const headerRef = useRef<HTMLElement>(null);
   const searchRef = useRef<HTMLInputElement>(null);
-  const light = overHero && !searchOpen;
+  const light = overHero && !searchOpen && !menuOpen;
+
+  const menuItems = useMemo(
+    () => [
+      { label: "Shop all", ariaLabel: "Shop all products", link: "/shop" },
+      ...categories.map((category) => ({
+        label: category,
+        ariaLabel: `Shop ${category}`,
+        link: `/shop?category=${encodeURIComponent(category)}`,
+      })),
+      { label: "Track order", ariaLabel: "Track your order", link: "/track" },
+      { label: "Refund", ariaLabel: "Refund help", link: "/help" },
+      { label: "About", ariaLabel: "About Ayesha's", link: "/about" },
+    ],
+    [categories]
+  );
 
   useEffect(() => {
     const node = headerRef.current;
@@ -256,140 +267,91 @@ export function Header({ hideSaleBanner = false }: { hideSaleBanner?: boolean })
   }
 
   return (
-    <header
-      ref={headerRef}
-      className={cn(
-        "sticky top-0 z-50 transition-colors duration-300",
-        light ? "bg-transparent text-white" : "bg-white text-black"
-      )}
-    >
-      <div className="relative flex h-16 items-center px-3 sm:px-6">
-        <Hamburger open={open} onClick={() => setOpen(true)} />
-
-        <div className="pointer-events-none absolute inset-x-0 flex justify-center">
-          <div className="pointer-events-auto">
-            <HeaderLogo light={light} />
-          </div>
-        </div>
-
-        <div className="ml-auto flex items-center gap-0">
-          <button
-            type="button"
-            className="inline-flex size-10 cursor-pointer items-center justify-center"
-            aria-label="Search"
-            onClick={() => setSearchOpen((value) => !value)}
-          >
-            <Search className={navIcon} />
-          </button>
-
-          <AccountMenu />
-          <CartButton light={light} />
-        </div>
-      </div>
-
-      <div
+    <>
+      <header
+        ref={headerRef}
         className={cn(
-          "grid transition-[grid-template-rows] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
-          searchOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
+          "sticky top-0 z-50 transition-colors duration-300",
+          light ? "bg-transparent text-white" : "bg-white text-black"
         )}
       >
-        <div className="overflow-hidden">
-          <form
-            onSubmit={submitSearch}
-            className={cn(
-              "bg-white text-black transition-opacity duration-300",
-              searchOpen ? "opacity-100" : "opacity-0"
-            )}
-          >
-            <div className="flex h-14 items-center gap-3 px-4 sm:px-6">
-              <Search className="size-5 shrink-0 stroke-[1.5] text-neutral-400" />
-              <input
-                ref={searchRef}
-                value={search}
-                onChange={(event) => setSearch(event.target.value)}
-                placeholder="Search suits"
-                className="w-full bg-transparent text-left text-lg outline-none placeholder:text-neutral-400 sm:text-xl"
-              />
-              <button
-                type="button"
-                className="inline-flex size-10 shrink-0 cursor-pointer items-center justify-center transition-transform duration-300 hover:rotate-90"
-                aria-label="Close search"
-                onClick={() => setSearchOpen(false)}
-              >
-                <X className="size-6 stroke-[1.5]" />
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
+        <div className="relative flex h-16 items-center px-3 sm:px-6">
+          <Hamburger
+            open={menuOpen}
+            onClick={() => setMenuOpen((value) => !value)}
+          />
 
-      <Sheet open={open} onOpenChange={setOpen}>
-        <SheetContent
-          side="left"
-          showCloseButton={false}
-          className="w-[min(100%,360px)] gap-0 rounded-none border-0 border-r border-white/10 bg-black/60 p-0 text-white shadow-[0_0_80px_rgba(0,0,0,0.55)] backdrop-blur-2xl backdrop-saturate-100 duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] data-open:slide-in-from-left-16 data-closed:slide-out-to-left-16"
-        >
-          <SheetTitle className="sr-only">Menu</SheetTitle>
-          <div className="flex h-16 shrink-0 items-center justify-between px-6">
-            <p className="text-[11px] tracking-[0.28em] text-white/45 uppercase">
-              Menu
-            </p>
-            <button
-              type="button"
-              className="inline-flex size-11 cursor-pointer items-center justify-center rounded-full border border-white/15 bg-white/5 transition-all duration-300 hover:rotate-90 hover:border-white/35 hover:bg-white/10"
-              aria-label="Close menu"
-              onClick={() => setOpen(false)}
-            >
-              <X className="size-5 stroke-[1.25]" />
-            </button>
+          <div className="pointer-events-none absolute inset-x-0 flex justify-center">
+            <div className="pointer-events-auto">
+              <HeaderLogo light={light} />
+            </div>
           </div>
 
-          <nav className="flex flex-1 flex-col overflow-y-auto px-5 pb-10">
-            <Link
-              href="/shop"
-              onClick={() => setOpen(false)}
-              className="animate-panel-item border border-white/15 bg-white/5 px-5 py-4 text-[17px] tracking-[0.16em] uppercase transition-colors hover:border-white/40 hover:bg-white/10"
-              style={{ animationDelay: "40ms" }}
+          <div className="ml-auto flex items-center gap-0">
+            <button
+              type="button"
+              className="inline-flex size-10 cursor-pointer items-center justify-center"
+              aria-label="Search"
+              onClick={() => setSearchOpen((value) => !value)}
             >
-              Shop all
-            </Link>
+              <Search className={navIcon} />
+            </button>
 
-            <p
-              className="animate-panel-item mt-10 px-1 pb-3 text-[10px] tracking-[0.28em] text-white/40 uppercase"
-              style={{ animationDelay: "90ms" }}
+            <AccountMenu />
+            <CartButton light={light} />
+          </div>
+        </div>
+
+        <div
+          className={cn(
+            "grid transition-[grid-template-rows] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
+            searchOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
+          )}
+        >
+          <div className="overflow-hidden">
+            <form
+              onSubmit={submitSearch}
+              className={cn(
+                "bg-white text-black transition-opacity duration-300",
+                searchOpen ? "opacity-100" : "opacity-0"
+              )}
             >
-              Category
-            </p>
-            <div className="flex flex-col gap-0.5">
-              {categories.map((category, index) => (
-                <Link
-                  key={category}
-                  href={`/shop?category=${category}`}
-                  onClick={() => setOpen(false)}
-                  className="animate-panel-item px-4 py-3 text-[15px] tracking-[0.04em] text-white/80 transition-colors hover:bg-white/10 hover:text-white"
-                  style={{ animationDelay: `${130 + index * 45}ms` }}
+              <div className="flex h-14 items-center gap-3 px-4 sm:px-6">
+                <Search className="size-5 shrink-0 stroke-[1.5] text-neutral-400" />
+                <input
+                  ref={searchRef}
+                  value={search}
+                  onChange={(event) => setSearch(event.target.value)}
+                  placeholder="Search suits"
+                  className="w-full bg-transparent text-left text-lg outline-none placeholder:text-neutral-400 sm:text-xl"
+                />
+                <button
+                  type="button"
+                  className="inline-flex size-10 shrink-0 cursor-pointer items-center justify-center transition-transform duration-300 hover:rotate-90"
+                  aria-label="Close search"
+                  onClick={() => setSearchOpen(false)}
                 >
-                  {category}
-                </Link>
-              ))}
-            </div>
+                  <X className="size-6 stroke-[1.5]" />
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </header>
 
-            <div className="mt-10 flex flex-col gap-0.5">
-              {accountLinks.map((item, index) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  onClick={() => setOpen(false)}
-                  className="animate-panel-item px-4 py-3 text-[13px] tracking-[0.14em] text-white/55 uppercase transition-colors hover:bg-white/10 hover:text-white"
-                  style={{ animationDelay: `${360 + index * 50}ms` }}
-                >
-                  {item.label}
-                </Link>
-              ))}
-            </div>
-          </nav>
-        </SheetContent>
-      </Sheet>
-    </header>
+      <StaggeredMenu
+        position="left"
+        hideChrome
+        isFixed
+        open={menuOpen}
+        onOpenChange={setMenuOpen}
+        items={menuItems}
+        displayItemNumbering
+        displaySocials={false}
+        colors={["#111111", "#cfcfcf"]}
+        accentColor="#111111"
+        closeOnClickAway={false}
+      />
+    </>
   );
 }
