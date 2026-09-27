@@ -7,6 +7,7 @@ import {
   Globe,
   LayoutDashboard,
   LogOut,
+  Mail,
   Package,
   RotateCcw,
   Settings,
@@ -34,6 +35,7 @@ const links: {
   { href: "/admin/customers", label: "Customers", module: "customers", icon: Users },
   { href: "/admin/users", label: "Users", module: "users", icon: UserCog },
   { href: "/admin/website", label: "Website", module: "website", icon: Globe },
+  { href: "/admin/waitlist", label: "Waitlist", module: "website", icon: Mail },
   { href: "/admin/settings", label: "Settings", module: "settings", icon: Settings },
 ];
 
@@ -54,6 +56,7 @@ function titleForPath(pathname: string) {
   if (pathname.startsWith("/admin/customers")) return "Customers";
   if (pathname.startsWith("/admin/users")) return "Users";
   if (pathname.startsWith("/admin/website")) return "Website";
+  if (pathname.startsWith("/admin/waitlist")) return "Waitlist";
   if (pathname.startsWith("/admin/settings")) return "Settings";
   return "Overview";
 }
@@ -65,6 +68,7 @@ function moduleForPath(pathname: string): AdminModule {
   if (pathname.startsWith("/admin/customers")) return "customers";
   if (pathname.startsWith("/admin/users")) return "users";
   if (pathname.startsWith("/admin/website")) return "website";
+  if (pathname.startsWith("/admin/waitlist")) return "website";
   if (pathname.startsWith("/admin/settings")) return "settings";
   return "overview";
 }

@@ -1,27 +1,21 @@
-import { mkdir, readFile, writeFile } from "fs/promises";
-import path from "path";
 import { NextResponse } from "next/server";
-import { uploadDir } from "@/lib/server/files";
+import { isDatabaseEnabled } from "@/lib/server/db";
+import { readSessionUserId } from "@/lib/server/session";
+import { addWaitlistEmail, readWaitlist } from "@/lib/server/waitlist";
 
 export const dynamic = "force-dynamic";
 
-type Entry = { email: string; createdAt: string };
-
-function waitlistPath() {
-  return path.join(uploadDir(), "waitlist.json");
-}
-
-async function readWaitlist(): Promise<Entry[]> {
-  try {
-    const raw = await readFile(
-      /*turbopackIgnore: true*/ waitlistPath(),
-      "utf8"
-    );
-    const parsed = JSON.parse(raw) as Entry[];
-    return Array.isArray(parsed) ? parsed : [];
-  } catch {
-    return [];
+export async function GET() {
+  const userId = await readSessionUserId();
+  if (!userId && isDatabaseEnabled()) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
+
+  const entries = await readWaitlist();
+  entries.sort(
+    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+  );
+  return NextResponse.json({ entries });
 }
 
 export async function POST(request: Request) {
@@ -34,21 +28,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Enter a valid email" }, { status: 400 });
     }
 
-    const list = await readWaitlist();
-    if (list.some((entry) => entry.email === email)) {
-      return NextResponse.json({ ok: true, already: true });
-    }
-
-    list.push({ email, createdAt: new Date().toISOString() });
-    const dir = uploadDir();
-    await mkdir(/*turbopackIgnore: true*/ dir, { recursive: true });
-    await writeFile(
-      /*turbopackIgnore: true*/ waitlistPath(),
-      JSON.stringify(list, null, 2),
-      "utf8"
-    );
-
-    return NextResponse.json({ ok: true });
+    const result = await addWaitlistEmail(email);
+    return NextResponse.json({ ok: true, already: result.already });
   } catch {
     return NextResponse.json(
       { error: "Could not save your email" },

@@ -1,9 +1,11 @@
 "use client";
 
 import { FormEvent, useState } from "react";
+import dynamic from "next/dynamic";
 import Image from "next/image";
-import LightRays from "@/components/light-rays";
 import { brand } from "@/lib/data";
+
+const Silk = dynamic(() => import("@/components/silk"), { ssr: false });
 
 export default function ComingSoonPage() {
   const [email, setEmail] = useState("");
@@ -14,7 +16,7 @@ export default function ComingSoonPage() {
 
   async function onSubmit(event: FormEvent) {
     event.preventDefault();
-    if (status === "loading") return;
+    if (status === "loading" || status === "done") return;
     setStatus("loading");
     setMessage("");
     try {
@@ -35,8 +37,8 @@ export default function ComingSoonPage() {
       setStatus("done");
       setMessage(
         data?.already
-          ? "You’re already on the list."
-          : "We’ll email you when we launch."
+          ? "You’re already on the list — we’ll notify you at launch."
+          : "We’ll notify you when we launch."
       );
       setEmail("");
     } catch {
@@ -47,22 +49,13 @@ export default function ComingSoonPage() {
 
   return (
     <main className="coming-soon fixed inset-0 overflow-hidden text-center">
-      <div className="coming-soon-glow absolute inset-0 z-0" aria-hidden />
-      <div className="absolute inset-0 z-[1]" aria-hidden>
-        <LightRays
-          raysOrigin="top-center"
-          raysColor="#ffffff"
-          raysSpeed={1.15}
-          lightSpread={0.7}
-          rayLength={2.8}
-          followMouse={false}
-          mouseInfluence={0}
-          noiseAmount={0}
-          distortion={0}
-          pulsating={false}
-          fadeDistance={1.2}
-          saturation={1}
-          className="custom-rays"
+      <div className="absolute inset-0 z-0 bg-[#12081f]" aria-hidden>
+        <Silk
+          speed={5}
+          scale={1}
+          color="#5227FF"
+          noiseIntensity={1.5}
+          rotation={0}
         />
       </div>
 
@@ -82,50 +75,45 @@ export default function ComingSoonPage() {
             Coming soon
           </h1>
 
-          <form
-            onSubmit={onSubmit}
-            className="mt-6 flex w-full flex-col gap-2.5 sm:mt-8"
-          >
-            <label className="sr-only" htmlFor="notify-email">
-              Email
-            </label>
-            <input
-              id="notify-email"
-              type="email"
-              name="email"
-              required
-              autoComplete="email"
-              inputMode="email"
-              placeholder="Email to notify me"
-              value={email}
-              onChange={(e) => {
-                setEmail(e.target.value);
-                if (status !== "idle" && status !== "loading") setStatus("idle");
-              }}
-              className="h-12 w-full rounded-full border border-white/20 bg-white/10 px-5 text-[14px] text-white outline-none placeholder:text-white/45 backdrop-blur-sm focus:border-white/45"
-            />
-            <button
-              type="submit"
-              disabled={status === "loading" || status === "done"}
-              className="font-nav-display h-12 w-full rounded-full bg-white px-6 text-[12px] tracking-wide text-black transition-opacity disabled:opacity-60"
-            >
-              {status === "loading"
-                ? "Saving…"
-                : status === "done"
-                  ? "Saved"
-                  : "Notify me"}
-            </button>
-          </form>
-
-          {message ? (
-            <p
-              className={`mt-3 text-[13px] normal-case ${
-                status === "error" ? "text-red-300" : "text-white/70"
-              }`}
-            >
+          {status === "done" ? (
+            <p className="mt-6 max-w-xs text-[15px] leading-relaxed text-white/80 normal-case">
               {message}
             </p>
-          ) : null}
+          ) : (
+            <form
+              onSubmit={onSubmit}
+              className="mt-6 flex w-full flex-col gap-2.5 sm:mt-8"
+            >
+              <label className="sr-only" htmlFor="notify-email">
+                Email
+              </label>
+              <input
+                id="notify-email"
+                type="email"
+                name="email"
+                required
+                autoComplete="email"
+                inputMode="email"
+                placeholder="Email to notify me"
+                value={email}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  if (status === "error") setStatus("idle");
+                }}
+                className="h-12 w-full rounded-full border border-white/25 bg-black/25 px-5 text-[14px] text-white outline-none placeholder:text-white/50 backdrop-blur-sm focus:border-white/50"
+              />
+              <button
+                type="submit"
+                disabled={status === "loading"}
+                className="font-nav-display h-12 w-full rounded-full bg-white px-6 text-[12px] tracking-wide text-black transition-opacity disabled:opacity-60"
+              >
+                {status === "loading" ? "Saving…" : "Notify me"}
+              </button>
+              {status === "error" && message ? (
+                <p className="text-[13px] text-red-200 normal-case">{message}</p>
+              ) : null}
+            </form>
+          )}
         </div>
       </div>
     </main>
