@@ -664,6 +664,13 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   );
 
   const addToCart = useCallback((productId: string, quantity = 1) => {
+    try {
+      window.dispatchEvent(
+        new CustomEvent("aw:feature", { detail: "add_to_bag" })
+      );
+    } catch {
+      /* ignore */
+    }
     setCart((current) => {
       const existing = current.find((item) => item.productId === productId);
       if (existing) {
@@ -734,6 +741,13 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         };
         if (!response.ok || !data.order) {
           throw new Error(data.error || "Could not place order");
+        }
+        try {
+          window.dispatchEvent(
+            new CustomEvent("aw:feature", { detail: "place_order" })
+          );
+        } catch {
+          /* ignore */
         }
         setOrders((current) => [normalizeOrder(data.order as Order), ...current]);
         if (data.products) setProducts(data.products.map(normalizeProduct));

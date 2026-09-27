@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect } from "react";
+import { Suspense, useEffect } from "react";
 import { ThemeProvider } from "next-themes";
+import { PixelTracker } from "@/components/pixel-tracker";
 import { ScrollToTop } from "@/components/scroll-to-top";
 import { Toaster } from "@/components/ui/sonner";
 import { StoreProvider } from "@/lib/store";
@@ -23,6 +24,9 @@ export function Providers({ children }: { children: React.ReactNode }) {
       <StoreProvider>
         <ScrollToTop />
         <CustomPointer />
+        <Suspense fallback={null}>
+          <PixelTracker />
+        </Suspense>
         {children}
         <Toaster
           position="top-center"

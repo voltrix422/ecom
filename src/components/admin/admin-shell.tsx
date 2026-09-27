@@ -16,7 +16,7 @@ import {
   Users,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { BrandLogo } from "@/components/brand-logo";
+import { brand } from "@/lib/data";
 import { peekAdminSession, useStore } from "@/lib/store";
 import AdminLoginPage from "@/app/admin/login/page";
 import type { AdminModule } from "@/lib/types";
@@ -153,12 +153,14 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             collapsed ? "justify-center px-2" : "px-5"
           )}
         >
-          <BrandLogo
-            size="sm"
-            href={null}
-            wordmarkClassName={cn(
-              "overflow-hidden whitespace-nowrap transition-[max-width,opacity] duration-500 ease-in-out",
-              collapsed ? "max-w-0 opacity-0" : "max-w-[9rem] opacity-100"
+          <img
+            src={brand.wordmark}
+            alt={brand.name}
+            className={cn(
+              "brightness-0 object-contain object-left transition-[height,max-width,opacity] duration-500 ease-in-out",
+              collapsed
+                ? "h-7 max-w-[2.5rem] opacity-100"
+                : "h-9 max-w-[9.5rem] opacity-100"
             )}
           />
         </button>
@@ -175,7 +177,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
                 title={collapsed ? link.label : undefined}
                 aria-label={link.label}
                 className={cn(
-                  "flex items-center gap-2 overflow-hidden py-2 text-sm text-muted-foreground transition-[padding] duration-500 ease-in-out hover:bg-muted hover:text-foreground",
+                  "font-nav-display flex items-center gap-2 overflow-hidden py-2 text-sm text-muted-foreground transition-[padding] duration-500 ease-in-out hover:bg-muted hover:text-foreground",
                   active && "bg-muted text-foreground",
                   collapsed ? "justify-center px-0" : "px-3"
                 )}
@@ -197,7 +199,9 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
 
       <div className="flex min-w-0 flex-1 flex-col">
         <header className="flex h-16 items-center justify-between border-b px-5 md:px-8">
-          <h1 className="text-xl md:text-2xl">{titleForPath(pathname)}</h1>
+          <h1 className="font-nav-display text-xl tracking-tight md:text-2xl">
+            {titleForPath(pathname)}
+          </h1>
           <Button
             variant="ghost"
             size="icon"
@@ -217,7 +221,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
               key={link.href}
               href={link.href}
               className={cn(
-                "px-3 py-1.5 text-xs tracking-wide uppercase text-muted-foreground",
+                "font-nav-display px-3 py-1.5 text-xs tracking-wide uppercase text-muted-foreground",
                 (link.href === "/admin"
                   ? pathname === "/admin"
                   : pathname.startsWith(link.href)) && "text-foreground"

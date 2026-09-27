@@ -348,6 +348,9 @@ export function Header({ hideSaleBanner = false }: { hideSaleBanner?: boolean })
   function submitSearch(event: React.FormEvent) {
     event.preventDefault();
     const value = search.trim();
+    if (value) {
+      window.dispatchEvent(new CustomEvent("aw:feature", { detail: "search" }));
+    }
     router.push(
       value
         ? `${storePath("/shop")}?q=${encodeURIComponent(value)}`

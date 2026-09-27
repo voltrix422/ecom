@@ -63,6 +63,7 @@ export default function ComingSoonPage() {
         setError(data?.error || "Something went wrong");
         return;
       }
+      window.dispatchEvent(new CustomEvent("aw:feature", { detail: "notify_me" }));
       setStatus("done");
       setEmail("");
     } catch {
