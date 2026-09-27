@@ -6,7 +6,7 @@ import { Suspense, useEffect, useState } from "react";
 import { Download, ShoppingCart } from "lucide-react";
 import { toast } from "sonner";
 import { StoreShell } from "@/components/storefront/store-shell";
-import { BrandArcLogo } from "@/components/brand-arc-logo";
+import { BrandLogo } from "@/components/brand-logo";
 import { brand } from "@/lib/data";
 import { formatDate, formatPrice } from "@/lib/format";
 import { downloadOrderReceiptPdf } from "@/lib/receipt-pdf";
@@ -68,11 +68,13 @@ function ReceiptView({
 
       <div className="text-center">
         <div className="mx-auto mb-3 flex justify-center">
-          <BrandArcLogo size={128} href={null} />
+          <BrandLogo
+            size="lg"
+            href={null}
+            className="flex-col items-center gap-2"
+            wordmarkClassName="font-nav-display text-[16px] tracking-tight lowercase"
+          />
         </div>
-        <p className="text-[15px] tracking-tight text-foreground/90">
-          {brand.name}
-        </p>
         <div className="mt-3 space-y-1 text-[11px] text-muted-foreground">
           <p>
             <span className="text-muted-foreground/80">Order</span>{" "}

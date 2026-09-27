@@ -5,11 +5,11 @@ import type { BankDetails, Order } from "@/lib/types";
 
 const RECEIPT_WIDTH = 80;
 
-/** Lockup artwork aspect after trim (w/h) */
-const LOCKUP_RATIO = 384 / 446;
+/** Logo mark aspect after trim (w/h) */
+const LOGO_RATIO = 357 / 606;
 
 async function loadLogoDataUrl() {
-  const response = await fetch(brand.lockup);
+  const response = await fetch(brand.logo);
   const blob = await response.blob();
   return new Promise<string>((resolve, reject) => {
     const reader = new FileReader();
@@ -109,10 +109,8 @@ export async function downloadOrderReceiptPdf(
   };
 
   if (logoDataUrl) {
-    // The lockup already contains the brand name curved above the mark, so no
-    // separate wordmark is drawn below it.
-    const logoHeight = 24;
-    const logoWidth = logoHeight * LOCKUP_RATIO;
+    const logoHeight = 22;
+    const logoWidth = logoHeight * LOGO_RATIO;
     doc.addImage(
       logoDataUrl,
       "PNG",
@@ -121,8 +119,12 @@ export async function downloadOrderReceiptPdf(
       logoWidth,
       logoHeight
     );
-    y += logoHeight + 6;
+    y += logoHeight + 4;
   }
+
+  doc.setTextColor(20);
+  center(brand.name, 11, "bold");
+  y += 6;
 
   doc.setTextColor(120);
   center("RECEIPT", 8);

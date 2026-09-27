@@ -11,8 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { BrandArcLogo } from "@/components/brand-arc-logo";
-import { brand } from "@/lib/data";
+import { BrandLogo } from "@/components/brand-logo";
 import { formatPrice, salePrice } from "@/lib/format";
 import { fileToDataUrl } from "@/lib/image-upload";
 import { useStore } from "@/lib/store";
@@ -127,11 +126,13 @@ function ReceiptCard({
     <div className="font-nav-display mx-auto w-full max-w-[320px] px-1 py-2 text-[13px] leading-relaxed text-foreground">
       <div className="text-center">
         <div className="mx-auto mb-3 flex justify-center">
-          <BrandArcLogo size={128} href={null} />
+          <BrandLogo
+            size="lg"
+            href={null}
+            className="flex-col items-center gap-2"
+            wordmarkClassName="font-nav-display text-[16px] tracking-tight lowercase"
+          />
         </div>
-        <p className="text-[15px] tracking-tight text-foreground/90">
-          {brand.name}
-        </p>
         {orderId ? (
           <div className="mt-3 space-y-1 text-[11px] text-muted-foreground">
             <p>
