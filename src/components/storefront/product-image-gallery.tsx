@@ -14,6 +14,12 @@ import { ChevronLeft, ChevronRight, X, ZoomIn } from "lucide-react";
 import { MediaImage } from "@/components/media-image";
 import { cn } from "cn";
 
+const navBtn =
+  "absolute top-1/2 z-20 flex size-7 -translate-y-1/2 items-center justify-center text-foreground/55 transition-colors duration-300 hover:text-foreground md:size-8";
+
+const lightboxNavBtn =
+  "absolute top-1/2 z-10 flex size-8 -translate-y-1/2 items-center justify-center text-white/55 transition-colors duration-300 hover:text-white md:size-9";
+
 type ProductImageGalleryProps = {
   images: string[];
   alt: string;
@@ -102,9 +108,7 @@ export function ProductImageGallery({
   function setStageNode(node: HTMLDivElement | null) {
     stageRef.current = node;
     if (galleryRef) {
-      (
-        galleryRef as { current: HTMLDivElement | null }
-      ).current = node;
+      (galleryRef as { current: HTMLDivElement | null }).current = node;
     }
   }
 
@@ -130,21 +134,15 @@ export function ProductImageGallery({
             "absolute inset-0 z-0 animate-gallery-fade",
             lensOn ? "cursor-crosshair" : "cursor-zoom-in"
           )}
-          aria-label={lensOn ? "Open full image" : "Open image"}
-          onClick={() => {
-            if (lensOn) {
-              setLightboxOpen(true);
-              return;
-            }
-            setLightboxOpen(true);
-          }}
+          aria-label="Open full image"
+          onClick={() => setLightboxOpen(true)}
         >
           <span
-            className="absolute inset-0 block transition-transform duration-150 ease-out will-change-transform"
+            className="absolute inset-0 block transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] will-change-transform"
             style={
               lensOn
                 ? {
-                    transform: "scale(2.15)",
+                    transform: "scale(2)",
                     transformOrigin: `${origin.x}% ${origin.y}%`,
                   }
                 : undefined
@@ -170,9 +168,9 @@ export function ProductImageGallery({
                 event.stopPropagation();
                 go(index - 1);
               }}
-              className="absolute top-1/2 left-2 z-20 flex size-10 -translate-y-1/2 items-center justify-center rounded-full border border-black/10 bg-white/90 text-foreground shadow-md backdrop-blur-md transition hover:bg-white md:left-3 md:size-11"
+              className={cn(navBtn, "left-1 md:left-2")}
             >
-              <ChevronLeft className="size-5" strokeWidth={1.75} />
+              <ChevronLeft className="size-4 md:size-[18px]" strokeWidth={1.25} />
             </button>
             <button
               type="button"
@@ -181,17 +179,17 @@ export function ProductImageGallery({
                 event.stopPropagation();
                 go(index + 1);
               }}
-              className="absolute top-1/2 right-2 z-20 flex size-10 -translate-y-1/2 items-center justify-center rounded-full border border-black/10 bg-white/90 text-foreground shadow-md backdrop-blur-md transition hover:bg-white md:right-3 md:size-11"
+              className={cn(navBtn, "right-1 md:right-2")}
             >
-              <ChevronRight className="size-5" strokeWidth={1.75} />
+              <ChevronRight className="size-4 md:size-[18px]" strokeWidth={1.25} />
             </button>
-            <div className="pointer-events-none absolute bottom-3 left-1/2 z-20 flex -translate-x-1/2 gap-1.5 rounded-full bg-black/25 px-2 py-1 backdrop-blur-sm">
+            <div className="pointer-events-none absolute bottom-2.5 left-1/2 z-20 flex -translate-x-1/2 gap-1">
               {images.map((_, i) => (
                 <span
                   key={i}
                   className={cn(
-                    "h-1.5 w-1.5 rounded-full transition-all duration-300",
-                    i === index ? "w-3 bg-white" : "bg-white/45"
+                    "h-1 w-1 rounded-full transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]",
+                    i === index ? "w-2.5 bg-foreground/70" : "bg-foreground/20"
                   )}
                 />
               ))}
@@ -208,13 +206,11 @@ export function ProductImageGallery({
             setLensOn((value) => !value);
           }}
           className={cn(
-            "absolute top-2 right-2 z-20 flex size-9 items-center justify-center rounded-full border border-black/10 shadow-md backdrop-blur-md transition md:size-10",
-            lensOn
-              ? "bg-foreground text-background"
-              : "bg-white/90 text-foreground hover:bg-white"
+            "absolute top-2 right-2 z-20 flex size-7 items-center justify-center text-foreground/45 transition-colors duration-300 hover:text-foreground md:size-8",
+            lensOn && "text-foreground"
           )}
         >
-          <ZoomIn className="size-4" strokeWidth={1.7} />
+          <ZoomIn className="size-3.5" strokeWidth={1.35} />
         </button>
       </div>
 
@@ -331,70 +327,68 @@ function ImageLightbox({
 
   return (
     <div
-      className="fixed inset-0 z-[130] flex items-center justify-center p-3 sm:p-6"
+      className="fixed inset-0 z-[130] h-[100dvh] w-screen"
       role="dialog"
       aria-modal="true"
       aria-label="Full product image"
     >
       <div
-        className="absolute inset-0 bg-white/25 backdrop-blur-2xl supports-[backdrop-filter]:bg-white/20"
+        className="absolute inset-0 bg-black/35 backdrop-blur-2xl supports-[backdrop-filter]:bg-black/25"
         onPointerDown={onBackdropPointer}
       />
-      <div className="absolute inset-0 bg-gradient-to-b from-black/25 via-black/35 to-black/45" />
 
-      <div className="relative z-10 flex h-full w-full max-w-6xl flex-col">
-        <div className="flex h-12 shrink-0 items-center justify-between px-1 text-white sm:h-14">
-          <p className="text-xs tracking-wide text-white/80 tabular-nums">
-            {index + 1} / {count}
-          </p>
-          <button
-            type="button"
-            onClick={onClose}
-            className="inline-flex size-10 items-center justify-center rounded-full border border-white/20 bg-white/15 text-white backdrop-blur-md hover:bg-white/25"
-            aria-label="Close"
-          >
-            <X className="size-5" strokeWidth={1.6} />
-          </button>
-        </div>
+      <button
+        type="button"
+        onClick={onClose}
+        className="absolute top-[max(0.75rem,env(safe-area-inset-top))] right-3 z-20 flex size-8 items-center justify-center text-white/60 transition-colors duration-300 hover:text-white"
+        aria-label="Close"
+      >
+        <X className="size-4" strokeWidth={1.25} />
+      </button>
 
+      <p className="absolute top-[max(1rem,env(safe-area-inset-top))] left-1/2 z-20 -translate-x-1/2 text-[11px] tracking-wide text-white/55 tabular-nums">
+        {index + 1} / {count}
+      </p>
+
+      <div
+        className="absolute inset-0 z-10 flex items-center justify-center px-10 py-14 sm:px-14 sm:py-16"
+        onTouchStart={onTouchStart}
+        onTouchEnd={onTouchEnd}
+        onPointerDown={onBackdropPointer}
+      >
         <div
-          className="relative min-h-0 flex-1"
-          onTouchStart={onTouchStart}
-          onTouchEnd={onTouchEnd}
+          key={`${src}-${fadeKey}`}
+          className="flex h-full w-full max-h-full max-w-full items-center justify-center animate-gallery-fade"
+          onPointerDown={(event) => event.stopPropagation()}
         >
-          <div
-            key={`${src}-${fadeKey}`}
-            className="absolute inset-0 flex items-center justify-center animate-gallery-fade"
-          >
-            <img
-              src={src}
-              alt={alt}
-              draggable={false}
-              className="max-h-full max-w-full select-none object-contain drop-shadow-2xl"
-            />
-          </div>
-
-          {count > 1 ? (
-            <>
-              <button
-                type="button"
-                aria-label="Previous image"
-                onClick={() => go(index - 1)}
-                className="absolute top-1/2 left-1 z-10 flex size-11 -translate-y-1/2 items-center justify-center rounded-full border border-white/25 bg-white/20 text-white shadow-lg backdrop-blur-md hover:bg-white/30 sm:left-2 sm:size-12"
-              >
-                <ChevronLeft className="size-6" strokeWidth={1.6} />
-              </button>
-              <button
-                type="button"
-                aria-label="Next image"
-                onClick={() => go(index + 1)}
-                className="absolute top-1/2 right-1 z-10 flex size-11 -translate-y-1/2 items-center justify-center rounded-full border border-white/25 bg-white/20 text-white shadow-lg backdrop-blur-md hover:bg-white/30 sm:right-2 sm:size-12"
-              >
-                <ChevronRight className="size-6" strokeWidth={1.6} />
-              </button>
-            </>
-          ) : null}
+          <img
+            src={src}
+            alt={alt}
+            draggable={false}
+            className="h-auto w-auto max-h-full max-w-full select-none object-contain"
+          />
         </div>
+
+        {count > 1 ? (
+          <>
+            <button
+              type="button"
+              aria-label="Previous image"
+              onClick={() => go(index - 1)}
+              className={cn(lightboxNavBtn, "left-2 md:left-4")}
+            >
+              <ChevronLeft className="size-[18px]" strokeWidth={1.2} />
+            </button>
+            <button
+              type="button"
+              aria-label="Next image"
+              onClick={() => go(index + 1)}
+              className={cn(lightboxNavBtn, "right-2 md:right-4")}
+            >
+              <ChevronRight className="size-[18px]" strokeWidth={1.2} />
+            </button>
+          </>
+        ) : null}
       </div>
     </div>
   );
