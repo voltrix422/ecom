@@ -6,7 +6,6 @@ import {
   useRef,
   useState,
   type MouseEvent as ReactMouseEvent,
-  type PointerEvent as ReactPointerEvent,
   type RefObject,
   type TouchEvent as ReactTouchEvent,
 } from "react";
@@ -15,10 +14,10 @@ import { MediaImage } from "@/components/media-image";
 import { cn } from "cn";
 
 const navBtn =
-  "absolute top-1/2 z-20 flex size-7 -translate-y-1/2 items-center justify-center text-foreground/55 transition-colors duration-300 hover:text-foreground md:size-8";
+  "absolute top-1/2 z-20 flex size-9 -translate-y-1/2 items-center justify-center text-foreground/80 transition-colors duration-300 hover:text-foreground md:size-10";
 
 const lightboxNavBtn =
-  "absolute top-1/2 z-10 flex size-8 -translate-y-1/2 items-center justify-center text-white/55 transition-colors duration-300 hover:text-white md:size-9";
+  "absolute top-1/2 z-10 flex size-9 -translate-y-1/2 items-center justify-center text-white transition-opacity duration-300 hover:opacity-100 md:size-10";
 
 type ProductImageGalleryProps = {
   images: string[];
@@ -168,9 +167,9 @@ export function ProductImageGallery({
                 event.stopPropagation();
                 go(index - 1);
               }}
-              className={cn(navBtn, "left-1 md:left-2")}
+              className={cn(navBtn, "left-3 md:left-4")}
             >
-              <ChevronLeft className="size-4 md:size-[18px]" strokeWidth={1.25} />
+              <ChevronLeft className="size-6 md:size-7" strokeWidth={2.5} />
             </button>
             <button
               type="button"
@@ -179,9 +178,9 @@ export function ProductImageGallery({
                 event.stopPropagation();
                 go(index + 1);
               }}
-              className={cn(navBtn, "right-1 md:right-2")}
+              className={cn(navBtn, "right-3 md:right-4")}
             >
-              <ChevronRight className="size-4 md:size-[18px]" strokeWidth={1.25} />
+              <ChevronRight className="size-6 md:size-7" strokeWidth={2.5} />
             </button>
             <div className="pointer-events-none absolute bottom-2.5 left-1/2 z-20 flex -translate-x-1/2 gap-1">
               {images.map((_, i) => (
@@ -321,71 +320,70 @@ function ImageLightbox({
     go(delta < 0 ? index + 1 : index - 1);
   }
 
-  function onBackdropPointer(event: ReactPointerEvent<HTMLDivElement>) {
-    if (event.target === event.currentTarget) onClose();
-  }
-
   return (
     <div
-      className="fixed inset-0 z-[130] h-[100dvh] w-screen"
+      className="fixed inset-0 z-[200] flex h-[100dvh] w-screen items-center justify-center"
       role="dialog"
       aria-modal="true"
       aria-label="Full product image"
+      onClick={onClose}
+      onTouchStart={onTouchStart}
+      onTouchEnd={onTouchEnd}
     >
-      <div
-        className="absolute inset-0 bg-black/35 backdrop-blur-2xl supports-[backdrop-filter]:bg-black/25"
-        onPointerDown={onBackdropPointer}
-      />
+      {/* Covers page + sticky navbar */}
+      <div className="absolute inset-0 bg-black/40 backdrop-blur-xl supports-[backdrop-filter]:bg-black/30" />
 
       <button
         type="button"
-        onClick={onClose}
-        className="absolute top-[max(0.75rem,env(safe-area-inset-top))] right-3 z-20 flex size-8 items-center justify-center text-white/60 transition-colors duration-300 hover:text-white"
+        onClick={(event) => {
+          event.stopPropagation();
+          onClose();
+        }}
+        className="absolute top-[max(0.75rem,env(safe-area-inset-top))] right-3 z-20 flex size-9 items-center justify-center text-white/70 transition-colors duration-300 hover:text-white"
         aria-label="Close"
       >
-        <X className="size-4" strokeWidth={1.25} />
+        <X className="size-5" strokeWidth={2} />
       </button>
 
-      <p className="absolute top-[max(1rem,env(safe-area-inset-top))] left-1/2 z-20 -translate-x-1/2 text-[11px] tracking-wide text-white/55 tabular-nums">
+      <p className="pointer-events-none absolute top-[max(1rem,env(safe-area-inset-top))] left-1/2 z-20 -translate-x-1/2 text-[11px] tracking-wide text-white/60 tabular-nums">
         {index + 1} / {count}
       </p>
 
       <div
-        className="absolute inset-0 z-10 flex items-center justify-center px-10 py-14 sm:px-14 sm:py-16"
-        onTouchStart={onTouchStart}
-        onTouchEnd={onTouchEnd}
-        onPointerDown={onBackdropPointer}
+        key={`${src}-${fadeKey}`}
+        className="relative z-10 mx-auto flex max-h-[min(88dvh,920px)] max-w-[min(92vw,820px)] items-center justify-center animate-gallery-fade"
+        onClick={(event) => event.stopPropagation()}
       >
-        <div
-          key={`${src}-${fadeKey}`}
-          className="flex h-full w-full max-h-full max-w-full items-center justify-center animate-gallery-fade"
-          onPointerDown={(event) => event.stopPropagation()}
-        >
-          <img
-            src={src}
-            alt={alt}
-            draggable={false}
-            className="h-auto w-auto max-h-full max-w-full select-none object-contain"
-          />
-        </div>
+        <img
+          src={src}
+          alt={alt}
+          draggable={false}
+          className="max-h-[min(88dvh,920px)] max-w-[min(92vw,820px)] select-none object-contain"
+        />
 
         {count > 1 ? (
           <>
             <button
               type="button"
               aria-label="Previous image"
-              onClick={() => go(index - 1)}
-              className={cn(lightboxNavBtn, "left-2 md:left-4")}
+              onClick={(event) => {
+                event.stopPropagation();
+                go(index - 1);
+              }}
+              className={cn(lightboxNavBtn, "left-2 opacity-80 md:left-3")}
             >
-              <ChevronLeft className="size-[18px]" strokeWidth={1.2} />
+              <ChevronLeft className="size-6 md:size-7" strokeWidth={2.5} />
             </button>
             <button
               type="button"
               aria-label="Next image"
-              onClick={() => go(index + 1)}
-              className={cn(lightboxNavBtn, "right-2 md:right-4")}
+              onClick={(event) => {
+                event.stopPropagation();
+                go(index + 1);
+              }}
+              className={cn(lightboxNavBtn, "right-2 opacity-80 md:right-3")}
             >
-              <ChevronRight className="size-[18px]" strokeWidth={1.2} />
+              <ChevronRight className="size-6 md:size-7" strokeWidth={2.5} />
             </button>
           </>
         ) : null}
