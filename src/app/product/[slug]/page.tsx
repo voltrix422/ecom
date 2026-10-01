@@ -4,8 +4,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { use, useEffect, useRef, useState } from "react";
 import { Heart, ShoppingBag } from "lucide-react";
-import { MediaImage } from "@/components/media-image";
 import { ProductCard } from "@/components/storefront/product-card";
+import { ProductImageGallery } from "@/components/storefront/product-image-gallery";
 import { StoreShell } from "@/components/storefront/store-shell";
 import { Button } from "@/components/ui/button";
 import {
@@ -109,45 +109,18 @@ export default function ProductPage({
       {/* Mobile detail layout */}
       <div className="md:hidden">
         <div className="flex h-[calc(100svh-4rem)] max-h-[calc(100svh-4rem)] flex-col">
-          <div
-            ref={mobileGalleryRef}
-            className="relative min-h-0 w-full flex-[1_1_0%] bg-white"
-          >
-            <MediaImage
-              src={currentSrc}
-              alt={piece.name}
-              fill
-              priority
-              fit="contain"
-              sizes="100vw"
-            />
-          </div>
-
-          {gallery.length > 1 ? (
-            <div className="flex shrink-0 gap-1.5 overflow-x-auto px-3 pt-0.5">
-              {gallery.map((src, index) => (
-                <button
-                  key={`${src.slice(0, 32)}-${index}`}
-                  type="button"
-                  onClick={() => setActiveImage(index)}
-                  className={cn(
-                    "relative h-9 w-6 shrink-0 overflow-hidden rounded-sm border",
-                    activeImage === index
-                      ? "border-foreground"
-                      : "border-transparent opacity-70"
-                  )}
-                >
-                  <MediaImage
-                    src={src}
-                    alt={`${piece.name} ${index + 1}`}
-                    fill
-                    fit="cover"
-                    sizes="24px"
-                  />
-                </button>
-              ))}
-            </div>
-          ) : null}
+          <ProductImageGallery
+            images={gallery}
+            alt={piece.name}
+            activeIndex={activeImage}
+            onChange={setActiveImage}
+            galleryRef={mobileGalleryRef}
+            imageClassName="min-h-0 w-full flex-[1_1_0%]"
+            className="flex min-h-0 flex-[1_1_0%] flex-col"
+            fit="contain"
+            sizes="100vw"
+            showThumbs
+          />
 
           <div className="shrink-0 px-4 pt-0.5 pb-[max(0.35rem,env(safe-area-inset-bottom))]">
             <div className="flex items-center gap-0.5 text-foreground">
@@ -246,43 +219,17 @@ export default function ProductPage({
       {/* Desktop / tablet layout */}
       <div className="mx-auto hidden max-w-7xl grid-cols-2 items-start gap-16 px-6 pt-2 pb-8 md:grid">
         <div>
-          <div
-            ref={desktopGalleryRef}
-            className="relative h-[calc(100svh-11rem)] w-full"
-          >
-            <MediaImage
-              src={currentSrc}
-              alt={piece.name}
-              fill
-              priority
-              sizes="50vw"
-              className="object-contain"
-            />
-          </div>
-          {gallery.length > 1 ? (
-            <div className="mt-4 flex gap-3 overflow-x-auto">
-              {gallery.map((src, index) => (
-                <button
-                  key={`${src.slice(0, 32)}-${index}`}
-                  type="button"
-                  onClick={() => setActiveImage(index)}
-                  className={`relative h-20 w-16 shrink-0 border ${
-                    activeImage === index
-                      ? "border-foreground"
-                      : "border-transparent opacity-70 hover:opacity-100"
-                  }`}
-                >
-                  <MediaImage
-                    src={src}
-                    alt={`${piece.name} ${index + 1}`}
-                    fill
-                    sizes="64px"
-                    className="object-contain"
-                  />
-                </button>
-              ))}
-            </div>
-          ) : null}
+          <ProductImageGallery
+            images={gallery}
+            alt={piece.name}
+            activeIndex={activeImage}
+            onChange={setActiveImage}
+            galleryRef={desktopGalleryRef}
+            imageClassName="h-[calc(100svh-11rem)] w-full"
+            fit="contain"
+            sizes="50vw"
+            showThumbs
+          />
         </div>
 
         <div className="relative">
