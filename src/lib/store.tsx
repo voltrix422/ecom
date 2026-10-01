@@ -247,10 +247,10 @@ const StoreContext = createContext<StoreContextValue | null>(null);
 
 export function StoreProvider({ children }: { children: React.ReactNode }) {
   const [ready, setReady] = useState(false);
-  const [products, setProducts] = useState<Product[]>(seedProducts);
+  const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<string[]>([...seedCategories]);
   const [cart, setCart] = useState<CartItem[]>([]);
-  const [orders, setOrders] = useState<Order[]>(seedOrders);
+  const [orders, setOrders] = useState<Order[]>([]);
   const [adminUsers, setAdminUsers] = useState<AdminUser[]>(seedAdminUsers);
   const [adminUser, setAdminUser] = useState<AdminUser | null>(null);
   const [cartOpen, setCartOpen] = useState(false);

@@ -12,7 +12,7 @@ export async function GET(
   return new Response(new Uint8Array(file.data), {
     headers: {
       "Content-Type": file.type,
-      "Cache-Control": "public, max-age=31536000, immutable",
+      "Cache-Control": "public, max-age=3600, must-revalidate",
     },
   });
 }

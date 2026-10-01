@@ -32,7 +32,7 @@ export default function ProductPage({
 }) {
   const { slug } = use(params);
   const router = useRouter();
-  const { getProduct, addToCart, products } = useStore();
+  const { getProduct, addToCart, products, ready } = useStore();
   const product = getProduct(slug);
   const [quantity, setQuantity] = useState(1);
   const [activeImage, setActiveImage] = useState(0);
@@ -46,7 +46,19 @@ export default function ProductPage({
   useEffect(() => {
     if (!product) return;
     setLiked(window.localStorage.getItem(likedKey(product.id)) === "1");
-  }, [product]);
+    setActiveImage(0);
+    setQuantity(1);
+  }, [product?.id]);
+
+  if (!ready) {
+    return (
+      <StoreShell>
+        <div className="mx-auto max-w-6xl px-6 py-24 text-center text-sm text-muted-foreground">
+          Loading
+        </div>
+      </StoreShell>
+    );
+  }
 
   if (!product) {
     return (
@@ -64,10 +76,14 @@ export default function ProductPage({
   }
 
   const piece = product;
-  const gallery =
-    piece.images && piece.images.length > 0
-      ? piece.images
-      : [piece.image];
+  const gallery = Array.from(
+    new Set(
+      (piece.images && piece.images.length > 0
+        ? piece.images
+        : [piece.image]
+      ).filter(Boolean)
+    )
+  );
   const related = products
     .filter((item) => item.category === piece.category && item.id !== piece.id)
     .slice(0, 3);

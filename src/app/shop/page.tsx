@@ -15,7 +15,7 @@ import { cn } from "cn";
 function ShopContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { products, categories } = useStore();
+  const { products, categories, ready } = useStore();
   const allCategories = categories.length ? categories : [...seedCategories];
   const initial = (searchParams.get("category") as Category | null) ?? "All";
   const [category, setCategory] = useState<Category | "All">(
@@ -44,6 +44,13 @@ function ShopContent() {
     });
   }, [category, products, query]);
 
+  if (!ready) {
+    return (
+      <div className="px-4 py-16 text-center text-sm text-muted-foreground md:px-6">
+        Loading
+      </div>
+    );
+  }
   const hasFilters = category !== "All" || query.length > 0;
 
   function selectCategory(item: Category | "All") {

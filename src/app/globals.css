@@ -64,7 +64,19 @@
   --animate-panel-item: panel-item 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
   --animate-search-drop: search-drop 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
   --animate-account-link: account-link 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+  --animate-gallery-fade: gallery-fade 0.32s ease-out both;
   --font-nav-display: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+}
+
+@keyframes gallery-fade {
+  from {
+    opacity: 0.28;
+    transform: scale(1.015);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 @keyframes panel-in {
