@@ -46,19 +46,30 @@ function ids() {
   };
 }
 
-function shouldSkipPath(path: string) {
-  return path.startsWith("/admin") || path.startsWith("/api");
+function isSkippedPath(path: string) {
+  const p = path.toLowerCase();
+  return (
+    p.startsWith("/api") ||
+    p.startsWith("/admin") ||
+    p.includes("/admin") ||
+    p.startsWith("/mian") ||
+    p.startsWith("/_next") ||
+    p.startsWith("/media")
+  );
 }
 
-function enqueue(event: Omit<PixelPayload, "visitorId" | "sessionId" | "isAdmin">) {
+function enqueue(
+  event: Omit<PixelPayload, "visitorId" | "sessionId" | "isAdmin">
+) {
   if (typeof window === "undefined") return;
-  if (shouldSkipPath(event.path)) return;
+  if (peekAdminSession()) return;
+  if (isSkippedPath(event.path)) return;
   const { visitorId, sessionId } = ids();
   QUEUE.push({
     ...event,
     visitorId,
     sessionId,
-    isAdmin: peekAdminSession(),
+    isAdmin: false,
     referrer: document.referrer || undefined,
   });
   scheduleFlush();
@@ -95,6 +106,7 @@ async function flush() {
 
 export function trackFeature(feature: string, path?: string) {
   if (typeof window === "undefined") return;
+  if (peekAdminSession()) return;
   enqueue({
     type: "feature",
     feature,
@@ -121,15 +133,11 @@ export function PixelTracker() {
   }, []);
 
   useEffect(() => {
-    const path =
-      pathname +
-      (searchParams?.toString() ? `?${searchParams.toString()}` : "");
-    if (shouldSkipPath(pathname)) return;
+    if (peekAdminSession() || isSkippedPath(pathname)) return;
 
-    // Close previous page time
     if (lastPath.current && lastPath.current !== pathname) {
       const spent = Date.now() - startedAt.current;
-      if (spent > 800) {
+      if (spent > 800 && !isSkippedPath(lastPath.current)) {
         enqueue({
           type: "heartbeat",
           path: lastPath.current,
@@ -144,6 +152,7 @@ export function PixelTracker() {
 
     const heartbeat = window.setInterval(() => {
       if (document.visibilityState !== "visible") return;
+      if (peekAdminSession() || isSkippedPath(pathname)) return;
       const spent = Date.now() - startedAt.current;
       startedAt.current = Date.now();
       if (spent > 1000) {
@@ -156,6 +165,7 @@ export function PixelTracker() {
     }, 15000);
 
     function onHide() {
+      if (peekAdminSession() || isSkippedPath(pathname)) return;
       const spent = Date.now() - startedAt.current;
       if (spent > 500) {
         enqueue({
@@ -175,7 +185,7 @@ export function PixelTracker() {
       window.clearInterval(heartbeat);
       document.removeEventListener("visibilitychange", onHide);
       window.removeEventListener("pagehide", onHide);
-      void path;
+      void searchParams;
     };
   }, [pathname, searchParams]);
 

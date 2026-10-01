@@ -85,18 +85,16 @@ function PixelPanel() {
   const visitorCards = [
     { label: "Today", value: data.visitors.today },
     { label: "Yesterday", value: data.visitors.yesterday },
-    { label: "7 days", value: data.visitors.week },
-    { label: "30 days", value: data.visitors.month },
-    { label: "Year", value: data.visitors.year },
+    { label: "Last 7 days", value: data.visitors.week },
+    { label: "Last 30 days", value: data.visitors.month },
     { label: "All time", value: data.visitors.all },
   ];
 
   const viewCards = [
     { label: "Today", value: data.pageviews.today },
     { label: "Yesterday", value: data.pageviews.yesterday },
-    { label: "7 days", value: data.pageviews.week },
-    { label: "30 days", value: data.pageviews.month },
-    { label: "Year", value: data.pageviews.year },
+    { label: "Last 7 days", value: data.pageviews.week },
+    { label: "Last 30 days", value: data.pageviews.month },
     { label: "All time", value: data.pageviews.all },
   ];
 
@@ -109,13 +107,13 @@ function PixelPanel() {
     <div className="space-y-12">
       <section>
         <p className="text-[10px] tracking-[0.14em] text-muted-foreground uppercase">
-          Unique visitors
+          Shoppers
         </p>
         <p className="mt-2 max-w-xl text-sm text-muted-foreground">
-          Counts real people by device. Your admin browsing is excluded, so these
-          numbers stay clean.
+          Real people on phones and computers. Admin visits, bots, and broken
+          URLs are removed. Same person on the same device counts once.
         </p>
-        <div className="mt-5 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
+        <div className="mt-5 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
           {visitorCards.map((card) => (
             <div key={card.label}>
               <p className="text-[11px] text-muted-foreground">{card.label}</p>
@@ -131,7 +129,10 @@ function PixelPanel() {
         <p className="text-[10px] tracking-[0.14em] text-muted-foreground uppercase">
           Page views
         </p>
-        <div className="mt-5 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
+        <p className="mt-2 max-w-xl text-sm text-muted-foreground">
+          How many store pages were opened. One person can open many pages.
+        </p>
+        <div className="mt-5 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
           {viewCards.map((card) => (
             <div key={card.label}>
               <p className="text-[11px] text-muted-foreground">{card.label}</p>
@@ -187,7 +188,7 @@ function PixelPanel() {
 
       <section>
         <p className="text-[10px] tracking-[0.14em] text-muted-foreground uppercase">
-          Pages · 30d
+          Top pages · last 30 days
         </p>
         {data.pages.length === 0 ? (
           <p className="mt-4 text-sm text-muted-foreground">No page data yet.</p>
@@ -204,7 +205,14 @@ function PixelPanel() {
                 key={page.path}
                 className="grid grid-cols-[1fr_auto_auto_auto] gap-3 py-3 text-sm"
               >
-                <span className="truncate font-medium">{page.path}</span>
+                <span className="min-w-0">
+                  <span className="block truncate font-medium">
+                    {page.label || page.path}
+                  </span>
+                  <span className="block truncate text-[11px] text-muted-foreground">
+                    {page.path}
+                  </span>
+                </span>
                 <span className="w-14 text-right tabular-nums">{page.views}</span>
                 <span className="w-16 text-right tabular-nums">
                   {page.visitors}
@@ -220,11 +228,11 @@ function PixelPanel() {
 
       <section>
         <p className="text-[10px] tracking-[0.14em] text-muted-foreground uppercase">
-          Features used · 30d
+          Actions · last 30 days
         </p>
         {data.features.length === 0 ? (
           <p className="mt-4 text-sm text-muted-foreground">
-            Feature taps will show here (notify, bag, search, checkout).
+            Bag, search, notify, and checkout actions show here.
           </p>
         ) : (
           <div className="mt-4 divide-y divide-border">
@@ -233,7 +241,7 @@ function PixelPanel() {
                 key={item.feature}
                 className="flex items-center justify-between gap-4 py-3 text-sm"
               >
-                <span className="font-medium">{item.feature}</span>
+                <span className="font-medium">{item.label || item.feature}</span>
                 <span className="tabular-nums text-muted-foreground">
                   {item.count} uses · {item.visitors} people
                 </span>
