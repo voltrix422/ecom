@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { MediaImage } from "@/components/media-image";
+import { Checkbox } from "@/components/ui/checkbox";
 import { fileToHeroDataUrl } from "@/lib/image-upload";
 import { useStore } from "@/lib/store";
 import { cn } from "cn";
@@ -261,6 +262,7 @@ export default function AdminWebsitePage() {
     heroBanners,
     addHeroBanners,
     removeHeroBanner,
+    removeHeroBanners,
     collectionSlides,
     addCollectionSlides,
     updateCollectionSlide,
@@ -271,6 +273,7 @@ export default function AdminWebsitePage() {
   const [uploadingHero, setUploadingHero] = useState(false);
   const [uploadingCollection, setUploadingCollection] = useState(false);
   const [tab, setTab] = useState<Tab>("content");
+  const [selectedHeroes, setSelectedHeroes] = useState<string[]>([]);
 
   if (!canAccess("website")) {
     return (
@@ -281,6 +284,40 @@ export default function AdminWebsitePage() {
   }
 
   const editable = canEdit();
+  const allHeroesSelected =
+    heroBanners.length > 0 && selectedHeroes.length === heroBanners.length;
+
+  function toggleHero(id: string) {
+    setSelectedHeroes((current) =>
+      current.includes(id)
+        ? current.filter((item) => item !== id)
+        : [...current, id]
+    );
+  }
+
+  function toggleAllHeroes() {
+    if (allHeroesSelected) {
+      setSelectedHeroes([]);
+      return;
+    }
+    setSelectedHeroes(heroBanners.map((banner) => banner.id));
+  }
+
+  function deleteSelectedHeroes() {
+    if (!editable || !selectedHeroes.length) return;
+    const count = selectedHeroes.length;
+    const ok = window.confirm(
+      count === 1
+        ? "Delete this hero image from the website?"
+        : `Delete ${count} hero images from the website?`
+    );
+    if (!ok) return;
+    removeHeroBanners(selectedHeroes);
+    setSelectedHeroes([]);
+    toast.success(
+      count === 1 ? "Hero image deleted" : `${count} hero images deleted`
+    );
+  }
 
   async function onHeroFiles(files: FileList | null) {
     if (!files?.length || !editable) return;
@@ -402,31 +439,77 @@ export default function AdminWebsitePage() {
               stay removed after refresh.
             </p>
 
+            {editable && heroBanners.length > 0 ? (
+              <div className="mt-4 flex flex-wrap items-center gap-3">
+                <label className="flex items-center gap-2 text-xs text-muted-foreground">
+                  <Checkbox
+                    checked={allHeroesSelected}
+                    onCheckedChange={() => toggleAllHeroes()}
+                    aria-label="Select all hero images"
+                  />
+                  Select all
+                </label>
+                {selectedHeroes.length > 0 ? (
+                  <button
+                    type="button"
+                    onClick={deleteSelectedHeroes}
+                    className="text-xs text-muted-foreground hover:text-destructive"
+                  >
+                    Delete selected ({selectedHeroes.length})
+                  </button>
+                ) : null}
+              </div>
+            ) : null}
+
             {heroBanners.length === 0 ? (
               <p className="mt-8 text-sm text-muted-foreground">
                 No hero images yet. Upload as many as you need.
               </p>
             ) : (
               <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3">
-                {heroBanners.map((banner, index) => (
-                  <div key={banner.id} className="relative bg-muted/40">
-                    <MediaImage
-                      src={banner.src}
-                      alt={`Hero ${index + 1}`}
-                      sizes="(min-width: 640px) 20vw, 45vw"
-                    />
-                    {editable ? (
-                      <button
-                        type="button"
-                        onClick={() => removeHeroBanner(banner.id)}
-                        aria-label="Remove image"
-                        className="absolute top-1.5 right-1.5 bg-background/80 p-1.5 text-muted-foreground hover:text-foreground"
-                      >
-                        <Trash2 className="size-3.5" />
-                      </button>
-                    ) : null}
-                  </div>
-                ))}
+                {heroBanners.map((banner, index) => {
+                  const selected = selectedHeroes.includes(banner.id);
+                  return (
+                    <div
+                      key={banner.id}
+                      className={cn(
+                        "relative bg-muted/40",
+                        selected && "ring-1 ring-foreground"
+                      )}
+                    >
+                      <MediaImage
+                        src={banner.src}
+                        alt={`Hero ${index + 1}`}
+                        sizes="(min-width: 640px) 20vw, 45vw"
+                      />
+                      {editable ? (
+                        <>
+                          <label className="absolute top-1.5 left-1.5 z-10 flex size-7 items-center justify-center bg-background/85">
+                            <Checkbox
+                              checked={selected}
+                              onCheckedChange={() => toggleHero(banner.id)}
+                              aria-label={`Select hero ${index + 1}`}
+                            />
+                          </label>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              removeHeroBanner(banner.id);
+                              setSelectedHeroes((current) =>
+                                current.filter((id) => id !== banner.id)
+                              );
+                              toast.success("Hero image deleted");
+                            }}
+                            aria-label="Remove image"
+                            className="absolute top-1.5 right-1.5 bg-background/80 p-1.5 text-muted-foreground hover:text-foreground"
+                          >
+                            <Trash2 className="size-3.5" />
+                          </button>
+                        </>
+                      ) : null}
+                    </div>
+                  );
+                })}
               </div>
             )}
           </section>

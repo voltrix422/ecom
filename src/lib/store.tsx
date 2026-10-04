@@ -212,6 +212,7 @@ type StoreContextValue = {
   upsertProduct: (product: Product) => void;
   reorderProducts: (activeId: string, overId: string) => void;
   deleteProduct: (id: string) => void;
+  deleteProducts: (ids: string[]) => void;
   updateOrderStatus: (id: string, status: OrderStatus) => void;
   refundTickets: RefundTicket[];
   submitRefund: (input: {
@@ -232,6 +233,7 @@ type StoreContextValue = {
   heroBanners: HeroBanner[];
   addHeroBanners: (srcs: string[]) => void;
   removeHeroBanner: (id: string) => void;
+  removeHeroBanners: (ids: string[]) => void;
   collectionSlides: CollectionSlide[];
   addCollectionSlides: (
     slides: { src: string; caption?: string; href?: string }[]
@@ -900,6 +902,26 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     [adminUser]
   );
 
+  const deleteProducts = useCallback(
+    (ids: string[]) => {
+      if (!canWrite(adminUser) || !canAccessModule(adminUser, "products")) return;
+      const remove = new Set(ids.filter(Boolean));
+      if (!remove.size) return;
+      setProducts((current) =>
+        current.filter((product) => !remove.has(product.id))
+      );
+      setCart((current) =>
+        current.filter((item) => !remove.has(item.productId))
+      );
+      if (remoteRef.current) {
+        void adminMutate({ op: "delete-products", ids: [...remove] })
+          .then((data) => applyRemote(data))
+          .catch((error) => console.error(error));
+      }
+    },
+    [adminUser]
+  );
+
   const updateOrderStatus = useCallback(
     (id: string, status: OrderStatus) => {
       if (!canWrite(adminUser) || !canAccessModule(adminUser, "orders")) return;
@@ -1240,6 +1262,26 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     [adminUser]
   );
 
+  const removeHeroBanners = useCallback(
+    (ids: string[]) => {
+      if (!canWrite(adminUser) || !canAccessModule(adminUser, "website")) return;
+      const remove = new Set(ids.filter(Boolean));
+      if (!remove.size) return;
+      heroTouched.current = true;
+      setHeroBanners((current) => {
+        const banners = current.filter((banner) => !remove.has(banner.id));
+        if (!remoteRef.current) persistHeroBanners(banners);
+        return banners;
+      });
+      if (remoteRef.current) {
+        void adminMutate({ op: "hero-remove-many", ids: [...remove] })
+          .then((data) => applyRemote(data))
+          .catch((error) => console.error(error));
+      }
+    },
+    [adminUser]
+  );
+
   const addCollectionSlides = useCallback(
     (slides: { src: string; caption?: string; href?: string }[]) => {
       if (!canWrite(adminUser) || !canAccessModule(adminUser, "website")) return;
@@ -1359,6 +1401,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       upsertProduct,
       reorderProducts,
       deleteProduct,
+      deleteProducts,
       updateOrderStatus,
       refundTickets,
       submitRefund,
@@ -1371,6 +1414,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       heroBanners,
       addHeroBanners,
       removeHeroBanner,
+      removeHeroBanners,
       collectionSlides,
       addCollectionSlides,
       updateCollectionSlide,
@@ -1407,6 +1451,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       upsertProduct,
       reorderProducts,
       deleteProduct,
+      deleteProducts,
       updateOrderStatus,
       refundTickets,
       submitRefund,
@@ -1419,6 +1464,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       heroBanners,
       addHeroBanners,
       removeHeroBanner,
+      removeHeroBanners,
       collectionSlides,
       addCollectionSlides,
       updateCollectionSlide,

@@ -6,6 +6,7 @@ import { ChevronDown, GripVertical, Search, Star, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { MediaImage } from "@/components/media-image";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { formatPrice } from "@/lib/format";
 import { useStore } from "@/lib/store";
@@ -87,8 +88,14 @@ function FilterGroup({
 }
 
 export default function AdminProductsPage() {
-  const { products, canEdit, categories, reorderProducts, deleteProduct } =
-    useStore();
+  const {
+    products,
+    canEdit,
+    categories,
+    reorderProducts,
+    deleteProduct,
+    deleteProducts,
+  } = useStore();
   const editable = canEdit();
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("All");
@@ -96,6 +103,7 @@ export default function AdminProductsPage() {
   const [featured, setFeatured] = useState<FeaturedFilter>("all");
   const [draggingId, setDraggingId] = useState<string | null>(null);
   const [overId, setOverId] = useState<string | null>(null);
+  const [selected, setSelected] = useState<string[]>([]);
   const [open, setOpen] = useState({
     category: false,
     stock: false,
@@ -109,7 +117,25 @@ export default function AdminProductsPage() {
     );
     if (!ok) return;
     deleteProduct(id);
+    setSelected((current) => current.filter((item) => item !== id));
     toast.success(`Deleted ${name}`);
+  }
+
+  function confirmDeleteSelected() {
+    if (!editable || !selected.length) return;
+    const ok = window.confirm(
+      selected.length === 1
+        ? "Delete this product from the store?"
+        : `Delete ${selected.length} products from the store?`
+    );
+    if (!ok) return;
+    deleteProducts(selected);
+    toast.success(
+      selected.length === 1
+        ? "Product deleted"
+        : `${selected.length} products deleted`
+    );
+    setSelected([]);
   }
 
   function toggleGroup(group: "category" | "stock" | "featured") {
@@ -147,6 +173,32 @@ export default function AdminProductsPage() {
     return map;
   }, [products]);
 
+  const filteredIds = useMemo(
+    () => filtered.map((product) => product.id),
+    [filtered]
+  );
+  const allFilteredSelected =
+    filteredIds.length > 0 &&
+    filteredIds.every((id) => selected.includes(id));
+
+  function toggleSelected(id: string) {
+    setSelected((current) =>
+      current.includes(id)
+        ? current.filter((item) => item !== id)
+        : [...current, id]
+    );
+  }
+
+  function toggleSelectAllFiltered() {
+    if (allFilteredSelected) {
+      setSelected((current) =>
+        current.filter((id) => !filteredIds.includes(id))
+      );
+      return;
+    }
+    setSelected((current) => [...new Set([...current, ...filteredIds])]);
+  }
+
   return (
     <div>
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -159,11 +211,34 @@ export default function AdminProductsPage() {
             className="h-8 rounded-none border-0 border-b border-border/60 pl-8 shadow-none focus-visible:ring-0"
           />
         </div>
-        {editable ? (
-          <Button asChild className="h-8 rounded-none">
-            <Link href="/admin/products/new">Add product</Link>
-          </Button>
-        ) : null}
+        <div className="flex items-center gap-3">
+          {editable && filtered.length > 0 ? (
+            <>
+              <label className="flex items-center gap-2 text-xs text-muted-foreground">
+                <Checkbox
+                  checked={allFilteredSelected}
+                  onCheckedChange={() => toggleSelectAllFiltered()}
+                  aria-label="Select all products"
+                />
+                Select all
+              </label>
+              {selected.length > 0 ? (
+                <button
+                  type="button"
+                  onClick={confirmDeleteSelected}
+                  className="text-xs text-muted-foreground hover:text-destructive"
+                >
+                  Delete selected ({selected.length})
+                </button>
+              ) : null}
+            </>
+          ) : null}
+          {editable ? (
+            <Button asChild className="h-8 rounded-none">
+              <Link href="/admin/products/new">Add product</Link>
+            </Button>
+          ) : null}
+        </div>
       </div>
 
       <div className="mt-6 grid items-start gap-8 lg:grid-cols-[140px_minmax(0,1fr)]">
@@ -309,12 +384,22 @@ export default function AdminProductsPage() {
                       "group relative",
                       editable && "cursor-grab active:cursor-grabbing",
                       isDragging && "opacity-40",
-                      isOver && "ring-1 ring-foreground/40"
+                      isOver && "ring-1 ring-foreground/40",
+                      selected.includes(product.id) && "ring-1 ring-foreground"
                     )}
                   >
                     <div className="mb-2 flex items-center justify-between gap-2">
-                      <span className="text-[11px] tracking-[0.14em] text-muted-foreground tabular-nums">
-                        {position}
+                      <span className="flex items-center gap-2">
+                        {editable ? (
+                          <Checkbox
+                            checked={selected.includes(product.id)}
+                            onCheckedChange={() => toggleSelected(product.id)}
+                            aria-label={`Select ${product.name}`}
+                          />
+                        ) : null}
+                        <span className="text-[11px] tracking-[0.14em] text-muted-foreground tabular-nums">
+                          {position}
+                        </span>
                       </span>
                       {editable ? (
                         <span className="flex items-center gap-1 text-muted-foreground">

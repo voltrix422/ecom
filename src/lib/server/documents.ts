@@ -524,6 +524,15 @@ function applyMutation(docs: Docs, user: AdminUser, body: MutateBody) {
     return;
   }
 
+  if (body.op === "delete-products") {
+    if (!can(user, "products") || !body.ids?.length) {
+      throw new Error("You cannot edit products");
+    }
+    const remove = new Set(body.ids);
+    docs.products = docs.products.filter((product) => !remove.has(product.id));
+    return;
+  }
+
   if (body.op === "reorder-products") {
     if (!can(user, "products") || !body.ids) throw new Error("You cannot edit products");
     const byId = new Map(docs.products.map((product) => [product.id, product]));
@@ -605,6 +614,15 @@ function applyMutation(docs: Docs, user: AdminUser, body: MutateBody) {
   if (body.op === "hero-remove") {
     if (!can(user, "website") || !body.id) throw new Error("You cannot edit the website");
     docs.heroes = docs.heroes.filter((banner) => banner.id !== body.id);
+    return;
+  }
+
+  if (body.op === "hero-remove-many") {
+    if (!can(user, "website") || !body.ids?.length) {
+      throw new Error("You cannot edit the website");
+    }
+    const remove = new Set(body.ids);
+    docs.heroes = docs.heroes.filter((banner) => !remove.has(banner.id));
     return;
   }
 
