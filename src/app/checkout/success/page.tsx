@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { StoreShell } from "@/components/storefront/store-shell";
 import { StoreReceipt } from "@/components/storefront/store-receipt";
 import { Button } from "@/components/ui/button";
+import { metaPurchase } from "@/lib/meta-pixel";
 import { downloadOrderReceiptPdf } from "@/lib/receipt-pdf";
 import { storePath } from "@/lib/site-mode";
 import { useStore } from "@/lib/store";
@@ -103,6 +104,23 @@ function SuccessContent() {
       cancelled = true;
     };
   }, [orderId, orders]);
+
+  useEffect(() => {
+    if (!order) return;
+    const key = `meta-purchase:${order.id}`;
+    try {
+      if (window.sessionStorage.getItem(key) === "1") return;
+      window.sessionStorage.setItem(key, "1");
+    } catch {
+      /* ignore */
+    }
+    const numItems = order.items.reduce((sum, item) => sum + item.quantity, 0);
+    metaPurchase({
+      ids: order.items.map((item) => item.productId),
+      numItems,
+      value: order.total,
+    });
+  }, [order]);
 
   async function onDownload() {
     if (!order) {

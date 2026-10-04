@@ -18,6 +18,7 @@ import {
 import { ProductShare } from "@/components/storefront/product-share";
 import { flyToCart } from "@/lib/fly-to-cart";
 import { formatPrice } from "@/lib/format";
+import { metaAddToCart, metaViewContent } from "@/lib/meta-pixel";
 import { storePath } from "@/lib/site-mode";
 import { useStore } from "@/lib/store";
 import { cn } from "cn";
@@ -50,6 +51,15 @@ export default function ProductPage({
     setActiveImage(0);
     setQuantity(1);
   }, [product?.id]);
+
+  useEffect(() => {
+    if (!ready || !product) return;
+    metaViewContent({
+      id: product.id,
+      name: product.name,
+      value: product.price,
+    });
+  }, [ready, product?.id, product?.name, product?.price]);
 
   if (!ready) {
     return (
@@ -107,6 +117,12 @@ export default function ProductPage({
 
   function handleAddToBag() {
     addToCart(piece.id, quantity);
+    metaAddToCart({
+      id: piece.id,
+      name: piece.name,
+      value: piece.price * quantity,
+      quantity,
+    });
     setBagPulse(true);
     window.setTimeout(() => setBagPulse(false), 500);
     flyToCart(currentSrc, galleryRect());
@@ -116,6 +132,12 @@ export default function ProductPage({
     if (buying) return;
     setBuying(true);
     addToCart(piece.id, quantity);
+    metaAddToCart({
+      id: piece.id,
+      name: piece.name,
+      value: piece.price * quantity,
+      quantity,
+    });
     window.setTimeout(() => {
       router.push(storePath("/checkout"));
     }, 220);

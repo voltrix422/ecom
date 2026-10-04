@@ -2,6 +2,7 @@
 
 import { Suspense, useEffect } from "react";
 import { ThemeProvider } from "next-themes";
+import { MetaPixel } from "@/components/meta-pixel";
 import { PixelTracker } from "@/components/pixel-tracker";
 import { ScrollToTop } from "@/components/scroll-to-top";
 import { Toaster } from "@/components/ui/sonner";
@@ -24,6 +25,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
       <StoreProvider>
         <ScrollToTop />
         <CustomPointer />
+        <MetaPixel />
         <Suspense fallback={null}>
           <PixelTracker />
         </Suspense>

@@ -21,6 +21,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { formatPrice } from "@/lib/format";
 import { fileToDataUrl } from "@/lib/image-upload";
+import { metaInitiateCheckout } from "@/lib/meta-pixel";
 import { storePath } from "@/lib/site-mode";
 import { useStore } from "@/lib/store";
 import type { PaymentMethod, Product } from "@/lib/types";
@@ -246,6 +247,7 @@ export default function CheckoutPage() {
   const [uploading, setUploading] = useState(false);
   const [details, setDetails] = useState(emptyDetails);
   const [detailsReady, setDetailsReady] = useState(false);
+  const checkoutTracked = useRef(false);
 
   useEffect(() => {
     try {
@@ -267,6 +269,18 @@ export default function CheckoutPage() {
     }
     setDetailsReady(true);
   }, []);
+
+  useEffect(() => {
+    if (checkoutTracked.current || !cart.length) return;
+    checkoutTracked.current = true;
+    const ids = cart.map((item) => item.productId);
+    const numItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+    metaInitiateCheckout({
+      ids,
+      numItems,
+      value: cartTotal,
+    });
+  }, [cart, cartTotal]);
 
   useEffect(() => {
     if (!detailsReady) return;
