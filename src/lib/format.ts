@@ -1,7 +1,8 @@
-export const SALE_OFF = 0.5;
+/** Kept for call sites; store sells at the listed product price. */
+export const SALE_OFF = 0;
 
 export function salePrice(value: number) {
-  return Math.round(value * (1 - SALE_OFF));
+  return Math.round(value);
 }
 
 export function formatPrice(value: number) {

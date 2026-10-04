@@ -5,7 +5,6 @@ import { useEffect, useLayoutEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { X } from "lucide-react";
 import { MediaImage } from "@/components/media-image";
-import { SalePrice } from "@/components/storefront/sale-price";
 import { Button } from "@/components/ui/button";
 import { formatPrice } from "@/lib/format";
 import { storePath } from "@/lib/site-mode";
@@ -248,12 +247,9 @@ export function CartDrawer() {
                           >
                             {product.name}
                           </Link>
-                          <div className="mt-1">
-                            <SalePrice
-                              price={product.price}
-                              className="flex-wrap gap-1.5 [&_span:last-child]:text-[14px]"
-                            />
-                          </div>
+                          <p className="font-nav-display mt-1 text-[14px] font-semibold tracking-tight tabular-nums">
+                            {formatPrice(product.price)}
+                          </p>
                         </div>
                         <button
                           type="button"

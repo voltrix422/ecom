@@ -4,7 +4,7 @@ import {
   categories as seedCategories,
   seedProducts,
 } from "@/lib/data";
-import { ensureUniqueProductSlugs, salePrice, uniqueProductSlug } from "@/lib/format";
+import { ensureUniqueProductSlugs, uniqueProductSlug } from "@/lib/format";
 import { isDeliveredStatus, findOrdersByQuery } from "@/lib/orders";
 import type {
   AdminUser,
@@ -282,7 +282,7 @@ export async function placeOrder(input: {
           return {
             productId: product.id,
             name: product.name,
-            price: salePrice(product.price),
+            price: product.price,
             quantity,
           };
         })

@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { Download } from "lucide-react";
 import { brand } from "@/lib/data";
-import { formatDate, formatPrice, salePrice } from "@/lib/format";
+import { formatDate, formatPrice } from "@/lib/format";
 import { cn } from "cn";
 import type {
   BankDetails,
@@ -278,6 +278,6 @@ export function checkoutReceiptLines(lines: Line[]) {
     key: product.id,
     name: product.name,
     quantity,
-    price: salePrice(product.price),
+    price: product.price,
   }));
 }

@@ -18,7 +18,6 @@ import {
   seedBankDetails,
 } from "@/lib/admin";
 import { seedOrders, seedProducts, categories as seedCategories } from "@/lib/data";
-import { salePrice } from "@/lib/format";
 import { isDeliveredStatus } from "@/lib/orders";
 import { adminMutate, setRemoteMode, type RemoteAdminState } from "@/lib/remote-client";
 import {
@@ -775,7 +774,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
           return {
             productId: product.id,
             name: product.name,
-            price: salePrice(product.price),
+            price: product.price,
             quantity: item.quantity,
           };
         })
@@ -1400,7 +1399,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
   const cartTotal = cart.reduce((sum, item) => {
     const product = products.find((entry) => entry.id === item.productId);
-    return sum + (product ? salePrice(product.price) * item.quantity : 0);
+    return sum + (product ? product.price * item.quantity : 0);
   }, 0);
 
   const customers = useMemo(() => customersFromOrders(orders), [orders]);
