@@ -79,7 +79,7 @@ export default function AdminOrderDetailPage({
   }
 
   function confirmDelete() {
-    if (!editable) return;
+    if (!editable || !order) return;
     const label = order.trackingId || order.id;
     const ok = window.confirm(
       `Delete order ${label}? This cannot be undone.`
