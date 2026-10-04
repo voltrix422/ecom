@@ -51,7 +51,7 @@ export function HomePinGrid() {
 
   return (
     <section className="md:hidden" aria-label="Shop">
-      <div className="columns-2 gap-3 px-3 pt-2 pb-28">
+      <div className="columns-2 gap-3 px-3 pt-3 pb-28">
         {pins.map((pin, index) => (
           <Link
             key={pin.key}

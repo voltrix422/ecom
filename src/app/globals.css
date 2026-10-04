@@ -65,7 +65,20 @@
   --animate-search-drop: search-drop 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
   --animate-account-link: account-link 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
   --animate-gallery-fade: gallery-fade 0.65s cubic-bezier(0.22, 1, 0.36, 1) both;
+  --animate-free-ship-breathe: free-ship-breathe 2.4s ease-in-out infinite;
   --font-nav-display: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+}
+
+@keyframes free-ship-breathe {
+  0%,
+  100% {
+    opacity: 1;
+    filter: brightness(1);
+  }
+  50% {
+    opacity: 0.88;
+    filter: brightness(1.12);
+  }
 }
 
 @keyframes gallery-fade {

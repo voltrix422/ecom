@@ -2,6 +2,7 @@
 
 import { useMemo } from "react";
 import { FeaturedSection } from "@/components/storefront/featured-section";
+import { FreeShippingStrip } from "@/components/storefront/free-shipping-strip";
 import MorphSlider from "@/components/storefront/morph-slider";
 import { HeroSection } from "@/components/storefront/hero-section";
 import { HomePinGrid } from "@/components/storefront/home-pin-grid";
@@ -27,6 +28,8 @@ export default function HomePage() {
 
   return (
     <StoreShell>
+      <FreeShippingStrip />
+
       {/* Mobile: Pinterest-style image discovery */}
       <HomePinGrid />
 
