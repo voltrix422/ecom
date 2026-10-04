@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useMemo } from "react";
 import { MediaImage } from "@/components/media-image";
+import { formatPrice } from "@/lib/format";
 import { storePath } from "@/lib/site-mode";
 import { useStore } from "@/lib/store";
 import { cn } from "cn";
@@ -26,6 +27,7 @@ export function HomePinGrid() {
         href: storePath(`/product/${product.slug}`),
         src: product.image,
         title: product.name,
+        price: product.price,
         aspect: ASPECTS[index % ASPECTS.length],
       })),
     [products]
@@ -71,9 +73,14 @@ export function HomePinGrid() {
                 sizes="50vw"
               />
             </div>
-            <p className="mt-2 truncate px-0.5 text-[12px] leading-snug text-foreground">
-              {pin.title}
-            </p>
+            <div className="mt-2 min-w-0 px-0.5">
+              <p className="font-nav-display truncate text-[13px] leading-snug tracking-tight text-foreground">
+                {pin.title}
+              </p>
+              <p className="font-nav-display mt-0.5 text-[15px] font-semibold leading-none tracking-tight text-foreground tabular-nums">
+                {formatPrice(pin.price)}
+              </p>
+            </div>
           </Link>
         ))}
       </div>
