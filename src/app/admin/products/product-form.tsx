@@ -28,8 +28,14 @@ const fieldClass =
 export function ProductForm({ product }: { product?: Product }) {
   const router = useRouter();
   const fileRef = useRef<HTMLInputElement>(null);
-  const { upsertProduct, canEdit, canAccess, categories, addCategory } =
-    useStore();
+  const {
+    upsertProduct,
+    deleteProduct,
+    canEdit,
+    canAccess,
+    categories,
+    addCategory,
+  } = useStore();
 
   const initialImages =
     product?.images?.length
@@ -417,13 +423,32 @@ export function ProductForm({ product }: { product?: Product }) {
         Featured on homepage
       </label>
 
-      <button
-        type="submit"
-        disabled={uploading}
-        className="mt-4 text-sm disabled:opacity-50"
-      >
-        {product ? "Save" : "Add product"}
-      </button>
+      <div className="mt-4 flex items-center gap-4">
+        <button
+          type="submit"
+          disabled={uploading}
+          className="text-sm disabled:opacity-50"
+        >
+          {product ? "Save" : "Add product"}
+        </button>
+        {product && canEdit() ? (
+          <button
+            type="button"
+            className="text-sm text-muted-foreground hover:text-destructive"
+            onClick={() => {
+              const ok = window.confirm(
+                `Delete “${product.name}” from the store? It will be removed from the website.`
+              );
+              if (!ok) return;
+              deleteProduct(product.id);
+              toast.success(`Deleted ${product.name}`);
+              router.push("/admin/products");
+            }}
+          >
+            Delete
+          </button>
+        ) : null}
+      </div>
     </form>
   );
 }

@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
-import { ChevronDown, GripVertical, Search, Star } from "lucide-react";
+import { ChevronDown, GripVertical, Search, Star, Trash2 } from "lucide-react";
+import { toast } from "sonner";
 import { MediaImage } from "@/components/media-image";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -86,7 +87,8 @@ function FilterGroup({
 }
 
 export default function AdminProductsPage() {
-  const { products, canEdit, categories, reorderProducts } = useStore();
+  const { products, canEdit, categories, reorderProducts, deleteProduct } =
+    useStore();
   const editable = canEdit();
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("All");
@@ -99,6 +101,16 @@ export default function AdminProductsPage() {
     stock: false,
     featured: false,
   });
+
+  function confirmDelete(id: string, name: string) {
+    if (!editable) return;
+    const ok = window.confirm(
+      `Delete “${name}” from the store? It will be removed from the website.`
+    );
+    if (!ok) return;
+    deleteProduct(id);
+    toast.success(`Deleted ${name}`);
+  }
 
   function toggleGroup(group: "category" | "stock" | "featured") {
     setOpen((current) => ({ ...current, [group]: !current[group] }));
@@ -305,8 +317,20 @@ export default function AdminProductsPage() {
                         {position}
                       </span>
                       {editable ? (
-                        <span className="text-muted-foreground" aria-hidden>
-                          <GripVertical className="size-3.5" />
+                        <span className="flex items-center gap-1 text-muted-foreground">
+                          <button
+                            type="button"
+                            aria-label={`Delete ${product.name}`}
+                            onClick={() =>
+                              confirmDelete(product.id, product.name)
+                            }
+                            className="p-0.5 hover:text-destructive"
+                          >
+                            <Trash2 className="size-3.5" />
+                          </button>
+                          <span aria-hidden>
+                            <GripVertical className="size-3.5" />
+                          </span>
                         </span>
                       ) : null}
                     </div>

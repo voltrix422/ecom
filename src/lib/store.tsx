@@ -272,7 +272,9 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     if (data.categories) setCategories(data.categories);
     if (data.bank) setBankDetails(data.bank);
     if (data.heroes) setHeroBanners(data.heroes);
-    if (data.collections) setCollectionSlides(usableCollectionSlides(data.collections));
+    if (data.collections) {
+      setCollectionSlides(usableCollectionSlides(data.collections));
+    }
     if (data.orders) setOrders(data.orders.map(normalizeOrder));
     if (data.refunds) setRefundTickets(data.refunds);
     if (data.users) setAdminUsers(data.users.map(normalizeAdminUser));
@@ -320,8 +322,13 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
           setBankDetails(boot.bank ?? seedBankDetails);
           if (!heroTouched.current) setHeroBanners(boot.heroes ?? []);
           if (!collectionsTouched.current) {
+            const remoteCollections = boot.collections ?? [];
             setCollectionSlides(
-              usableCollectionSlides(boot.collections ?? DEFAULT_COLLECTION_SLIDES)
+              usableCollectionSlides(
+                remoteCollections.length > 0
+                  ? remoteCollections
+                  : DEFAULT_COLLECTION_SLIDES
+              )
             );
           }
           setCollectionsHydrated(true);

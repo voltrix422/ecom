@@ -6,29 +6,24 @@ import MorphSlider from "@/components/storefront/morph-slider";
 import { HeroSection } from "@/components/storefront/hero-section";
 import { HomePinGrid } from "@/components/storefront/home-pin-grid";
 import { StoreShell } from "@/components/storefront/store-shell";
-import {
-  DEFAULT_COLLECTION_SLIDES,
-  usableCollectionSlides,
-} from "@/lib/collection-slides";
+import { resolveCollectionSlides } from "@/lib/collection-slides";
 import { useStore } from "@/lib/store";
 
 export default function HomePage() {
   const { products, collectionSlides } = useStore();
-  const featured = useMemo(
-    () => products.filter((product) => product.featured),
-    [products]
-  );
+  const featured = useMemo(() => {
+    const marked = products.filter((product) => product.featured);
+    return marked.length > 0 ? marked : products.slice(0, 4);
+  }, [products]);
 
   const morphItems = useMemo(() => {
-    const slides = usableCollectionSlides(
-      collectionSlides.length > 0 ? collectionSlides : DEFAULT_COLLECTION_SLIDES
-    );
+    const slides = resolveCollectionSlides(collectionSlides, products);
     return slides.map((slide) => ({
       image: slide.src,
       caption: slide.caption,
       href: slide.href,
     }));
-  }, [collectionSlides]);
+  }, [collectionSlides, products]);
 
   return (
     <StoreShell>
