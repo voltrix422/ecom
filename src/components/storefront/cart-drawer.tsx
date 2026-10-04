@@ -41,7 +41,7 @@ export function CartDrawer() {
     })
     .filter((item): item is NonNullable<typeof item> => item !== null);
 
-  const shipping = cartTotal >= 15000 ? 0 : 250;
+  const shipping = 0;
 
   useLayoutEffect(() => {
     const panel = panelRef.current;
@@ -240,11 +240,11 @@ export function CartDrawer() {
                     </div>
                     <div className="flex min-w-0 flex-col justify-between gap-2">
                       <div className="flex items-start justify-between gap-2">
-                        <div className="min-w-0">
+                        <div className="min-w-0 flex-1">
                           <Link
                             href={storePath(`/product/${product.id}`)}
                             onClick={() => setCartOpen(false)}
-                            className="font-nav-display block truncate text-[14px]"
+                            className="font-nav-display block text-[14px] leading-snug"
                           >
                             {product.name}
                           </Link>
@@ -300,10 +300,10 @@ export function CartDrawer() {
                     <span className="text-neutral-500">Subtotal</span>
                     <span>{formatPrice(cartTotal)}</span>
                   </div>
-                  <div className="flex justify-between">
+                  <div className="flex items-center justify-between gap-3">
                     <span className="text-neutral-500">Shipping</span>
-                    <span>
-                      {shipping === 0 ? "Free" : formatPrice(shipping)}
+                    <span className="bg-red-600 px-1.5 py-0.5 text-[10px] font-semibold tracking-[0.08em] text-white uppercase">
+                      Free shipping
                     </span>
                   </div>
                   <div className="flex justify-between pt-1 text-[15px] font-semibold">

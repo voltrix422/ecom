@@ -285,7 +285,7 @@ export default function CheckoutPage() {
     })
     .filter((item): item is Line => item !== null);
 
-  const shipping = cartTotal >= 15000 ? 0 : 250;
+  const shipping = 0;
   const total = cartTotal + shipping;
 
   function goBack() {

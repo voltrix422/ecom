@@ -294,7 +294,7 @@ export async function placeOrder(input: {
         (sum, item) => sum + item.price * item.quantity,
         0
       );
-      const shipping = subtotal >= 15000 ? 0 : 250;
+      const shipping = 0;
       const sequence =
         docs.orders.reduce((max, order) => {
           const value = Number(order.id.replace("ORD-", ""));

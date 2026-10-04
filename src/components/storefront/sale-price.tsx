@@ -19,7 +19,7 @@ export function SalePrice({
     >
       <span
         className={cn(
-          "text-foreground/30 line-through",
+          "text-foreground/40",
           size === "md" ? "text-[14px] tracking-wide" : "text-[13px]"
         )}
       >
