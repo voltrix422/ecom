@@ -2,7 +2,7 @@
  * Flip to false when launching: `/` becomes the store again.
  * While true, public storefront lives under `/main`.
  */
-export const COMING_SOON = true;
+export const COMING_SOON = false;
 
 export const STORE_BASE = COMING_SOON ? "/main" : "";
 
