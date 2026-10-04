@@ -29,6 +29,7 @@ export function ProductForm({ product }: { product?: Product }) {
   const router = useRouter();
   const fileRef = useRef<HTMLInputElement>(null);
   const {
+    products,
     upsertProduct,
     deleteProduct,
     canEdit,
@@ -60,6 +61,20 @@ export function ProductForm({ product }: { product?: Product }) {
   const [uploading, setUploading] = useState(false);
   const [draggingIndex, setDraggingIndex] = useState<number | null>(null);
   const [overIndex, setOverIndex] = useState<number | null>(null);
+  const [copyFromId, setCopyFromId] = useState("");
+
+  const copySources = products.filter((entry) => entry.id !== product?.id);
+
+  function copyTextFromProduct(id: string) {
+    setCopyFromId(id);
+    if (!id) return;
+    const source = products.find((entry) => entry.id === id);
+    if (!source) return;
+    setDescription(source.description ?? "");
+    setDetails(source.details?.join("\n") ?? "");
+    toast.success(`Copied text from ${source.name}`);
+    setCopyFromId("");
+  }
 
   if (!canAccess("products") || !canEdit()) {
     return (
@@ -392,6 +407,31 @@ export function ProductForm({ product }: { product?: Product }) {
           </div>
         )}
       </div>
+
+      {copySources.length > 0 ? (
+        <div className="mt-4 flex min-w-0 items-baseline gap-2">
+          <span className="shrink-0 text-[11px] text-muted-foreground">
+            Copy text from
+          </span>
+          <Select value={copyFromId || undefined} onValueChange={copyTextFromProduct}>
+            <SelectTrigger
+              className={cn(
+                fieldClass,
+                "w-full min-w-0 rounded-none px-0 shadow-none !border-0 border-b border-foreground/15 focus-visible:ring-0"
+              )}
+            >
+              <SelectValue placeholder="Choose a product" />
+            </SelectTrigger>
+            <SelectContent>
+              {copySources.map((entry) => (
+                <SelectItem key={entry.id} value={entry.id}>
+                  {entry.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      ) : null}
 
       <div className="mt-4">
         <p className="text-[11px] text-muted-foreground">Description</p>
