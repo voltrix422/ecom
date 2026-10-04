@@ -24,7 +24,7 @@ export function HomePinGrid() {
     () =>
       products.map((product, index) => ({
         key: product.id,
-        href: storePath(`/product/${product.slug}`),
+        href: storePath(`/product/${product.id}`),
         src: product.image,
         title: product.name,
         price: product.price,

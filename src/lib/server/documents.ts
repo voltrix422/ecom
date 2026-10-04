@@ -4,7 +4,7 @@ import {
   categories as seedCategories,
   seedProducts,
 } from "@/lib/data";
-import { salePrice } from "@/lib/format";
+import { ensureUniqueProductSlugs, salePrice, uniqueProductSlug } from "@/lib/format";
 import { isDeliveredStatus, findOrdersByQuery } from "@/lib/orders";
 import type {
   AdminUser,
@@ -171,6 +171,11 @@ export async function readPublicDocs() {
     await client.query("BEGIN");
     try {
       const docs = await readDocs(client);
+      const repaired = ensureUniqueProductSlugs(docs.products);
+      if (repaired.changed) {
+        docs.products = repaired.products;
+        await writeDocs(client, docs, ["products"]);
+      }
       await client.query("COMMIT");
       return docs;
     } catch (error) {
@@ -505,6 +510,11 @@ function applyMutation(docs: Docs, user: AdminUser, body: MutateBody) {
       throw new Error("You cannot edit products");
     }
     const next = normalizeProduct(body.product);
+    next.slug = uniqueProductSlug(
+      next.slug || next.name,
+      docs.products.map((entry) => entry.slug),
+      docs.products.find((entry) => entry.id === next.id)?.slug
+    );
     if (
       !docs.categories.some(
         (item) => item.toLowerCase() === next.category.toLowerCase()

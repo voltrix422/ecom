@@ -50,7 +50,7 @@ export function resolveCollectionSlides(
       id: `collection-auto-${product.id}`,
       src,
       caption: product.category || product.name,
-      href: storePath(`/product/${product.slug}`),
+      href: storePath(`/product/${product.id}`),
     });
     if (fromProducts.length >= 6) break;
   }

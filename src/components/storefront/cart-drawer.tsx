@@ -242,7 +242,7 @@ export function CartDrawer() {
                       <div className="flex items-start justify-between gap-2">
                         <div className="min-w-0">
                           <Link
-                            href={storePath(`/product/${product.slug}`)}
+                            href={storePath(`/product/${product.id}`)}
                             onClick={() => setCartOpen(false)}
                             className="font-nav-display block truncate text-[14px]"
                           >

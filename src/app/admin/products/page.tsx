@@ -423,7 +423,7 @@ export default function AdminProductsPage() {
                       href={
                         editable
                           ? `/admin/products/${product.id}`
-                          : `/product/${product.slug}`
+                          : `/product/${product.id}`
                       }
                       className="relative block aspect-[3/4]"
                       onClick={(event) => {

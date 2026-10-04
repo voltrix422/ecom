@@ -17,7 +17,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { slugify } from "@/lib/format";
+import { uniqueProductSlug } from "@/lib/format";
 import { fileToDataUrl } from "@/lib/image-upload";
 import { useStore } from "@/lib/store";
 import type { Product } from "@/lib/types";
@@ -155,7 +155,11 @@ export function ProductForm({ product }: { product?: Product }) {
     const next: Product = {
       id: product?.id ?? `p-${Date.now()}`,
       name: name.trim(),
-      slug: slugify(product?.slug || name),
+      slug: uniqueProductSlug(
+        product?.slug || name.trim(),
+        products.map((entry) => entry.slug),
+        product?.slug
+      ),
       description: description.trim(),
       price: Number(price || 0),
       category,

@@ -10,7 +10,7 @@ import type { Product } from "@/lib/types";
 function FeaturedPanel({ product }: { product: Product }) {
   return (
     <Link
-      href={storePath(`/product/${product.slug}`)}
+      href={storePath(`/product/${product.id}`)}
       className="group relative block min-h-[78svh] overflow-hidden bg-muted/10 lg:min-h-[90svh]"
     >
       <MediaImage
