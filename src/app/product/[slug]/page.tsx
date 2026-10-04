@@ -123,11 +123,15 @@ export default function ProductPage({
 
   return (
     <StoreShell>
-      <FreeShippingStrip />
+      {/* Desktop: strip above layout */}
+      <div className="hidden md:block">
+        <FreeShippingStrip />
+      </div>
 
-      {/* Mobile detail layout */}
+      {/* Mobile detail layout — strip inside viewport so Buy stays put */}
       <div className="md:hidden">
         <div className="flex h-[calc(100svh-4rem)] max-h-[calc(100svh-4rem)] flex-col">
+          <FreeShippingStrip />
           <ProductImageGallery
             images={gallery}
             alt={piece.name}
