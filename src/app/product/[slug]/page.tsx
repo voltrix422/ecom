@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { use, useEffect, useRef, useState } from "react";
 import { Heart, ShoppingBag } from "lucide-react";
+import { FreeShippingStrip } from "@/components/storefront/free-shipping-strip";
 import { ProductCard } from "@/components/storefront/product-card";
 import { ProductImageGallery } from "@/components/storefront/product-image-gallery";
 import { StoreShell } from "@/components/storefront/store-shell";
@@ -122,6 +123,8 @@ export default function ProductPage({
 
   return (
     <StoreShell>
+      <FreeShippingStrip />
+
       {/* Mobile detail layout */}
       <div className="md:hidden">
         <div className="flex h-[calc(100svh-4rem)] max-h-[calc(100svh-4rem)] flex-col">
