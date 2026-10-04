@@ -2,9 +2,11 @@
 
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, Trash2 } from "lucide-react";
+import { toast } from "sonner";
 import { OrderStatusSelect } from "@/app/admin/orders/status-select";
 import { OrderTags } from "@/components/order-tags";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import {
   Dialog,
@@ -29,7 +31,14 @@ function localDay(iso: string) {
 
 export default function AdminOrdersPage() {
   const router = useRouter();
-  const { orders, refundTickets, updateOrderStatus, canEdit } = useStore();
+  const {
+    orders,
+    refundTickets,
+    updateOrderStatus,
+    deleteOrder,
+    deleteOrders,
+    canEdit,
+  } = useStore();
   const editable = canEdit();
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [kpisOpen, setKpisOpen] = useState(false);
@@ -38,6 +47,7 @@ export default function AdminOrdersPage() {
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
   const [status, setStatus] = useState<"all" | OrderStatus>("all");
+  const [selected, setSelected] = useState<string[]>([]);
 
   const scoped = useMemo(
     () =>
@@ -70,6 +80,14 @@ export default function AdminOrdersPage() {
       ? scoped
       : scoped.filter((order) => order.status === status);
 
+  const visibleIds = useMemo(
+    () => visible.map((order) => order.id),
+    [visible]
+  );
+  const allVisibleSelected =
+    visibleIds.length > 0 &&
+    visibleIds.every((id) => selected.includes(id));
+
   const refundOrders = useMemo(
     () =>
       refundTickets
@@ -95,13 +113,80 @@ export default function AdminOrdersPage() {
     setStatus("all");
   }
 
+  function toggleSelected(id: string) {
+    setSelected((current) =>
+      current.includes(id)
+        ? current.filter((item) => item !== id)
+        : [...current, id]
+    );
+  }
+
+  function toggleSelectAllVisible() {
+    if (allVisibleSelected) {
+      setSelected((current) =>
+        current.filter((id) => !visibleIds.includes(id))
+      );
+      return;
+    }
+    setSelected((current) => [...new Set([...current, ...visibleIds])]);
+  }
+
+  function confirmDelete(id: string, label: string) {
+    if (!editable) return;
+    const ok = window.confirm(
+      `Delete order ${label}? This cannot be undone.`
+    );
+    if (!ok) return;
+    deleteOrder(id);
+    setSelected((current) => current.filter((item) => item !== id));
+    toast.success(`Deleted ${label}`);
+  }
+
+  function confirmDeleteSelected() {
+    if (!editable || !selected.length) return;
+    const ok = window.confirm(
+      selected.length === 1
+        ? "Delete this order? This cannot be undone."
+        : `Delete ${selected.length} orders? This cannot be undone.`
+    );
+    if (!ok) return;
+    deleteOrders(selected);
+    toast.success(
+      selected.length === 1
+        ? "Order deleted"
+        : `${selected.length} orders deleted`
+    );
+    setSelected([]);
+  }
+
   return (
     <div>
-      <div className="flex items-center justify-between gap-4">
+      <div className="flex flex-wrap items-center justify-between gap-4">
         <p className="text-sm text-muted-foreground">
           {visible.length} {visible.length === 1 ? "order" : "orders"}
         </p>
-        <div className="flex items-center gap-4">
+        <div className="flex flex-wrap items-center gap-4">
+          {editable && visible.length > 0 ? (
+            <>
+              <label className="flex items-center gap-2 text-xs text-muted-foreground">
+                <Checkbox
+                  checked={allVisibleSelected}
+                  onCheckedChange={() => toggleSelectAllVisible()}
+                  aria-label="Select all orders"
+                />
+                Select all
+              </label>
+              {selected.length > 0 ? (
+                <button
+                  type="button"
+                  onClick={confirmDeleteSelected}
+                  className="text-xs text-muted-foreground hover:text-destructive"
+                >
+                  Delete selected ({selected.length})
+                </button>
+              ) : null}
+            </>
+          ) : null}
           <button
             type="button"
             onClick={() => setRefundsOpen(true)}
@@ -251,6 +336,11 @@ export default function AdminOrdersPage() {
           <table className="w-full border-separate border-spacing-0 text-[13px]">
             <thead>
               <tr className="text-left text-[11px] text-muted-foreground">
+                {editable ? (
+                  <th className="w-8 px-2 pb-2 font-medium">
+                    <span className="sr-only">Select</span>
+                  </th>
+                ) : null}
                 <th className="px-2 pb-2 font-medium">Order</th>
                 <th className="px-2 pb-2 font-medium">Tracking</th>
                 <th className="px-2 pb-2 font-medium">Customer</th>
@@ -259,6 +349,11 @@ export default function AdminOrdersPage() {
                 <th className="px-2 pb-2 font-medium">Payment</th>
                 <th className="px-2 pb-2 font-medium">Status</th>
                 <th className="px-2 pb-2 text-right font-medium">Total</th>
+                {editable ? (
+                  <th className="w-10 px-2 pb-2 font-medium">
+                    <span className="sr-only">Delete</span>
+                  </th>
+                ) : null}
               </tr>
             </thead>
             <tbody>
@@ -268,6 +363,19 @@ export default function AdminOrdersPage() {
                   className="cursor-pointer hover:bg-muted/40 [&>td]:border-b [&>td]:border-foreground/10 last:[&>td]:border-b-0"
                   onClick={() => router.push(`/admin/orders/${order.id}`)}
                 >
+                  {editable ? (
+                    <td
+                      className="px-2 py-1.5"
+                      onClick={(event) => event.stopPropagation()}
+                      onPointerDown={(event) => event.stopPropagation()}
+                    >
+                      <Checkbox
+                        checked={selected.includes(order.id)}
+                        onCheckedChange={() => toggleSelected(order.id)}
+                        aria-label={`Select ${order.id}`}
+                      />
+                    </td>
+                  ) : null}
                   <td className="px-2 py-1.5 whitespace-nowrap">{order.id}</td>
                   <td className="px-2 py-1.5 font-mono text-xs whitespace-nowrap">
                     {order.trackingId}
@@ -304,9 +412,7 @@ export default function AdminOrdersPage() {
                       value={order.status}
                       editable={editable}
                       className="h-7 w-auto rounded-none border-0 bg-transparent px-0 shadow-none ring-0 !border-0 focus-visible:border-0 focus-visible:ring-0"
-                      onChange={(status) =>
-                        updateOrderStatus(order.id, status)
-                      }
+                      onChange={(next) => updateOrderStatus(order.id, next)}
                     />
                     <OrderTags
                       hideStatus
@@ -319,6 +425,24 @@ export default function AdminOrdersPage() {
                   <td className="px-2 py-1.5 text-right whitespace-nowrap">
                     {formatPrice(order.total)}
                   </td>
+                  {editable ? (
+                    <td
+                      className="px-2 py-1.5"
+                      onClick={(event) => event.stopPropagation()}
+                      onPointerDown={(event) => event.stopPropagation()}
+                    >
+                      <button
+                        type="button"
+                        aria-label={`Delete ${order.id}`}
+                        onClick={() =>
+                          confirmDelete(order.id, order.trackingId || order.id)
+                        }
+                        className="p-0.5 text-muted-foreground hover:text-destructive"
+                      >
+                        <Trash2 className="size-3.5" />
+                      </button>
+                    </td>
+                  ) : null}
                 </tr>
               ))}
             </tbody>

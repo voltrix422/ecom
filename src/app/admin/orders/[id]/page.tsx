@@ -2,7 +2,9 @@
 
 import Link from "next/link";
 import { use, useEffect, useState } from "react";
-import { Check, ChevronLeft, Copy, X } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Check, ChevronLeft, Copy, Trash2, X } from "lucide-react";
+import { toast } from "sonner";
 import { OrderStatusSelect } from "@/app/admin/orders/status-select";
 import { OrderTags } from "@/components/order-tags";
 import { formatDate, formatPrice } from "@/lib/format";
@@ -15,7 +17,9 @@ export default function AdminOrderDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = use(params);
-  const { orders, refundTickets, updateOrderStatus, canEdit } = useStore();
+  const router = useRouter();
+  const { orders, refundTickets, updateOrderStatus, deleteOrder, canEdit } =
+    useStore();
   const [copied, setCopied] = useState<"tracking" | "phone" | "address" | null>(
     null
   );
@@ -74,15 +78,39 @@ export default function AdminOrderDetailPage({
     window.setTimeout(() => setCopied(null), 1500);
   }
 
+  function confirmDelete() {
+    if (!editable) return;
+    const label = order.trackingId || order.id;
+    const ok = window.confirm(
+      `Delete order ${label}? This cannot be undone.`
+    );
+    if (!ok) return;
+    deleteOrder(order.id);
+    toast.success(`Deleted ${label}`);
+    router.push("/admin/orders");
+  }
+
   return (
     <div className="max-w-2xl">
-      <Link
-        href="/admin/orders"
-        aria-label="Back"
-        className="-ml-2 inline-flex size-11 items-center justify-center"
-      >
-        <ChevronLeft className="size-8" strokeWidth={1.75} />
-      </Link>
+      <div className="flex items-center justify-between gap-4">
+        <Link
+          href="/admin/orders"
+          aria-label="Back"
+          className="-ml-2 inline-flex size-11 items-center justify-center"
+        >
+          <ChevronLeft className="size-8" strokeWidth={1.75} />
+        </Link>
+        {editable ? (
+          <button
+            type="button"
+            onClick={confirmDelete}
+            className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-destructive"
+          >
+            <Trash2 className="size-3.5" />
+            Delete order
+          </button>
+        ) : null}
+      </div>
 
       <h2 className="font-heading text-2xl tracking-tight">{order.id}</h2>
       <div className="mt-0.5 flex items-start justify-between gap-6">

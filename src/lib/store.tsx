@@ -213,6 +213,8 @@ type StoreContextValue = {
   reorderProducts: (activeId: string, overId: string) => void;
   deleteProduct: (id: string) => void;
   deleteProducts: (ids: string[]) => void;
+  deleteOrder: (id: string) => void;
+  deleteOrders: (ids: string[]) => void;
   updateOrderStatus: (id: string, status: OrderStatus) => void;
   refundTickets: RefundTicket[];
   submitRefund: (input: {
@@ -937,6 +939,42 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     [adminUser]
   );
 
+  const deleteOrder = useCallback(
+    (id: string) => {
+      if (!canWrite(adminUser) || !canAccessModule(adminUser, "orders")) return;
+      setOrders((current) => current.filter((order) => order.id !== id));
+      setRefundTickets((current) =>
+        current.filter((ticket) => ticket.orderId !== id)
+      );
+      if (remoteRef.current) {
+        void adminMutate({ op: "delete-order", id })
+          .then((data) => applyRemote(data))
+          .catch((error) => console.error(error));
+      }
+    },
+    [adminUser]
+  );
+
+  const deleteOrders = useCallback(
+    (ids: string[]) => {
+      if (!canWrite(adminUser) || !canAccessModule(adminUser, "orders")) return;
+      const remove = new Set(ids.filter(Boolean));
+      if (!remove.size) return;
+      setOrders((current) =>
+        current.filter((order) => !remove.has(order.id))
+      );
+      setRefundTickets((current) =>
+        current.filter((ticket) => !remove.has(ticket.orderId))
+      );
+      if (remoteRef.current) {
+        void adminMutate({ op: "delete-orders", ids: [...remove] })
+          .then((data) => applyRemote(data))
+          .catch((error) => console.error(error));
+      }
+    },
+    [adminUser]
+  );
+
   const submitRefund = useCallback(
     async (input: {
       order: Order;
@@ -1402,6 +1440,8 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       reorderProducts,
       deleteProduct,
       deleteProducts,
+      deleteOrder,
+      deleteOrders,
       updateOrderStatus,
       refundTickets,
       submitRefund,
@@ -1452,6 +1492,8 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       reorderProducts,
       deleteProduct,
       deleteProducts,
+      deleteOrder,
+      deleteOrders,
       updateOrderStatus,
       refundTickets,
       submitRefund,

@@ -567,6 +567,25 @@ function applyMutation(docs: Docs, user: AdminUser, body: MutateBody) {
     return;
   }
 
+  if (body.op === "delete-order") {
+    if (!can(user, "orders") || !body.id) throw new Error("You cannot edit orders");
+    docs.orders = docs.orders.filter((order) => order.id !== body.id);
+    docs.refunds = docs.refunds.filter((ticket) => ticket.orderId !== body.id);
+    return;
+  }
+
+  if (body.op === "delete-orders") {
+    if (!can(user, "orders") || !body.ids?.length) {
+      throw new Error("You cannot edit orders");
+    }
+    const remove = new Set(body.ids);
+    docs.orders = docs.orders.filter((order) => !remove.has(order.id));
+    docs.refunds = docs.refunds.filter(
+      (ticket) => !remove.has(ticket.orderId)
+    );
+    return;
+  }
+
   if (body.op === "bank") {
     if (!can(user, "settings") || !body.bank) throw new Error("You cannot edit settings");
     docs.bank = {
